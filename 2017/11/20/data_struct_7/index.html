@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="今天，我们来介绍最小代价生成树这一算法。最小生成树的算法有三个，一个是prime算法，一个是kruskal算法，另一个是Boruvka算法。这三个算法都是解决最小代价生成树这一问题的，在这里我们只说prime算法和kruskal算法，那么这两个算法有什么不同呢？图我们知道，有稠密图和稀疏图（引入下定义：数据结构中对于稀疏图的定义为：有很少条边或弧（边的条数|E|远小于|V|²）的图称为稀疏图（sp">
+<meta property="og:type" content="article">
+<meta property="og:title" content="最小代价生成树问题">
+<meta property="og:url" content="http://yoursite.com/2017/11/20/data_struct_7/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="今天，我们来介绍最小代价生成树这一算法。最小生成树的算法有三个，一个是prime算法，一个是kruskal算法，另一个是Boruvka算法。这三个算法都是解决最小代价生成树这一问题的，在这里我们只说prime算法和kruskal算法，那么这两个算法有什么不同呢？图我们知道，有稠密图和稀疏图（引入下定义：数据结构中对于稀疏图的定义为：有很少条边或弧（边的条数|E|远小于|V|²）的图称为稀疏图（sp">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/11/min_tree.jpg">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/11/screenshot-from-2017-11-17-18-18-48.png">
+<meta property="og:updated_time" content="2018-01-22T08:10:46.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="最小代价生成树问题">
+<meta name="twitter:description" content="今天，我们来介绍最小代价生成树这一算法。最小生成树的算法有三个，一个是prime算法，一个是kruskal算法，另一个是Boruvka算法。这三个算法都是解决最小代价生成树这一问题的，在这里我们只说prime算法和kruskal算法，那么这两个算法有什么不同呢？图我们知道，有稠密图和稀疏图（引入下定义：数据结构中对于稀疏图的定义为：有很少条边或弧（边的条数|E|远小于|V|²）的图称为稀疏图（sp">
+<meta name="twitter:image" content="https://liaochuntao.files.wordpress.com/2017/11/min_tree.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/20/data_struct_7/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>最小代价生成树问题 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/20/data_struct_7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">最小代价生成树问题
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-11-20 19:36:02" itemprop="dateCreated datePublished" datetime="2017-11-20T19:36:02+08:00">2017-11-20</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-01-22 16:10:46" itemprop="dateModified" datetime="2018-01-22T16:10:46+08:00">2018-01-22</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数据结构/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>今天，我们来介绍最小代价生成树这一算法。最小生成树的算法有三个，一个是prime算法，一个是kruskal算法，另一个是Boruvka算法。这三个算法都是解决最小代价生成树这一问题的，在这里我们只说prime算法和kruskal算法，那么这两个算法有什么不同呢？图我们知道，有稠密图和稀疏图（引入下定义：数据结构中对于稀疏图的定义为：有很少条边或弧（边的条数|E|远小于|V|²）的图称为稀疏图（sparse graph），反之边的条数|E|接近|V|²，称为稠密图（dense graph）。）。由于这两个算法的贪心策略不同，在面对稠密图时，prime的算法的时间复杂度为O（V^2）[v为顶点的个数]，kruskal算法的时间复杂度为O（E * logE）[E为边的条数]，而稠密图的E是大于V的，所以kruskal算法时间复杂度反而大于prime算法；在面对稀疏图时kruskal算法是优于prime算法的。</p>
+<p>大致讲完两个算法的具体适用于什么类型的图，那现在我们正式来说说生是最下代价生成树吧。</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/11/min_tree.jpg" alt="min_tree"></p>
+<p>这是一张无向网，每一条边的数字代表连接两个点之间的代价值，现在，我们需要找到（顶点个数 - 1）条边能够使得每两个点都有连通路径，且这些边的代价值中和最小。下面这幅图就是其中一个最小代价生成树（红色连接起来的）：</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/11/screenshot-from-2017-11-17-18-18-48.png" alt="Screenshot from 2017-11-17 18-18-48"></p>
+<p>那么prime算法是怎么实现的呢？其实prime算法的步骤很简单：<br>第一步：我们先找到一个顶点（任意一个顶点都行，加入说我们找到了v3）；<br>第二步也是最重要、整个程序核心的一步：我们把v3放入顶点集合U0中，然后找一条权值最小的边&lt;u,v&gt;，其中u属于U0，v属于U-U0（U全该图的顶点集合），然后我们把v这个点加入到U0中，重复这个操作，直到我们的U0集合等于U集合为止，辣么这个时候，我们找到了|U|-1条边，也就是我们的最小生成树已经找到了。<br>通过上面的解释，我们也验证了prime算法的时间复杂度是和顶点个数有关的，下面，我贴出prime算法的代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">minimum</span><span class="params">(minside &amp;closedge, <span class="keyword">int</span> vexnum)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>, j, k, min;</span><br><span class="line">    <span class="keyword">while</span> (!closedge[i].lowcost)</span><br><span class="line">        i += <span class="number">1</span>;</span><br><span class="line">    min = closedge[i].lowcost;</span><br><span class="line">    k = i;</span><br><span class="line">    <span class="keyword">for</span> (j = i + <span class="number">1</span>; j &lt; vexnum; j ++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (closedge[j].lowcost &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (min &gt; closedge[j].lowcost) &#123;</span><br><span class="line">                min = closedge[j].lowcost;</span><br><span class="line">                k = j;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> k;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">MiniSpanTree_PRIM</span><span class="params">(MGraph G, VertexType u)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i, j, k, min;</span><br><span class="line">    minside closedge;</span><br><span class="line">    k = LocateVex(G, u);</span><br><span class="line">    <span class="comment">//初始化minside数组</span></span><br><span class="line">    <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; G.vexnum; j ++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (j != k) &#123;</span><br><span class="line">            <span class="built_in">strcpy</span>(closedge[j].adjvex, u);</span><br><span class="line">            closedge[j].lowcost = G.arcs[k][j].adj;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//自身到自身的最小代价为0</span></span><br><span class="line">    closedge[k].lowcost = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"最小代价生成树的各边为："</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; G.vexnum; i ++) &#123;</span><br><span class="line">        <span class="comment">//去寻找一个最小代价的路径，并找到与之联系的顶点</span></span><br><span class="line">        k = minimum(closedge, G.vexnum);</span><br><span class="line">        <span class="built_in">cout</span> &lt;&lt; <span class="string">"("</span> &lt;&lt; closedge[k].adjvex &lt;&lt; <span class="string">","</span> &lt;&lt; G.vexs[k] &lt;&lt; <span class="string">")"</span> &lt;&lt; <span class="string">" "</span>;</span><br><span class="line">        closedge[k].lowcost = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; G.vexnum; j ++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (G.arcs[k][j].adj &lt; closedge[j].lowcost) &#123;</span><br><span class="line">                <span class="built_in">strcpy</span>(closedge[j].adjvex, G.vexs[k]);</span><br><span class="line">                closedge[j].lowcost = G.arcs[k][j].adj;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这是相关图的数据结构代码<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> INFINTY INT32_MAX</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_VERTEX_NUM 20</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_NAME 3</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_INFO 20</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">char</span> VertexType[MAX_NAME];</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">char</span> InfoType;</span><br><span class="line"></span><br><span class="line"><span class="keyword">enum</span> GraphKind&#123;DG, DN, UDG, UDN&#125;;</span><br><span class="line"><span class="keyword">int</span> IncInfo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="comment">//图节点（如果是图，则代表边是否存在，如果是网，则是权值信息）</span></span><br><span class="line">    <span class="keyword">int</span> adj;</span><br><span class="line">    InfoType *info;</span><br><span class="line">&#125;ArcCell, AdjMatrix[MAX_VERTEX_NUM][MAX_VERTEX_NUM];</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">MGraph</span> &#123;</span></span><br><span class="line">    <span class="comment">//顶点集向量</span></span><br><span class="line">    VertexType  vexs[MAX_VERTEX_NUM];</span><br><span class="line">    <span class="comment">//边集</span></span><br><span class="line">    AdjMatrix arcs;</span><br><span class="line">    <span class="comment">//顶点的个数以及边的条数</span></span><br><span class="line">    <span class="keyword">int</span> vexnum, arcnum;</span><br><span class="line">    <span class="comment">//图的类型</span></span><br><span class="line">    GraphKind  kind;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">node</span> &#123;</span></span><br><span class="line">    VertexType adjvex;</span><br><span class="line">    <span class="keyword">int</span> lowcost;</span><br><span class="line">&#125; minside[MAX_VERTEX_NUM];</span><br></pre></td></tr></table></figure></p>
+<p>接着，我们再说说kruskal算法是什么个步骤：</p>
+<p>同样，还是以上面的最先的那个图为例，kruskal算法的贪心策略是从边，也就是边所具有的权值，我们将图中的黑色的连线忽略，然后呢，我们把这些边的权值拿出来，进行选取，每一次选择权值最小的边，然后找到两个顶点，这样，我们就构建了一个两个节点的树，接着不断进行这个步骤，但是，要小心，我们最终的目的是找到最小代价生成树，因此我们在判断边是否被选取时，考虑的条件不单单是权值大小的问题，还要考虑这个边进来之后，会不会构成圈，如果会是当前的树存在圈，那么这条边我们是不能选取的，应该舍弃这条边。因此，kruskal算法实际是判断当前边是否能够被选取的问题，也就是判断某边加入是否会构成圈的问题，因为边的权值排序是很轻松的。下面我放出kruskal算法的代码，是基于邻接矩阵的图结构的。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAXEDGE 30</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    elemtype v1;</span><br><span class="line">    elemtype v2;</span><br><span class="line">    <span class="keyword">int</span> cost;</span><br><span class="line">&#125; EdgeType;</span><br><span class="line">EdgeType edges[MAXEDGE];</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">int</span> elemtype;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    elemtype v1;</span><br><span class="line">    elemtype v2;</span><br><span class="line">    <span class="keyword">int</span> cost;</span><br><span class="line">&#125; EdgeType;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Kruskal</span><span class="params">(EdgeType edges[], <span class="keyword">int</span> n)</span></span></span><br><span class="line"><span class="function"><span class="comment">/*用Kruskal 方法构造有n 个顶点的图edges 的最小生成树*/</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> father[MAXEDGE];</span><br><span class="line">    <span class="keyword">int</span> i, j, vf1, vf2;</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; n; i++)</span><br><span class="line">        father[i] = <span class="number">-1</span>;</span><br><span class="line">    i = <span class="number">0</span>;</span><br><span class="line">    j = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (i &lt; MAXEDGE &amp;&amp; j &lt; n - <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        vf1 = Find(father, edges[i].v1);</span><br><span class="line">        vf2 = Find(father, edges[i].v2);</span><br><span class="line">        <span class="keyword">if</span> (vf1 != vf2)</span><br><span class="line">        &#123;</span><br><span class="line">            father[vf2] = vf1;</span><br><span class="line">            j++;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">"%3d %3d\n"</span>, edges[i].v1, edges[i].v2);</span><br><span class="line">        &#125;</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">Find</span><span class="params">(<span class="keyword">int</span> father[], <span class="keyword">int</span> v)</span></span></span><br><span class="line"><span class="function"><span class="comment">/*寻找顶点v 所在树的根结点*/</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> t;</span><br><span class="line">    t = v;</span><br><span class="line">    <span class="keyword">while</span> (father[t] &gt;= <span class="number">0</span>)</span><br><span class="line">        t = father[t];</span><br><span class="line">    <span class="keyword">return</span> (t);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/14/data_struct_6/" rel="next" title="图论相关--邻接矩阵">
+                <i class="fa fa-chevron-left"></i> 图论相关--邻接矩阵
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/28/data_struct_8/" rel="prev" title="Dijkstra算法与Floyed算法">
+                Dijkstra算法与Floyed算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

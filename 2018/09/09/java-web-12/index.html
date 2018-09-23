@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="SpringSecuriry 方法权限控制在java-web中，经常会涉及权限问题：restful接口的权限访问、数据库接口权限访问、方法权限访问等等，这些权限的问题，如果要手动去实现的话，对于restful接口的权限访问还比较好解决，写一个HttpFilter拦截器，拦截需要验证的url进行相应的权限验证即可；但是方法呢？方法可没有像HttpFiler一样的东西呀，怎么去实现这个方法的权限拦截验">
+<meta name="keywords" content="Spring,代理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何利用JDK代理以及注解简单实现SpringSecurity的方法权限控制">
+<meta property="og:url" content="http://yoursite.com/2018/09/09/java-web-12/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="SpringSecuriry 方法权限控制在java-web中，经常会涉及权限问题：restful接口的权限访问、数据库接口权限访问、方法权限访问等等，这些权限的问题，如果要手动去实现的话，对于restful接口的权限访问还比较好解决，写一个HttpFilter拦截器，拦截需要验证的url进行相应的权限验证即可；但是方法呢？方法可没有像HttpFiler一样的东西呀，怎么去实现这个方法的权限拦截验">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-09-23T05:17:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何利用JDK代理以及注解简单实现SpringSecurity的方法权限控制">
+<meta name="twitter:description" content="SpringSecuriry 方法权限控制在java-web中，经常会涉及权限问题：restful接口的权限访问、数据库接口权限访问、方法权限访问等等，这些权限的问题，如果要手动去实现的话，对于restful接口的权限访问还比较好解决，写一个HttpFilter拦截器，拦截需要验证的url进行相应的权限验证即可；但是方法呢？方法可没有像HttpFiler一样的东西呀，怎么去实现这个方法的权限拦截验">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/09/09/java-web-12/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>如何利用JDK代理以及注解简单实现SpringSecurity的方法权限控制 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/09/java-web-12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">如何利用JDK代理以及注解简单实现SpringSecurity的方法权限控制
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-09-09 13:15:41" itemprop="dateCreated datePublished" datetime="2018-09-09T13:15:41+08:00">2018-09-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-09-23 13:17:33" itemprop="dateModified" datetime="2018-09-23T13:17:33+08:00">2018-09-23</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="SpringSecuriry-方法权限控制"><a href="#SpringSecuriry-方法权限控制" class="headerlink" title="SpringSecuriry 方法权限控制"></a>SpringSecuriry 方法权限控制</h4><p>在java-web中，经常会涉及权限问题：restful接口的权限访问、数据库接口权限访问、方法权限访问等等，这些权限的问题，如果要手动去实现的话，对于restful接口的权限访问还比较好解决，写一个<code>HttpFilter</code>拦截器，拦截需要验证的<code>url</code>进行相应的权限验证即可；但是方法呢？方法可没有像<code>HttpFiler</code>一样的东西呀，怎么去实现这个方法的权限拦截验证？这时，SpringSecurity解决了这个问题，利用注解以及依赖注入、动态代理，成功的解决了方法的权限拦截这个问题。</p>
+<h4 id="利用代理将方法执行方反转"><a href="#利用代理将方法执行方反转" class="headerlink" title="利用代理将方法执行方反转"></a>利用代理将方法执行方反转</h4><p><a href="https://www.liaochuntao.cn/2018/01/09/java_web_6/" target="_blank" rel="noopener">参考以前的一篇文章——如何简单实现JDK的动态代理功能</a></p>
+<h4 id="实现注解扫描"><a href="#实现注解扫描" class="headerlink" title="实现注解扫描"></a>实现注解扫描</h4><p>实现了方法的拦截后，还有一个问题，怎么才能知道，那些方法是需要权限验证的？简单的来说，就是怎么去查找到那些被注解的类以及方法。这个时候，就需要使用JDK中线程运行的上下文类环境，通过代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String filePath = packageName.replace(<span class="string">'.'</span>, <span class="string">'/'</span>);</span><br><span class="line">Enumeration&lt;URL&gt; dirs = Thread.currentThread().getContextClassLoader().getResources(filePath)</span><br></pre></td></tr></table></figure>
+<p>就可以扫描所指定的包，扫描的结果都存放在了<code>Enumeration&lt;URL&gt; dirs</code>中，随后，我们可以通过对<code>URL</code>的协议进行分别处理，在这里，我只简单的处理了——只对<code>file</code>协议进行扫描</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (dirs.hasMoreElements()) &#123;</span><br><span class="line">  URL url = dirs.nextElement();</span><br><span class="line">  <span class="keyword">if</span> (<span class="string">"file"</span>.equals(url.getProtocol())) &#123;</span><br><span class="line">    fileScan(packageName, URLDecoder.decode(url.getFile(), <span class="string">"UTF-8"</span>));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而<code>fileScan</code>方法则是进一布对<code>URL</code>的子目录、文件进行扫描操作，如果遇到的是目录类型，就递归调用<code>fileScan</code>方法，如果发现是以<code>.class</code>结尾的文件，表明找到了类文件，这个时候，就把类的路径（packageName + className）存储至<code>Set</code>集合中，等待下一步的操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">fileScan</span><span class="params">(String packageName, String filePath)</span> </span>&#123;</span><br><span class="line">  File dir = <span class="keyword">new</span> File(filePath);</span><br><span class="line">  <span class="keyword">if</span> (dir.exists()) &#123;</span><br><span class="line">    File[] files = dir.listFiles(pathname -&gt; (<span class="keyword">true</span> &amp;&amp; pathname.isDirectory()) || (pathname.getName().endsWith(<span class="string">".class"</span>)));</span><br><span class="line">    <span class="keyword">for</span> (File file : files) &#123;</span><br><span class="line">      <span class="keyword">if</span> (file.isDirectory()) &#123;</span><br><span class="line">        fileScan(packageName + <span class="string">"."</span> + file.getName(), file.getPath());</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        String className = file.getName().substring(<span class="number">0</span>, file.getName().length() - <span class="number">6</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">          classes.add(Thread.currentThread().getContextClassLoader().loadClass(packageName + <span class="string">"."</span> + className));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">          e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>经过这一步的处理之后，我们就得到了一个装了被注解<code>@EnableSecure</code>以及<code>@Secure</code>所修饰的类的类名的<code>Set</code>集合了，有了类名，就下来就好办了。我们只需要利用java自带的API——<code>Thread.currentThread().getContextClassLoader().loadClass()</code>，根据类名去装载这个类，然后，利用java的反射机制获取这个类下所共用的方法(public域的方法)数组<code>Method[]</code>，最后只需要去便利这个方法数组，利用<code>Method</code>所带有的方法<code>getAnnotation()</code>获取被注解<code>@Secure</code>所注解的方法，将这些方法装进List或者Set容器，又或者数组，存储这些方法起来，剩下的就只有JDK动态代理去实现方法的权限拦截验证了。</p>
+<h4 id="后期优化"><a href="#后期优化" class="headerlink" title="后期优化"></a>后期优化</h4><p>目前实现的只是简单的方法拦截，需要继承代理接口才可以实现方法的拦截，后期打算参考参考依赖注入，实现cglib动态代理</p>
+<h4 id="最终代码实现"><a href="#最终代码实现" class="headerlink" title="最终代码实现"></a>最终代码实现</h4><blockquote>
+<p>注解扫描代码</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ScanPackage</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String packageName;</span><br><span class="line">    <span class="keyword">private</span> Set&lt;Class&gt; classes;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 构造函数，传入要扫描的包名</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> packageName</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ScanPackage</span><span class="params">(String packageName)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.packageName = packageName;</span><br><span class="line">        <span class="keyword">this</span>.classes = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line">        sacn();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 扫描指定包下的所有class文件</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">sacn</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        String filePath = packageName.replace(<span class="string">'.'</span>, <span class="string">'/'</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Enumeration&lt;URL&gt; dirs = Thread.currentThread().getContextClassLoader()</span><br><span class="line">                    .getResources(filePath);</span><br><span class="line">            <span class="keyword">while</span> (dirs.hasMoreElements()) &#123;</span><br><span class="line">                URL url = dirs.nextElement();</span><br><span class="line">                <span class="keyword">if</span> (<span class="string">"file"</span>.equals(url.getProtocol())) &#123;</span><br><span class="line">                    fileScan(packageName, URLDecoder.decode(url.getFile(), <span class="string">"UTF-8"</span>));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 扫描所有class文件，并将扫描到的class文件装载进Set集合</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> packageName</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> filePath</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">fileScan</span><span class="params">(String packageName, String filePath)</span> </span>&#123;</span><br><span class="line">        File dir = <span class="keyword">new</span> File(filePath);</span><br><span class="line">        <span class="keyword">if</span> (dir.exists()) &#123;</span><br><span class="line">            File[] files = dir.listFiles(pathname -&gt; (<span class="keyword">true</span> &amp;&amp; pathname.isDirectory())</span><br><span class="line">                    || (pathname.getName().endsWith(<span class="string">".class"</span>)));</span><br><span class="line">            <span class="keyword">for</span> (File file : files) &#123;</span><br><span class="line">                <span class="keyword">if</span> (file.isDirectory()) &#123;</span><br><span class="line">                    fileScan(packageName + <span class="string">"."</span> + file.getName(), file.getPath());</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    String className = file.getName().substring(<span class="number">0</span>, file.getName().length() - <span class="number">6</span>);</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        classes.add(Thread.currentThread().getContextClassLoader()</span><br><span class="line">                                .loadClass(packageName + <span class="string">"."</span> + className));</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>过滤出被注解的类以及方法</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MethodPermissionFilter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> HashMap&lt;String, Method[]&gt; proxyMap;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MethodPermissionFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        String packageName = Main.class.getPackage().getName();</span><br><span class="line">        ScanPackage scanPackage = <span class="keyword">new</span> ScanPackage(packageName);</span><br><span class="line">        proxyMap = getEnableSecureClass(scanPackage.getClasses());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 利用Java原生的lambda表达式，构建&#123;<span class="doctag">@link</span> HashMap&lt;String, Method[]&gt;&#125; String =&gt; 方法类名，Method[] =&gt; 该类的所有方法</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> classes</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> HashMap&lt;String, Method[]&gt; getEnableSecureClass(Set&lt;Class&gt; classes) &#123;</span><br><span class="line">        <span class="keyword">return</span> classes.stream().filter(cls -&gt; cls.getAnnotation(EnableSecure.class) != <span class="keyword">null</span>)</span><br><span class="line">                .collect(HashMap::<span class="keyword">new</span>, (m, v) -&gt; m.put(v.getName(), v.getMethods()), HashMap::putAll);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 方法权限验证，如果所拥有的权限超出方法所允许的权限则抛出异常</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> clsName</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> meth</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> r</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isAuthority</span><span class="params">(String clsName, Method meth, String r)</span> </span>&#123;</span><br><span class="line">        Method[] methods = proxyMap.get(clsName);</span><br><span class="line">        <span class="keyword">for</span> (Method method : methods) &#123;</span><br><span class="line">            <span class="keyword">if</span> (meth.getName().equals(method.getName())) &#123;</span><br><span class="line">                Secure secure = method.getAnnotation(Secure.class);</span><br><span class="line">                String role = secure.role();</span><br><span class="line">                <span class="keyword">if</span> (r.equals(role)) &#123;</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>方法拦截</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyInvokationHandler</span>&lt;<span class="title">E</span>&gt; <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> E target;</span><br><span class="line">    <span class="keyword">private</span> String role;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> MethodPermissionFilter methodPermissionFilter;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyInvokationHandler</span><span class="params">(E target, String role)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.target = target;</span><br><span class="line">        <span class="keyword">this</span>.role = role;</span><br><span class="line">        <span class="keyword">this</span>.methodPermissionFilter = <span class="keyword">new</span> MethodPermissionFilter();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (methodPermissionFilter.isAuthority(target.getClass().getName(), method, role)) &#123;</span><br><span class="line">            <span class="keyword">return</span> method.invoke(target, args);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"You have no permission use this function"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>代理工厂</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JDKFactory</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> InvocationHandler handler;</span><br><span class="line">    <span class="keyword">private</span> Object proxy;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * JDK代理实现</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> proxy</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> role</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">JDKFactory</span><span class="params">(Object proxy, String role)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.proxy = proxy;</span><br><span class="line">        <span class="keyword">this</span>.handler = <span class="keyword">new</span> MyInvokationHandler&lt;&gt;(proxy, role);</span><br><span class="line">        <span class="keyword">this</span>.proxy = (Object) Proxy.newProxyInstance(proxy.getClass().getClassLoader(),</span><br><span class="line">                <span class="keyword">new</span> Class[]&#123;proxy.getClass()&#125;, handler);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="Cglib-动态代理实现Spring依赖注入（2018-9-20补充）"><a href="#Cglib-动态代理实现Spring依赖注入（2018-9-20补充）" class="headerlink" title="Cglib 动态代理实现Spring依赖注入（2018-9-20补充）"></a>Cglib 动态代理实现Spring依赖注入（2018-9-20补充）</h4><p>之前用的都是JDK自带的方法代理拦截，虽然实现简单，但是有一个缺点，就是我们需要每个<code>service</code>都需要去<code>implements</code>一个接口才可以实现JDK的原生代理功能；在使用<code>spring</code>的依赖注入时，我们可能没有继承接口，那么这个时候，就没办法使用JDK的原生代理功能了，这个时候就需要使用CGLib动态代理了。<a href="https://www.jianshu.com/p/13aa63e1ac95" target="_blank" rel="noopener">什么是CGLib</a></p>
+<blockquote>
+<p>获取CGLib代理的对象</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CglibProxy</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Enhancer enhancer = <span class="keyword">new</span> Enhancer();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">getProxy</span><span class="params">(Object target)</span> </span>&#123;</span><br><span class="line">        enhancer.setSuperclass(target.getClass());</span><br><span class="line">        enhancer.setCallback(<span class="keyword">new</span> CglibMethodInterceptor());</span><br><span class="line">        <span class="keyword">return</span> (T) enhancer.create();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>CGLib方法拦截操作</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CglibMethodInterceptor</span> <span class="keyword">implements</span> <span class="title">MethodInterceptor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">intercept</span><span class="params">(Object obj, Method method, Object[] args, MethodProxy proxy)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (obj.getClass().equals(method.getDeclaringClass())) &#123;</span><br><span class="line">            <span class="keyword">return</span> method.invoke(obj, args);</span><br><span class="line">        &#125;</span><br><span class="line">        String methodName = method.getName();</span><br><span class="line">        System.out.println(<span class="string">"[before] The method "</span> + methodName + <span class="string">" begins with "</span> + (args!=<span class="keyword">null</span> ? Arrays.asList(args) : <span class="string">"[]"</span>));</span><br><span class="line">        Object result = proxy.invokeSuper(obj, args);</span><br><span class="line">        System.out.println(String.format(<span class="string">"after method:%s execute"</span>, method.getName()));</span><br><span class="line">        System.out.println(<span class="string">"[after] The method ends with "</span> + result);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>将代理对象注入到类中</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ServiceFilter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> HashMap&lt;Class, Object&gt; serviceMap;</span><br><span class="line">    <span class="keyword">private</span> HashMap&lt;String, Object&gt; autowiredMap;</span><br><span class="line">    <span class="keyword">private</span> CglibProxy cglibProxy;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ServiceFilter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cglibProxy = <span class="keyword">new</span> CglibProxy();</span><br><span class="line">        String packageName = Main.class.getPackage().getName();</span><br><span class="line">        ScanPackage scanPackage = <span class="keyword">new</span> ScanPackage(packageName);</span><br><span class="line">        serviceMap = getServiceClasses(scanPackage.getClasses());</span><br><span class="line">        setServiceFields();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> HashMap <span class="title">getServiceClasses</span><span class="params">(Set&lt;Class&gt; classes)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> classes.stream().filter(c -&gt; c.isAnnotationPresent(Service.class))</span><br><span class="line">                .collect(HashMap::<span class="keyword">new</span>, (m, v) -&gt; &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="keyword">if</span> (v.getInterfaces().length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                            m.put(v.getInterfaces()[<span class="number">0</span>], cglibProxy.getProxy(v.newInstance()));</span><br><span class="line">                        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                            m.put(v, v.newInstance());</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (InstantiationException | IllegalAccessException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;, HashMap::putAll);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 将CGLib代理得到的对象注入到类中，实现Spring的<span class="doctag">@Autowired</span>注解，从而实现IoC控制反转，将对象的生成转交</span></span><br><span class="line"><span class="comment">     * 利用Field的set方法实现属性的赋值</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setServiceFields</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        serviceMap.keySet().forEach(cls -&gt; &#123;</span><br><span class="line">            Field[] fields = cls.getDeclaredFields();</span><br><span class="line">            <span class="keyword">for</span> (Field field : fields) &#123;</span><br><span class="line">                field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">                <span class="keyword">if</span> (field.isAnnotationPresent(Autowired.class)) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        field.set(serviceMap.get(cls), serviceMap.get(field.getType()));</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>测试用例</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span>(value = <span class="string">"Main"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> TestService testService;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ServiceFilter serviceFilter = <span class="keyword">new</span> ServiceFilter();</span><br><span class="line">        Main main = (Main) serviceFilter.getServiceMap().get(Main.class);</span><br><span class="line">        main.testService.print();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h4><p><a href="https://github.com/chuntaojun/spring-demo/tree/master/security-demo" target="_blank" rel="noopener">github-spring-demo</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring/" rel="tag"># Spring</a>
+          
+            <a href="/tags/代理/" rel="tag"># 代理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/09/08/java-web-9/" rel="next" title="使用Java的观察者以及定期任务实现redis的缓存过期机制">
+                <i class="fa fa-chevron-left"></i> 使用Java的观察者以及定期任务实现redis的缓存过期机制
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/09/12/leetcode-5/" rel="prev" title="leetcode回顾——Spiral Matrix III">
+                leetcode回顾——Spiral Matrix III <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#SpringSecuriry-方法权限控制"><span class="nav-number">1.</span> <span class="nav-text">SpringSecuriry 方法权限控制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#利用代理将方法执行方反转"><span class="nav-number">2.</span> <span class="nav-text">利用代理将方法执行方反转</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实现注解扫描"><span class="nav-number">3.</span> <span class="nav-text">实现注解扫描</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#后期优化"><span class="nav-number">4.</span> <span class="nav-text">后期优化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#最终代码实现"><span class="nav-number">5.</span> <span class="nav-text">最终代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Cglib-动态代理实现Spring依赖注入（2018-9-20补充）"><span class="nav-number">6.</span> <span class="nav-text">Cglib 动态代理实现Spring依赖注入（2018-9-20补充）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#源码"><span class="nav-number">7.</span> <span class="nav-text">源码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

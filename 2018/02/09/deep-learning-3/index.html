@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="比赛连接 sofasofa.io  根据姓名预测男女性别 今天尝试着做了一道机器学习题——根据姓名预测男女性别。这道题目其实算法就是二分类的题目，这类算法很多，比如knn近邻算法，决策树，svm向量机等等；传统的机器学习算法可以达到百分之七十到百分之八十五之间，我想能不能用深度学习来做一下看看能达到多高的accuracy率。  我们每天会接触不同的人，有热情的面孔，也有冰冷的名片。作为一个说着">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次竞赛题目有感——根据姓名预测男女性别">
+<meta property="og:url" content="http://yoursite.com/2018/02/09/deep-learning-3/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="比赛连接 sofasofa.io  根据姓名预测男女性别 今天尝试着做了一道机器学习题——根据姓名预测男女性别。这道题目其实算法就是二分类的题目，这类算法很多，比如knn近邻算法，决策树，svm向量机等等；传统的机器学习算法可以达到百分之七十到百分之八十五之间，我想能不能用深度学习来做一下看看能达到多高的accuracy率。  我们每天会接触不同的人，有热情的面孔，也有冰冷的名片。作为一个说着">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://120.24.90.180/blog/image/deep_learning/deep_learning-3.1.png">
+<meta property="og:image" content="http://120.24.90.180/blog/image/deep_learning/deep_learning-3.2.png">
+<meta property="og:image" content="http://120.24.90.180/blog/image/deep_learning/deep_learning-3.3.png">
+<meta property="og:image" content="http://120.24.90.180/blog/image/deep_learning/deep_learning-3.4.png">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/deep_learning/deep_learning-3.5.png">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/deep_learning/deep_learning-3.6.png">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/deep_learning/deep_learning-3.7.png">
+<meta property="og:updated_time" content="2018-04-26T04:07:57.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="记一次竞赛题目有感——根据姓名预测男女性别">
+<meta name="twitter:description" content="比赛连接 sofasofa.io  根据姓名预测男女性别 今天尝试着做了一道机器学习题——根据姓名预测男女性别。这道题目其实算法就是二分类的题目，这类算法很多，比如knn近邻算法，决策树，svm向量机等等；传统的机器学习算法可以达到百分之七十到百分之八十五之间，我想能不能用深度学习来做一下看看能达到多高的accuracy率。  我们每天会接触不同的人，有热情的面孔，也有冰冷的名片。作为一个说着">
+<meta name="twitter:image" content="http://120.24.90.180/blog/image/deep_learning/deep_learning-3.1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/02/09/deep-learning-3/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>记一次竞赛题目有感——根据姓名预测男女性别 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/09/deep-learning-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">记一次竞赛题目有感——根据姓名预测男女性别
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-02-09 16:29:14" itemprop="dateCreated datePublished" datetime="2018-02-09T16:29:14+08:00">2018-02-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-04-26 12:07:57" itemprop="dateModified" datetime="2018-04-26T12:07:57+08:00">2018-04-26</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/深度学习/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>比赛连接 sofasofa.io</p>
+</blockquote>
+<p><a href="http://sofasofa.io/competition.php?id=3" target="_blank" rel="noopener">根据姓名预测男女性别</a></p>
+<p>今天尝试着做了一道机器学习题——根据姓名预测男女性别。这道题目其实算法就是二分类的题目，这类算法很多，比如knn近邻算法，决策树，svm向量机等等；传统的机器学习算法可以达到百分之七十到百分之八十五之间，我想能不能用深度学习来做一下看看能达到多高的accuracy率。</p>
+<blockquote>
+<p>我们每天会接触不同的人，有热情的面孔，也有冰冷的名片。作为一个说着中国话的中国人，我们有着常年累月的积累和对文字的理解，通过名字判断（猜测）性别，并非难事。可是，对于一个冰冷的机器，它能够根据名字判断性别吗？这个练习赛就是根据中文名字（姓已经省略），判断性别 </p>
+</blockquote>
+<p>竞赛题目</p>
+<blockquote>
+<p>竞赛题目数据截图</p>
+</blockquote>
+<p><img src="http://120.24.90.180/blog/image/deep_learning/deep_learning-3.1.png" alt="数据截图"></p>
+<p>其实这道题就是一个二分类，跟之前做的识别方圆的题目是一个类型的，只不过从图片转为了文本二分类而已。那么，现在有一个问题，这里给出的是中文名字数据，这样的数据是没办法直接进入模型的，因此还需要进行数据处理；如何将中文汉字转为深度学习模型可以处理的数据就是这道题的一个难点。在这里，我采用的将中文汉字转为Unicode编码后在转为二进制的文本向量的方式来处理。利用python的ord()函数和bin()函数将汉字转为二进制的编码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">FILL_NAME = [[<span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>],</span><br><span class="line">             [<span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>],</span><br><span class="line">             [<span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>]]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">str2bin</span><span class="params">(user_name)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param user_name:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">return</span> [map(int, bin(ord(i))[<span class="number">2</span>:]) <span class="keyword">for</span> i <span class="keyword">in</span> user_name[<span class="number">0</span>]]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">listExtend</span><span class="params">(List)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param List:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    a = []</span><br><span class="line">    <span class="keyword">if</span> len(List) == <span class="number">3</span>:</span><br><span class="line">        List.extend(FILL_NAME)</span><br><span class="line">        [a.extend(i) <span class="keyword">for</span> i <span class="keyword">in</span> List]</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        [a.extend(i) <span class="keyword">for</span> i <span class="keyword">in</span> List]</span><br><span class="line">    <span class="keyword">return</span> a</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_data_dense</span><span class="params">(fileName_train=FILE_TRAIN_PATH, fileName_test=FILE_TEST_PATH)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param fileName_train:</span></span><br><span class="line"><span class="string">    :param fileName_test:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    train, test = np.array(pd.read_csv(fileName_train).values), np.array(pd.read_csv(fileName_test).values)</span><br><span class="line">    train_name, test_name, train_sex, test_sex = train_test_split(train[:, <span class="number">1</span>:<span class="number">2</span>], train[:, <span class="number">2</span>], test_size=<span class="number">0.2</span>)</span><br><span class="line">    train_name, test_name = map(str2bin, train_name), map(str2bin, test_name)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">name2vec</span><span class="params">(names)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> np.array(map(listExtend, names))</span><br><span class="line"></span><br><span class="line">    train_name = name2vec(train_name);</span><br><span class="line">    test_name = name2vec(test_name)</span><br><span class="line">    <span class="keyword">print</span> train_name, <span class="string">'\n'</span>, np.shape(train_name)</span><br><span class="line">    <span class="keyword">return</span> train_name, train_sex, test_name, test_sex</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>转换结果</p>
+</blockquote>
+<p><img src="http://120.24.90.180/blog/image/deep_learning/deep_learning-3.2.png" alt="word2vec"></p>
+<p>既然我们已经将汉字转为了向量之后，那下一步就是构建一个深度学习模型用于二分类了。关于如何构建二分类的深度学习模型，在判断奇偶数的篇章中已经给出了。</p>
+<h4 id="简单的全连接深度学习模型"><a href="#简单的全连接深度学习模型" class="headerlink" title="简单的全连接深度学习模型"></a>简单的全连接深度学习模型</h4><blockquote>
+<p>模型代码</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_model_dense</span><span class="params">(train_x)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    :param train_x:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    inputs = Input(shape=(train_x.shape[<span class="number">1</span>],))</span><br><span class="line">    x_dense_1 = Dense(units=<span class="number">64</span>, activation=<span class="string">'relu'</span>, use_bias=<span class="keyword">True</span>)(inputs)</span><br><span class="line">    x_dropout_1 = Dropout(rate=<span class="number">0.1</span>)(x_dense_1)</span><br><span class="line">    x_dense_2 = Dense(units=<span class="number">256</span>, activation=<span class="string">'relu'</span>, use_bias=<span class="keyword">True</span>)(x_dropout_1)</span><br><span class="line">    x_dropout_2 = Dropout(rate=<span class="number">0.1</span>)(x_dense_2)</span><br><span class="line">    x_dense_3 = Dense(units=<span class="number">128</span>, activation=<span class="string">'relu'</span>, use_bias=<span class="keyword">True</span>)(x_dropout_2)</span><br><span class="line">    predictions = Dense(units=<span class="number">1</span>, activation=<span class="string">'tanh'</span>)(x_dense_3)</span><br><span class="line">    model = Model(inputs=inputs, outputs=predictions)</span><br><span class="line">    model.compile(loss=<span class="string">'binary_crossentropy'</span>,</span><br><span class="line">                  optimizer=<span class="string">'adam'</span>,</span><br><span class="line">                  metrics=[<span class="string">'accuracy'</span>])</span><br><span class="line">    model.summary()</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train_model</span><span class="params">(batch_size=<span class="number">32</span>, verbose=<span class="number">2</span>, validation_split=<span class="number">0.1</span>, model=None, type=<span class="number">1</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param batch_size:</span></span><br><span class="line"><span class="string">    :param verbose:</span></span><br><span class="line"><span class="string">    :param validation_split:</span></span><br><span class="line"><span class="string">    :param model:</span></span><br><span class="line"><span class="string">    :param type:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">if</span> model <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        <span class="keyword">raise</span> Exception(<span class="string">"model is None"</span>)</span><br><span class="line">    train_name, train_sex, test_name, test_sex = ld.load_data(type)</span><br><span class="line">    history = model.fit(train_name, train_sex,</span><br><span class="line">                        batch_size=batch_size,</span><br><span class="line">                        validation_split=validation_split,</span><br><span class="line">                        epochs=<span class="number">50</span>,</span><br><span class="line">                        verbose=verbose)</span><br><span class="line">    plt.plot(history.history[<span class="string">'loss'</span>], label=<span class="string">'train'</span>)</span><br><span class="line">    plt.plot(history.history[<span class="string">'val_loss'</span>], label=<span class="string">'test'</span>)</span><br><span class="line">    plt.legend()</span><br><span class="line">    plt.show()</span><br><span class="line">    score = model.evaluate(test_name, test_sex,</span><br><span class="line">                           batch_size=batch_size)</span><br><span class="line">    print(score)</span><br></pre></td></tr></table></figure>
+<p>那么这个模型的结果如何呢？跑一跑就知道了</p>
+<blockquote>
+<p>模型训练/测试的损失函数值变化情况</p>
+</blockquote>
+<p><img src="http://120.24.90.180/blog/image/deep_learning/deep_learning-3.3.png" alt="loss_data"></p>
+<blockquote>
+<p>模型二分类结果</p>
+</blockquote>
+<p><img src="http://120.24.90.180/blog/image/deep_learning/deep_learning-3.4.png" alt="binary_classify"></p>
+<p>可以看出，模型的二分类准确率为百分之78～79，将近百分之80，因此这个模型的accuracy还是可以接受的。但是，跟传统的机器学习相比，百分之78～79的正确率有点不尽人意。那么，如何提高深度学习的accuracy呢？</p>
+<h4 id="多输入单输出的深度学习模型（accuracy为百分之81-xx）"><a href="#多输入单输出的深度学习模型（accuracy为百分之81-xx）" class="headerlink" title="多输入单输出的深度学习模型（accuracy为百分之81.xx）"></a>多输入单输出的深度学习模型（accuracy为百分之81.xx）</h4><p>观察训练数据可以看出，名字要么是由两个字组成的，要么就是单个字；而两个字组成的名字，而每个字对应男女的可能性都有所不同，我们可以认为两个字共同影响最终性别的取向，因此可以将名字拆分，分别进行学习{字-&gt;性别}的映射，然后将映射组合起来，再进行两个字对性别综合影响的学习。</p>
+<blockquote>
+<p>模型图</p>
+</blockquote>
+<p><img src="http://120.24.90.180:8080/blog/image/deep_learning/deep_learning-3.5.png" alt="多输入单输出的深度学习模型"></p>
+<p>每一个字进入一个神经网络进行学习字与性别的关系，分别为a_name和b_name，通过神经网络学习到了a_name与性别的特征向量encode_1、b_name与性别的特征向量encode_2；然后通过keras.layers.concatenate将学习到的特征向量组合成一个新的特征向量，再进行一次神经网络的学习。</p>
+<blockquote>
+<p>模型代码</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_model</span><span class="params">()</span>:</span></span><br><span class="line">    a_name = Input(shape=(<span class="number">24</span>,))</span><br><span class="line">    a_dense_1 = Dense(units=<span class="number">48</span>, activation=<span class="string">'relu'</span>)(a_name)</span><br><span class="line">    a_dropout = Dropout(rate=<span class="number">0.2</span>)(a_dense_1)</span><br><span class="line">    a_dense_2 = Dense(units=<span class="number">96</span>, activation=<span class="string">'relu'</span>)(a_dropout)</span><br><span class="line">    encode_1 = Dense(units=<span class="number">24</span>, activation=<span class="string">'relu'</span>)(a_dense_2)</span><br><span class="line"></span><br><span class="line">    b_name = Input(shape=(<span class="number">24</span>,))</span><br><span class="line">    b_dense_1 = Dense(units=<span class="number">48</span>, activation=<span class="string">'relu'</span>)(b_name)</span><br><span class="line">    b_dropout = Dropout(rate=<span class="number">0.2</span>)(b_dense_1)</span><br><span class="line">    b_dense_2 = Dense(units=<span class="number">96</span>, activation=<span class="string">'relu'</span>)(b_dropout)</span><br><span class="line">    encode_2 = Dense(units=<span class="number">24</span>, activation=<span class="string">'relu'</span>)(b_dense_2)</span><br><span class="line"></span><br><span class="line">    inputs = concatenate([encode_1, encode_2], axis=<span class="number">-1</span>)</span><br><span class="line">    x_dense_1 = Dense(units=<span class="number">96</span>, activation=<span class="string">'relu'</span>, use_bias=<span class="keyword">True</span>)(inputs)</span><br><span class="line">    x_dropout_1 = Dropout(rate=<span class="number">0.1</span>)(x_dense_1)</span><br><span class="line">    x_dense_2 = Dense(units=<span class="number">192</span>, activation=<span class="string">'relu'</span>, use_bias=<span class="keyword">True</span>)(x_dropout_1)</span><br><span class="line">    x_dropout_2 = Dropout(rate=<span class="number">0.1</span>)(x_dense_2)</span><br><span class="line">    x_dense_3 = Dense(units=<span class="number">96</span>, activation=<span class="string">'relu'</span>, use_bias=<span class="keyword">True</span>)(x_dropout_1)</span><br><span class="line">    predictions = Dense(units=<span class="number">1</span>, activation=<span class="string">'sigmoid'</span>, name=<span class="string">'out_put'</span>)(x_dense_3)</span><br><span class="line"></span><br><span class="line">    model = Model(inputs=[a_name, b_name], outputs=predictions)</span><br><span class="line">    model.compile(loss=<span class="string">'binary_crossentropy'</span>,</span><br><span class="line">                  optimizer=<span class="string">'adam'</span>,</span><br><span class="line">                  metrics=[<span class="string">'accuracy'</span>])</span><br><span class="line">    model.summary()</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train_model</span><span class="params">(batch_size=<span class="number">64</span>, verbose=<span class="number">2</span>, validation_split=<span class="number">0.1</span>, type=<span class="string">'dense'</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    :param batch_size:</span></span><br><span class="line"><span class="string">    :param verbose:</span></span><br><span class="line"><span class="string">    :param validation_split:</span></span><br><span class="line"><span class="string">    :param type:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    train_name, train_sex, test_name, test_sex = ld.load_data(type=type)</span><br><span class="line">    model = build_model()</span><br><span class="line">    history = model.fit([train_name[:, <span class="number">0</span>: <span class="number">24</span>], train_name[:, <span class="number">24</span>:]], train_sex,</span><br><span class="line">                        batch_size=batch_size,</span><br><span class="line">                        validation_split=validation_split,</span><br><span class="line">                        epochs=<span class="number">50</span>,</span><br><span class="line">                        verbose=verbose)</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>模型训练/测试的损失函数值的变化情况</p>
+</blockquote>
+<p><img src="http://120.24.90.180:8080/blog/image/deep_learning/deep_learning-3.6.png" alt="模型训练/测试的损失函数值的变化情况"></p>
+<blockquote>
+<p>模型对测试集的预测情况</p>
+</blockquote>
+<p><img src="http://120.24.90.180:8080/blog/image/deep_learning/deep_learning-3.7.png" alt="模型对测试集的预测情况"></p>
+<blockquote>
+<p>模型展示与训练(视频)</p>
+</blockquote>
+<p><img src="" alt="bilibili"></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/07/machine-learning-4/" rel="next" title="机器学习之Logistic回归">
+                <i class="fa fa-chevron-left"></i> 机器学习之Logistic回归
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/16/machine-learning-5/" rel="prev" title="机器学习之线性回归">
+                机器学习之线性回归 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#简单的全连接深度学习模型"><span class="nav-number">1.</span> <span class="nav-text">简单的全连接深度学习模型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#多输入单输出的深度学习模型（accuracy为百分之81-xx）"><span class="nav-number">2.</span> <span class="nav-text">多输入单输出的深度学习模型（accuracy为百分之81.xx）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

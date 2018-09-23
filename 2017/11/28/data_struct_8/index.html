@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前一章我们讲了图的最小生成树的算法，今天我们来讲一讲最短路径的算法——Dijkstra算法与Floyed算法。 Dijkstra算法Dijkstra算法，目的是求的图中的一点，到其余顶点的最短路径；Floyed算法，目的是求图中任意两个顶点之间的最短路径。其实从Dijkstra算法去实现Floyed算法很简单，再多做一次循环去计算每个顶点到除了它自己的其他点的最短路径即可，之所以会有Floyed算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dijkstra算法与Floyed算法">
+<meta property="og:url" content="http://yoursite.com/2017/11/28/data_struct_8/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="前一章我们讲了图的最小生成树的算法，今天我们来讲一讲最短路径的算法——Dijkstra算法与Floyed算法。 Dijkstra算法Dijkstra算法，目的是求的图中的一点，到其余顶点的最短路径；Floyed算法，目的是求图中任意两个顶点之间的最短路径。其实从Dijkstra算法去实现Floyed算法很简单，再多做一次循环去计算每个顶点到除了它自己的其他点的最短路径即可，之所以会有Floyed算">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/11/e69caae591bde5908de69687e4bbb6.png">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/11/e69caae591bde5908de69687e4bbb61.png">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/11/screenshot-from-2017-11-28-14-51-36.png">
+<meta property="og:updated_time" content="2018-01-21T05:37:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dijkstra算法与Floyed算法">
+<meta name="twitter:description" content="前一章我们讲了图的最小生成树的算法，今天我们来讲一讲最短路径的算法——Dijkstra算法与Floyed算法。 Dijkstra算法Dijkstra算法，目的是求的图中的一点，到其余顶点的最短路径；Floyed算法，目的是求图中任意两个顶点之间的最短路径。其实从Dijkstra算法去实现Floyed算法很简单，再多做一次循环去计算每个顶点到除了它自己的其他点的最短路径即可，之所以会有Floyed算">
+<meta name="twitter:image" content="https://liaochuntao.files.wordpress.com/2017/11/e69caae591bde5908de69687e4bbb6.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/28/data_struct_8/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Dijkstra算法与Floyed算法 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/28/data_struct_8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Dijkstra算法与Floyed算法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-11-28 14:52:30" itemprop="dateCreated datePublished" datetime="2017-11-28T14:52:30+08:00">2017-11-28</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-01-21 13:37:26" itemprop="dateModified" datetime="2018-01-21T13:37:26+08:00">2018-01-21</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数据结构/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前一章我们讲了图的最小生成树的算法，今天我们来讲一讲最短路径的算法——Dijkstra算法与Floyed算法。</p>
+<h4 id="Dijkstra算法"><a href="#Dijkstra算法" class="headerlink" title="Dijkstra算法"></a>Dijkstra算法</h4><p>Dijkstra算法，目的是求的图中的一点，到其余顶点的最短路径；Floyed算法，目的是求图中任意两个顶点之间的最短路径。其实从Dijkstra算法去实现Floyed算法很简单，再多做一次循环去计算每个顶点到除了它自己的其他点的最短路径即可，之所以会有Floyed算法，是由于Floyed算法的简洁优美（Floyed算法的思想是利用了动态规划的思想）。现在，我们具体来介绍下这两个算法吧！</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/11/e69caae591bde5908de69687e4bbb6.png" alt="未命名文件.png"></p>
+<p>（该图为Dijkstra算法与Floyed算法的使用图，有向图或无向图对算法的改动其实很小）</p>
+<p>首先，我们来介绍下Dijkstra（迪杰斯特莱算法）。该算法是从其中一个顶点出发，通过广度优先遍历搜索，实现最短路径的计算。现在，假设我们从A这个点出发，开始做广度优先遍历，发现有两个点A是可以到达的，就是C和G点，我们观察到A-&gt;C的代价是5，A-&gt; G的代价是7，所以，首先得出A-&gt;C和A-&gt;G的最短路径是5、7；随后我们从C点开始广度优先遍历搜索（也可能从G点继续开始广度优先遍历搜索），发现C点可以到达的点有G、F、D三个点，在加上出发点，我们发现了三条路径：A-&gt;C-&gt;G、A-&gt;C-&gt;F、A-&gt;C-&gt;D，由于前一步我们得出A-&gt;C的最短路径代价为5，所以我们只需要计算C-&gt;G、C-&gt;F、C-&gt;D的最短路径代价，观察得出分别为17、3、1；所以得出A-&gt;C-&gt;G、A-&gt;C-&gt;F、A-&gt;C-&gt;D的最短路径代价为17+5，3+5，1+5，但是，这真的是真的最短路径代价吗？我们从第一步得出A-&gt;G的最短路径代价为7，显然A-&gt;C-&gt;G的这条最短路径代价大于我直接从A-&gt;G这条路径，所以，在更新时，A-&gt;G的最短路径代价依旧保留为A-&gt;G的最短路径代价；如果说我的A-&gt;C-&gt;G的最短路径代价比我A-&gt;G的最短路径代价还小，更新时A-&gt;G的最短路径代价就更新为从A-&gt;C-&gt;G的最短路径代价的值。因此，我们可以总结出Dijkstra算法的一个最短路径计算选择公式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dw = min&#123;dw, dv + Cv, w&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过Dijkstra算法计算过后，我们得出从A顶点到其余顶点的最短路径值图（每个顶点旁边的数值为最短路径的代价值）</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/11/e69caae591bde5908de69687e4bbb61.png" alt="未命名文件"></p>
+<p>红色的线就是最短路径的选择，现在我们贴上代码（代码正确性未检验，我是根据伪代码自己完成的，但是提供了思路，并且我没有实现路径的记录，只是实现了最短路径代价值的记录）<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 迪杰斯特莱算法，求某一点到其余所有顶点的最短路径问题</span></span><br><span class="line"><span class="comment"> * @param G</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Dijkstra</span><span class="params">(ALGraph G)</span> </span>&#123;</span><br><span class="line">    VertexType v, start;</span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"请输入一个开始的顶点"</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="built_in">cin</span> &gt;&gt; start;</span><br><span class="line">    G.vertices[LocateVex(G, start)].dist = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> knows = G.vexnum;</span><br><span class="line">    <span class="keyword">while</span> (knows --) &#123;</span><br><span class="line">        <span class="keyword">int</span> loc = FindMinDist(G);</span><br><span class="line">        G.vertices[loc].know = <span class="literal">true</span>;</span><br><span class="line">        ArcNode *p = G.vertices[loc].firstarc;</span><br><span class="line">        <span class="keyword">while</span> (p != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!G.vertices[p -&gt; adjvex].know) &#123;</span><br><span class="line">                <span class="keyword">if</span> (G.vertices[loc].dist + *(p -&gt; info) &lt; G.vertices[p -&gt; adjvex].dist) &#123;</span><br><span class="line">                    G.vertices[p -&gt; adjvex].dist = G.vertices[loc].dist + *(p -&gt; info);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            p = p -&gt; nextarc;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>ALGraph图的结构我是采用了邻接表来实现，如果采用邻接矩阵，那就是去遍历矩阵中的每一个值。</p>
+<blockquote>
+<p>附上ALGraph的结构实现：</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_NAME 3</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> INFINITY 2e10</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">int</span> InfoType;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">char</span> VertexType[MAX_NAME];</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_VERTEX_NUM 20</span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">enum</span> GraphKind&#123;DG, DN, UDG, UDN&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//弧（边）的结构信息</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ArcNode</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> adjvex;</span><br><span class="line">    ArcNode *nextarc;</span><br><span class="line">    InfoType *info;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//图的节点信息</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> degree;</span><br><span class="line">    <span class="keyword">int</span> dist;</span><br><span class="line">    <span class="keyword">bool</span> know;</span><br><span class="line">    VertexType data;</span><br><span class="line">    ArcNode *firstarc;</span><br><span class="line">&#125;VNode, AdjList[MAX_VERTEX_NUM];</span><br><span class="line"></span><br><span class="line"><span class="comment">//图的整体信息</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ALGraph</span> &#123;</span></span><br><span class="line">    AdjList vertices;</span><br><span class="line">    <span class="keyword">int</span> vexnum, arcnum;</span><br><span class="line">    <span class="keyword">int</span> kind;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h4 id="Floyed算法"><a href="#Floyed算法" class="headerlink" title="Floyed算法"></a>Floyed算法</h4><p>接着，我们在说说Floyed算法（弗洛伊德算法），目前我只是实现了在邻接矩阵的图结构为基础的Floyed算法，邻接矩阵的还在思考当中。</p>
+<p>Floyed算法有一个很重要的思想，就是动态规划，由于我们Floyed算法相比与Dijkstra算法，计算量更大，要考虑方方面面，需要计算任意两个顶点之间的最短路径，因此，采用动态规划的实现，可以大大提高计算速度，减少计算量，其本质计算公式和Dijkstra算法计算公式一样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">D[v][w] = min&#123;D[v][w], D[v][k] + D[k][w]&#125;</span><br></pre></td></tr></table></figure></p>
+<p>相比与Dijkstra算法的双重循环，最基本的Floyed算法需要三重循环，一层是两个顶点之间的中间连接点循环，两层路径端点的循环，通过最外层的循环来实现两个顶点之间的连接点，内两层循环实现路径两端端点的变动实现。</p>
+<blockquote>
+<p>弗洛伊德代码实现如下：</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 将图的邻接表转换为邻接矩阵的形式</span></span><br><span class="line"><span class="comment"> * @param</span></span><br><span class="line"><span class="comment"> * G        图的邻接表数据结构 </span></span><br><span class="line"><span class="comment"> * @param </span></span><br><span class="line"><span class="comment"> * P        路径二位数组 </span></span><br><span class="line"><span class="comment"> * @param </span></span><br><span class="line"><span class="comment"> * D        最短路径的权值 </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Link2Martir</span><span class="params">(ALGraph G, <span class="keyword">int</span> *graph)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 弗洛伊德算法</span></span><br><span class="line"><span class="comment"> * @param G</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Floyed</span><span class="params">(ALGraph G)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> P[G.vexnum][G.vexnum], D[G.vexnum][G.vexnum], graph[G.vexnum][G.vexnum];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; G.vexnum; ++ i) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; G.vexnum; ++ j) &#123;</span><br><span class="line">            D[i][j] = graph[i][j];</span><br><span class="line">            P[i][j] = j;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; G.vexnum; ++i) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; G.vexnum; ++j) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k &lt; G.vexnum; ++k) &#123;</span><br><span class="line">                D[j][k] = D[j][k] &gt; D[j][i] + D[i][k] ? D[j][i] + D[i][k] : D[j][k];</span><br><span class="line">                P[j][k] = k;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由于我是将邻接表转换成了邻接矩阵的形式，所以在函数Floyed（ALGraph G）中，graph[][]这个int类型的数组就是转换后的邻接矩阵，然后我们设置一个P[][]的二维数组进行记录从X-&gt;Y的前驱顶点的位置，上面的图转换后P[][]数组的形式如下：</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/11/screenshot-from-2017-11-28-14-51-36.png" alt="Screenshot from 2017-11-28 14-51-36"></p>
+<p>（附上一个视频，这里的Floyed算法我个人觉得还行，我是通过这个来在重新理解的）</p>
+<p><a href="https://www.youtube.com/watch?v=1ndAomKMZ24" target="_blank" rel="noopener">https://www.youtube.com/watch?v=1ndAomKMZ24</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/20/data_struct_7/" rel="next" title="最小代价生成树问题">
+                <i class="fa fa-chevron-left"></i> 最小代价生成树问题
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/02/data_struct_9/" rel="prev" title="静态查找表算法">
+                静态查找表算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Dijkstra算法"><span class="nav-number">1.</span> <span class="nav-text">Dijkstra算法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Floyed算法"><span class="nav-number">2.</span> <span class="nav-text">Floyed算法</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

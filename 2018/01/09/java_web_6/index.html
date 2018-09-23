@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Spring框架有一个很重要的机制——代理机制，而这个机制是实现Spring一个重要编程思想——切面编程思想重要工具。 那么代理功能有什么用呢？假设我们有一个方法，我们想查看这个方法的执行性能与开销时间，我们是怎么做的呢？  可能大部分的人都会这样直接在方法内部加上这两句代码：12long start = System.currentTimeMillis();System.out.println(">
+<meta name="keywords" content="Spring,代理">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何简单实现JDK的动态代理功能">
+<meta property="og:url" content="http://yoursite.com/2018/01/09/java_web_6/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Spring框架有一个很重要的机制——代理机制，而这个机制是实现Spring一个重要编程思想——切面编程思想重要工具。 那么代理功能有什么用呢？假设我们有一个方法，我们想查看这个方法的执行性能与开销时间，我们是怎么做的呢？  可能大部分的人都会这样直接在方法内部加上这两句代码：12long start = System.currentTimeMillis();System.out.println(">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-29-13-51-38.png">
+<meta property="og:updated_time" content="2018-01-21T05:32:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何简单实现JDK的动态代理功能">
+<meta name="twitter:description" content="Spring框架有一个很重要的机制——代理机制，而这个机制是实现Spring一个重要编程思想——切面编程思想重要工具。 那么代理功能有什么用呢？假设我们有一个方法，我们想查看这个方法的执行性能与开销时间，我们是怎么做的呢？  可能大部分的人都会这样直接在方法内部加上这两句代码：12long start = System.currentTimeMillis();System.out.println(">
+<meta name="twitter:image" content="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-29-13-51-38.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/09/java_web_6/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>如何简单实现JDK的动态代理功能 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/09/java_web_6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">如何简单实现JDK的动态代理功能
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-01-09 23:49:42" itemprop="dateCreated datePublished" datetime="2018-01-09T23:49:42+08:00">2018-01-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-01-21 13:32:30" itemprop="dateModified" datetime="2018-01-21T13:32:30+08:00">2018-01-21</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Spring框架有一个很重要的机制——代理机制，而这个机制是实现Spring一个重要编程思想——切面编程思想重要工具。</p>
+<p>那么代理功能有什么用呢？假设我们有一个方法，我们想查看这个方法的执行性能与开销时间，我们是怎么做的呢？</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-29-13-51-38.png" alt="Screenshot from 2017-12-29 13-51-38"></p>
+<p>可能大部分的人都会这样直接在方法内部加上这两句代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">long</span> start = System.currentTimeMillis();</span><br><span class="line">System.out.println(<span class="string">"该方法消耗时间"</span> + (System.currentTimeMillis() - start));</span><br></pre></td></tr></table></figure></p>
+<p>可能感觉这样子，才两行代码，没有什么大不了的，但是如果方法一多，需要对大多数的业务逻辑代码进行开销记录呢？那个就会增加无数的重复代码，而这些代码跟我们的业务逻辑是根本没有关系的，我们只是希望在这个方法执行的过程中能够记录其开销而已，并不想去破坏这个方法原有的代码结构。那么这个要怎么实现呢？这个其实就是依靠Java自带的代理机制来解决，其实Java的JDK就有类的动态代理功能，而这本质又依赖于Java中的反射机制来实现。</p>
+<p>那么什么是代理机制呢？所谓代理，就是我把一切都弄好了，但是呢，我本身不去做这件事情，我把这件事情的实施交给别人，这就是代理机制；只不过现在是换成我们主动想要一个代理人去实施这个事情，而不是方法本身去实施；当目标方法准备执行时被我们的代理类拦截了下来，然后，由代理类自带的方法去间接执行目标方法，在这过程当中，就可以增加任何你想要做的事情：加入开销时间、记录每一时刻执行的方法的详细信息（方法名、参数名）等等；这样，你会发现，只需要一个代理类，就可以实现我们刚刚想对所有方法进行开销时间的记录操作，并且还能不断扩充我们想要实现的增强功能（附录：这个其实已经有一点点Spring的切面编程的意味了）</p>
+<blockquote>
+<p>代理类</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyInvokationHandler</span>&lt;<span class="title">E</span>&gt; <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> E target;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyInvokationHandler</span><span class="params">(E target)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.target = target;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        Long beginTime = System.currentTimeMillis();</span><br><span class="line">        Object returnValue = method.invoke(target, args);</span><br><span class="line">        System.out.println(<span class="string">"方法"</span> + method.getName() + <span class="string">"调用结束，耗时"</span>+ (System.currentTimeMillis() -beginTime));</span><br><span class="line">        <span class="keyword">return</span> returnValue;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>被代理的接口</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">proxyInterface</span> <span class="keyword">extends</span> <span class="title">ControlDatabase</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    &lt;T&gt;<span class="function">ResultBean&lt;T&gt; <span class="title">query</span><span class="params">(Object o, String sql)</span> <span class="keyword">throws</span> SQLException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    &lt;T&gt;<span class="function">ResultBean&lt;T&gt; <span class="title">insert</span><span class="params">(PreparedStatement preparedStatement)</span> <span class="keyword">throws</span> SQLException</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    &lt;T&gt;<span class="function">ResultBean&lt;T&gt; <span class="title">delete</span><span class="params">(PreparedStatement preparedStatement)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    &lt;T&gt;<span class="function">ResultBean&lt;T&gt; <span class="title">update</span><span class="params">(PreparedStatement preparedStatement)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>实现代理调用</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyProxy</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ControlDatabase controlDatabase;</span><br><span class="line">    <span class="keyword">private</span> InvocationHandler handler;</span><br><span class="line">    <span class="keyword">private</span> proxyInterface proxy;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyProxy</span><span class="params">(ControlDatabase controlDatabase)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.controlDatabase = controlDatabase;</span><br><span class="line">        handler = <span class="keyword">new</span> MyInvokationHandler&lt;&gt;(controlDatabase);</span><br><span class="line">        proxy = (proxyInterface) Proxy.newProxyInstance(proxyInterface.class.getClassLoader(),</span><br><span class="line">                <span class="keyword">new</span> Class[]&#123;proxyInterface.class&#125;, handler);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> proxyInterface <span class="title">getProxy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> proxy;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">messageImpl</span> <span class="keyword">implements</span> <span class="title">messageMap</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">ResultBean&lt;T&gt; <span class="title">queryCompyInfo</span><span class="params">()</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        proxyInterface proxy = <span class="keyword">new</span> AdaperFactory(<span class="keyword">new</span> MysqlQuery()).getProxy();</span><br><span class="line">        Connection connection = proxy.getConnection();</span><br><span class="line">        String sql = <span class="string">"SELECT * FROM Lanmu WHERE Lname='公司介绍'"</span>;</span><br><span class="line">        Statement statement = connection.createStatement();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ResultBean(proxy.query(statement, sql).getData());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从实现代理调用的 MyProxy 这个类中我们可以看出，只要是继承了proxyInterface这个接口的类或者接口，都会被我们的代理类所拦截下来，进入代理的流程。让我们通过一个视频来了解下吧：</p>
+<blockquote>
+<p>YouTube站点</p>
+</blockquote>
+<p>[youtube <a href="https://www.youtube.com/watch?v=WVU7S8nD9NQ&amp;w=560&amp;h=315]" target="_blank" rel="noopener">https://www.youtube.com/watch?v=WVU7S8nD9NQ&amp;w=560&amp;h=315]</a></p>
+<blockquote>
+<p>哔哩哔哩站点</p>
+</blockquote>
+<p><a href="https://www.bilibili.com/video/av18146765/" target="_blank" rel="noopener">https://www.bilibili.com/video/av18146765/</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring/" rel="tag"># Spring</a>
+          
+            <a href="/tags/代理/" rel="tag"># 代理</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/31/deep_learning_2/" rel="next" title="深度学习初探一——奇偶数学习">
+                <i class="fa fa-chevron-left"></i> 深度学习初探一——奇偶数学习
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/18/java_web_2/" rel="prev" title="Java原生代码实现简易版爬虫">
+                Java原生代码实现简易版爬虫 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

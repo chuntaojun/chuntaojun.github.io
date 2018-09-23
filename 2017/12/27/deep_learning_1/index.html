@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="比赛连接 sofasofa.io  形状识别：是方还是圆  我们给出四千张图像作为训练集。每个图像中只有一个图形，要么是圆形，要么是正方形。你的任务根据是根据这四千张图片训练出一个二元分类模型，并用它（不是用肉眼）在测试集上判断每个图像中的形状。   训练集中共有4000个灰度图像，预测集中有3550个灰度图像。每个图像中都会含有大量的噪点。图像的分辨率为40x40，也就是40x40的矩阵，每个">
+<meta name="keywords" content="图像识别">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次竞赛题目有感——图像识别">
+<meta property="og:url" content="http://yoursite.com/2017/12/27/deep_learning_1/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="比赛连接 sofasofa.io  形状识别：是方还是圆  我们给出四千张图像作为训练集。每个图像中只有一个图形，要么是圆形，要么是正方形。你的任务根据是根据这四千张图片训练出一个二元分类模型，并用它（不是用肉眼）在测试集上判断每个图像中的形状。   训练集中共有4000个灰度图像，预测集中有3550个灰度图像。每个图像中都会含有大量的噪点。图像的分辨率为40x40，也就是40x40的矩阵，每个">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/square.jpg?w=300">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/u672au547du540du6587u4ef61.png">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/e69caae591bde5908de69687e4bbb61.png">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/loss1.png">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-27-03-01-10.png">
+<meta property="og:updated_time" content="2018-04-04T03:32:03.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="记一次竞赛题目有感——图像识别">
+<meta name="twitter:description" content="比赛连接 sofasofa.io  形状识别：是方还是圆  我们给出四千张图像作为训练集。每个图像中只有一个图形，要么是圆形，要么是正方形。你的任务根据是根据这四千张图片训练出一个二元分类模型，并用它（不是用肉眼）在测试集上判断每个图像中的形状。   训练集中共有4000个灰度图像，预测集中有3550个灰度图像。每个图像中都会含有大量的噪点。图像的分辨率为40x40，也就是40x40的矩阵，每个">
+<meta name="twitter:image" content="https://liaochuntao.files.wordpress.com/2017/12/square.jpg?w=300">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/27/deep_learning_1/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>记一次竞赛题目有感——图像识别 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/27/deep_learning_1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">记一次竞赛题目有感——图像识别
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-12-27 03:07:37" itemprop="dateCreated datePublished" datetime="2017-12-27T03:07:37+08:00">2017-12-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-04-04 11:32:03" itemprop="dateModified" datetime="2018-04-04T11:32:03+08:00">2018-04-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/深度学习/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>比赛连接 sofasofa.io</p>
+</blockquote>
+<p><a href="http://sofasofa.io/competition.php?id=6" target="_blank" rel="noopener">形状识别：是方还是圆</a></p>
+<blockquote>
+<p>我们给出四千张图像作为训练集。每个图像中只有一个图形，要么是圆形，要么是正方形。你的任务根据是根据这四千张图片训练出一个二元分类模型，并用它（不是用肉眼）在测试集上判断每个图像中的形状。</p>
+</blockquote>
+<blockquote>
+<p>训练集中共有4000个灰度图像，预测集中有3550个灰度图像。每个图像中都会含有大量的噪点。<br>图像的分辨率为40x40，也就是40x40的矩阵，每个矩阵以行向量的形式被存放在train.csv和test.csv中。train.csv和test.csv中每行数据代表一个图像，也就是说每行都有1600个特征。</p>
+</blockquote>
+<p>竞赛题目</p>
+<p>最近迷上了深度学习，毅然抛弃了曾经学习已久的Java-Web（当然也不是完全抛弃，只是不那么放精力去研究了，偶尔研究下怎么原生代码实现Spring功能）。言归正传，我今天讲讲如何用深度学习来识别图像中的方形和圆形吧。</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/12/square.jpg?w=300" alt="square.jpg"></p>
+<p>先放上训练的图像，我们从图中是不是很容易就看出左上和下面的图片中存在方形，右上角的图片中存在圆形，对于我们人来说，这不是小case吗？确实，稍微懂事一点的孩子，稍微教下，孩子马上就能知道方形和圆形的区别，但是，我们现在需要教计算机去学习方形和圆形的区别，这怎么做到？如果在前几年，那么可以用机器学习的分类算法，对这些图片进行分类，但是这个算法可能十分复杂。但是如果采用深度学习来做图像识别，那么会非常的快将一个图像识别模型构造出来，当然，模型构造的好坏还是需要一定的练习，但是代码量相比传统的机器学习，可以说少的是很多了。</p>
+<p>那么我们如何用深度学习来完成这个图像识别呢？题目中已经明确了每一张图片的特征维度是1600，并且已经帮我们处理为了一维数组，那么，首先我们可以考虑使用向前传播的神经网络来学习图片特征，利用数个全连接层（Dense，用于特征学习，层层推导特征向量，然后将特征映射到标签）和（全连接层数-1）层的Dropout层（去除模型过拟合），那么我们将这个神经网络图示就如下面的图：</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/12/u672au547du540du6587u4ef61.png" alt="u672au547du540du6587u4ef6.png"></p>
+<p>那么全连接层是如何实现将特征向量映射到标签中的吗？首先，我们有维度为1600的关于图片特征的特征向量，这个就是整个神经网络的输入部分，然后，这个向量中的每一个值通过与全连接层中的所有神经元进行连接，怎么连接？每一个特征值与神经元之间的连接需要乘上一个权重wi，与权重进行相乘操作后产生的新数据作为该神经元的输入，然后在神经元内数据经过激活函数去线性之后将处理过后的数据往下一个神经元输入，就这样通过数层的神经网络层之后，最后一层全连接层会将上一个神经元输入的数据进行计算，得出一个估计答案，再把这个答案映射到标签空间中，与对应的标签进行比对，计算误差值，这就是全连接层的工作。这里有一个小小的难点，我们刚刚说的权重wi，这是怎么确定的？实际上，这个权重恰恰是整个神经网络所要学习的东西；我们说神经网络学习学什么？学的就是这个权重，那怎么学习呢？这里就要提到反向传播算法，我这里简要说下反向传播算法怎么去让神经网络学习权重：在最后一层全连接层中不是计算出了一个估计答案和与实际答案之间的误差吗？这个误差，就是重点，反向传播算法将这个误差带回到神经网络，通过误差去不断调整权重wi，知道这个误差在可以接受的范围内，于是，神经网络就学习到了东西——对于这个场景中整个神经网络适合的权重wi。</p>
+<p>只用全连接层来做图片识别的最典型的就是tensorflow的入门教程——MNIST的手写字体图片的识别，<a href="https://www.tensorflow.org/get_started/mnist/beginners" target="_blank" rel="noopener">这个是tensorflow采用全连接层来实现的文章。</a></p>
+<p>但是呢，经过人们发现，这种神经网络的学习能力还是那么稍微不如意，于是，又诞生了卷积神经网络，相比于全连接层的将一张图的所有特征向量一次性输入神经网络；卷积神经网络是将图片进行分块学习，学习每一块的特征，从这图片中的每一块提取价值信息，最后进行汇总，从而实现学习整张图片的信息，形象的来说，就是在我们看到一辆车时，我们大脑接收到这张图片，堆这张图片的每一部分进行信息提取：提取了轮子信息、提取了车门信息、提取了形状信息……这些信息综合到一起，哦，于是我们大脑得出一个结论——这是一辆车。那么卷积网络模型是怎么样的呢？看下图</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/12/e69caae591bde5908de69687e4bbb61.png" alt="未命名文件"></p>
+<p>通过卷积操作对我们的图片进行特征的提取工作，提取方式不是对整张图进行特征提取，而是堆图中的一部分进行特征提取操作，然后通过最大值池化层进行计算，将该特征和区域的最大值作为抽样后的值，向下一个卷积层传递。这里可能会问，池化层具体有什么用呢？池化层的作用是为了在全连接层中，能够减少全连接的数量，全连接的数量下来了，参数（权重wi）个数也就下来了，而参数的个数与该神经网络是否过拟合是有一定联系的。</p>
+<blockquote>
+<p>现在讲讲我们如何解决这个题目：<br>题目所给的图片特征是一维的，也就是说将图片原来具有的长宽降维处理，但是，在我们构建的模型中，采用的2D卷积操作，因此我们需要将一维的进行升维操作，使的图片的长宽通过矩阵的shape体现出来，升维操作我们采用的是numpy的reshape操作</p>
+</blockquote>
+<pre><code>data = np.array([np.reshape(i, (40, 40)) for i in data])
+</code></pre><blockquote>
+<p>同时，2D卷积操作还有一个channel，就是颜色通道，所以，我们还需要对矩阵进行一次操作，由于是灰度图片，RGB颜色通道为1，所以我们再次用numpy的reshape进行操作<br>将矩阵重新塑形为 （40， 40， 1）的形状，以符合卷积神经网络的输入</p>
+</blockquote>
+<pre><code>data = np.array([np.reshape(i, (i.shape[0], i.shape[1], 1)) for i in data])
+</code></pre><p>这样，我们就完成了神经网络输入数据的数据处理部分操作</p>
+<blockquote>
+<p>数据加载代码</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"></span><br><span class="line">FILE_PATH_train = <span class="string">"/media/chuntaojun/Mylinux/code/PythonProject/DeepingLearning/sofasofa/Prac_1/data/train.csv"</span></span><br><span class="line"></span><br><span class="line">FILE_PATH_test = <span class="string">"/media/chuntaojun/Mylinux/code/PythonProject/DeepingLearning/sofasofa/Prac_1/data/test.csv"</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_train_test_data</span><span class="params">()</span>:</span></span><br><span class="line">    data_train = pd.read_csv(FILE_PATH_train)</span><br><span class="line">    data_test = pd.read_csv(FILE_PATH_test)</span><br><span class="line">    <span class="keyword">del</span> data_train[<span class="string">'id'</span>]</span><br><span class="line">    <span class="keyword">del</span> data_test[<span class="string">'id'</span>]</span><br><span class="line">    data_train = np.array(data_train.values)</span><br><span class="line">    np.random.shuffle(data_train)</span><br><span class="line">    labels = data_train[:, <span class="number">-1</span>]</span><br><span class="line">    data_test = np.array(data_test.values)</span><br><span class="line">    data, data_test = data_modify_suitable_train(data_train, <span class="keyword">True</span>), data_modify_suitable_train(np.array(data_test),<span class="keyword">False</span>)</span><br><span class="line">    train_x, test_x, train_y, test_y = train_test_split(data, labels, test_size=<span class="number">0.7</span>)</span><br><span class="line">    <span class="keyword">return</span> train_x, train_y, test_x, test_y, data_test</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">data_modify_suitable_train</span><span class="params">(data_set=None, type=True)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> data_set isnotNone:</span><br><span class="line">        data = []</span><br><span class="line">        <span class="keyword">if</span> typeisTrue:</span><br><span class="line">            np.random.shuffle(data_set)</span><br><span class="line">            data = data_set[:, <span class="number">0</span>: data_set.shape[<span class="number">1</span>] - <span class="number">1</span>]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            data = data_set</span><br><span class="line">    data = np.array([np.reshape(i, (<span class="number">40</span>, <span class="number">40</span>)) <span class="keyword">for</span> i <span class="keyword">in</span> data])</span><br><span class="line">    data = np.array([np.reshape(i, (i.shape[<span class="number">0</span>], i.shape[<span class="number">1</span>], <span class="number">1</span>)) <span class="keyword">for</span> i <span class="keyword">in</span> data])</span><br><span class="line">    <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    load_train_test_data()</span><br></pre></td></tr></table></figure>
+<p>对于CNN模型构建部分，我们采用的keras深度学习框架，因此我们可以很快速的构建起CNN模型，通过Sequential()获取模型对象，然后通过mode.add()方法不断的为模型添加网络层：</p>
+<ul>
+<li>Convolution2D  ：2维卷积层</li>
+<li>MaxPooling2D   ：与2维卷积层操作对应的2维池化层</li>
+<li>Flatten                 ：从卷积层到全连接层，需要将矩阵维度降为一维</li>
+<li>Dense                   ：全连接层，通过全连接层进行计算，然后将结果映射到标签空间</li>
+<li>activation=’sigmoid’ ：因为这个图片识别其实就是二分类的操作，因此我们的激活函数采用sigmoid，这个函数了能够将结果映射到[0，1]区间，以0.5为阀值，进行二分类操作</li>
+</ul>
+<blockquote>
+<p>CNN卷积神经网络模型构建代码</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> keras.callbacks <span class="keyword">import</span> TensorBoard</span><br><span class="line"><span class="keyword">from</span> keras.layers <span class="keyword">import</span> Dense, Dropout, MaxPooling2D, Flatten, Convolution2D</span><br><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Sequential</span><br><span class="line"><span class="keyword">from</span> keras <span class="keyword">import</span> backend <span class="keyword">as</span> K</span><br><span class="line"><span class="keyword">import</span> load_data <span class="keyword">as</span> ld</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> csv</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">f1</span><span class="params">(y_true, y_pred)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">recall</span><span class="params">(y_true,y_pred)</span>:</span></span><br><span class="line">        true_positives = K.sum(K.round(K.clip(y_true * y_pred, <span class="number">0</span>, <span class="number">1</span>)))</span><br><span class="line">        possible_positives = K.sum(K.round(K.clip(y_true, <span class="number">0</span>, <span class="number">1</span>)))</span><br><span class="line">        recall = true_positives / (possible_positives + K.epsilon())</span><br><span class="line">        <span class="keyword">return</span> recall</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">precision</span><span class="params">(y_true,y_pred)</span>:</span></span><br><span class="line">        true_positives = K.sum(K.round(K.clip(y_true * y_pred, <span class="number">0</span>, <span class="number">1</span>)))</span><br><span class="line">        predicted_positives = K.sum(K.round(K.clip(y_pred, <span class="number">0</span>, <span class="number">1</span>)))</span><br><span class="line">        precision = true_positives / (predicted_positives + K.epsilon())</span><br><span class="line">        <span class="keyword">return</span> precision</span><br><span class="line">        precision = precision(y_true, y_pred)</span><br><span class="line">        recall = recall(y_true, y_pred)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">2</span>* ((precision * recall) / (precision + recall))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">built_model</span><span class="params">()</span>:</span></span><br><span class="line">    model = Sequential()</span><br><span class="line">    model.add(Convolution2D(filters=<span class="number">8</span>,</span><br><span class="line">                            kernel_size=(<span class="number">5</span>, <span class="number">5</span>),</span><br><span class="line">                            input_shape=(<span class="number">40</span>, <span class="number">40</span>, <span class="number">1</span>),</span><br><span class="line">                            activation=<span class="string">'relu'</span>))</span><br><span class="line">    model.add(Convolution2D(filters=<span class="number">16</span>,</span><br><span class="line">                            kernel_size=(<span class="number">3</span>, <span class="number">3</span>),</span><br><span class="line">                            activation=<span class="string">'relu'</span>))</span><br><span class="line">    model.add(MaxPooling2D(pool_size=(<span class="number">2</span>, <span class="number">2</span>)))</span><br><span class="line">    model.add(Convolution2D(filters=<span class="number">16</span>,</span><br><span class="line">                            kernel_size=(<span class="number">3</span>, <span class="number">3</span>),</span><br><span class="line">                            activation=<span class="string">'relu'</span>))</span><br><span class="line">    model.add(MaxPooling2D(pool_size=(<span class="number">2</span>, <span class="number">2</span>)))</span><br><span class="line">    model.add(Flatten())</span><br><span class="line">    model.add(Dense(units=<span class="number">128</span>,</span><br><span class="line">                    activation=<span class="string">'relu'</span>))</span><br><span class="line">    model.add(Dropout(<span class="number">0.5</span>))</span><br><span class="line">    model.add(Dense(units=<span class="number">1</span>,</span><br><span class="line">                    activation=<span class="string">'sigmoid'</span>))</span><br><span class="line">    model.compile(loss=<span class="string">'binary_crossentropy'</span>,</span><br><span class="line">                  optimizer=<span class="string">'adam'</span>,</span><br><span class="line">                  metrics=[<span class="string">'accuracy'</span>, f1])</span><br><span class="line">    model.summary()</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train_model</span><span class="params">(batch_size=<span class="number">64</span>, epochs=<span class="number">20</span>, model=None)</span>:</span></span><br><span class="line">    train_x, train_y, test_x, test_y, t = ld.load_train_test_data()</span><br><span class="line">    <span class="keyword">if</span> model <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        model = built_model()</span><br><span class="line">        history = model.fit(train_x, train_y,</span><br><span class="line">                            batch_size=batch_size,</span><br><span class="line">                            epochs=epochs,</span><br><span class="line">                            verbose=<span class="number">2</span>,</span><br><span class="line">                            validation_split=<span class="number">0.1</span>)</span><br><span class="line">    <span class="keyword">print</span><span class="string">"刻画损失函数在训练与验证集的变化"</span></span><br><span class="line">    plt.plot(history.history[<span class="string">'loss'</span>], label=<span class="string">'train'</span>)</span><br><span class="line">    plt.plot(history.history[<span class="string">'val_loss'</span>], label=<span class="string">'valid'</span>)</span><br><span class="line">    plt.legend()</span><br><span class="line">    plt.show()</span><br><span class="line">    predicted = model.predict(t,</span><br><span class="line">                              batch_size=batch_size,</span><br><span class="line">                              verbose=<span class="number">1</span>)</span><br><span class="line">    predicted = np.array([round(w) <span class="keyword">for</span> w <span class="keyword">in</span> predicted])</span><br><span class="line">    score = model.evaluate(test_x, test_y,</span><br><span class="line">                           batch_size=batch_size)</span><br><span class="line">    <span class="keyword">print</span> score</span><br><span class="line">    <span class="keyword">print</span><span class="string">"刻画预测结果与测试集结果"</span></span><br><span class="line">    model.save(<span class="string">'my_model.h5'</span>)</span><br><span class="line">    <span class="keyword">return</span> predicted</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    predicted = train_model()</span><br><span class="line">    num = <span class="number">4000</span></span><br><span class="line">    csvFile = open(<span class="string">'test_y.csv'</span>, <span class="string">'w'</span>)</span><br><span class="line">    write = csv.writer(csvFile)</span><br><span class="line">    write.writerow([<span class="string">'id'</span>,<span class="string">'y'</span>])</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> predicted:</span><br><span class="line">        write.writerow([num,int(i)])</span><br><span class="line">        num += <span class="number">1</span></span><br><span class="line">    <span class="keyword">print</span> predicted</span><br></pre></td></tr></table></figure>
+<p>然后通过训练我们的神经网络，得到了一个损失函数值在训练过程的变化图（损失函数就是神经网络模型优化的目标）</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/12/loss1.png" alt="loss.png"></p>
+<p>最后，将我们模型预测的结果提交到sofasofa.io竞赛平台对应的题目中，看看排名成绩</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-27-03-01-10.png" alt="Screenshot from 2017-12-27 03-01-10"></p>
+<p>可以看出我们的模型构建的还是蛮不错的（第二个是我）</p>
+<blockquote>
+<p>YouTube视频展示模型构建情况</p>
+</blockquote>
+<p>[youtube <a href="https://www.youtube.com/watch?v=lYVTVgtSTnw&amp;w=560&amp;h=315]" target="_blank" rel="noopener">https://www.youtube.com/watch?v=lYVTVgtSTnw&amp;w=560&amp;h=315]</a></p>
+<blockquote>
+<p>哔哩哔哩站点展示模型构建情况</p>
+</blockquote>
+<p><a href="https://www.bilibili.com/video/av17661456/" target="_blank" rel="noopener">https://www.bilibili.com/video/av17661456/</a></p>
+<blockquote>
+<p>项目代码</p>
+</blockquote>
+<p><a href="https://github.com/chuntaojun/Deeplearning/tree/master/Prac_1" target="_blank" rel="noopener">https://github.com/chuntaojun/Deeplearning/tree/master/Prac_1</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/图像识别/" rel="tag"># 图像识别</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/27/data_struct_15/" rel="next" title="排序算法三之快速排序">
+                <i class="fa fa-chevron-left"></i> 排序算法三之快速排序
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/31/deep_learning_2/" rel="prev" title="深度学习初探一——奇偶数学习">
+                深度学习初探一——奇偶数学习 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

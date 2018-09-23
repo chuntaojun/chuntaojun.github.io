@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="奇偶数判断，这个是不是太简单了，不就一个数去对2取取余数，如果余数为0，那么这个数为偶数，否则，这个数为奇数，用Python写的话代码就像这样： def fun(number):     if number % 2 == 0:         print &amp;quot;这是偶数&amp;quot;     else:         print &amp;quot;这是奇数&amp;quot; 但是，这个判断法则是我们知道">
+<meta name="keywords" content="keras">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深度学习初探一——奇偶数学习">
+<meta property="og:url" content="http://yoursite.com/2017/12/31/deep_learning_2/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="奇偶数判断，这个是不是太简单了，不就一个数去对2取取余数，如果余数为0，那么这个数为偶数，否则，这个数为奇数，用Python写的话代码就像这样： def fun(number):     if number % 2 == 0:         print &amp;quot;这是偶数&amp;quot;     else:         print &amp;quot;这是奇数&amp;quot; 但是，这个判断法则是我们知道">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2018-01-01-01-24-51.png">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-31-19-21-00.png">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/loss2.png">
+<meta property="og:updated_time" content="2018-01-21T05:31:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深度学习初探一——奇偶数学习">
+<meta name="twitter:description" content="奇偶数判断，这个是不是太简单了，不就一个数去对2取取余数，如果余数为0，那么这个数为偶数，否则，这个数为奇数，用Python写的话代码就像这样： def fun(number):     if number % 2 == 0:         print &amp;quot;这是偶数&amp;quot;     else:         print &amp;quot;这是奇数&amp;quot; 但是，这个判断法则是我们知道">
+<meta name="twitter:image" content="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2018-01-01-01-24-51.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/31/deep_learning_2/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>深度学习初探一——奇偶数学习 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/31/deep_learning_2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">深度学习初探一——奇偶数学习
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-12-31 20:11:48" itemprop="dateCreated datePublished" datetime="2017-12-31T20:11:48+08:00">2017-12-31</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-01-21 13:31:26" itemprop="dateModified" datetime="2018-01-21T13:31:26+08:00">2018-01-21</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/深度学习/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>奇偶数判断，这个是不是太简单了，不就一个数去对2取取余数，如果余数为0，那么这个数为偶数，否则，这个数为奇数，用Python写的话代码就像这样：</p>
+<pre><code>def fun(number):
+    if number % 2 == 0:
+        print &quot;这是偶数&quot;
+    else:
+        print &quot;这是奇数&quot;
+</code></pre><p>但是，这个判断法则是我们知道的，我们人为的在编程中将判断规则告诉计算机，通过计算来判断一个数是奇数还是偶数。如果我们要只告诉计算机一些数中那些是奇数，那些是偶数，然后让它自己判断新的数据属于偶数还是奇数的话，你要怎么编程呢？这不，最近闲来无视，看了看深度学习的书，突然想试一下，用深度神经网络让计算机去学习奇偶数的特点，然后去判断新的数据是奇数还是偶数。</p>
+<p>现在我们来讲重点！！！如何用深度神经网络来让计算机学习判断一个数的奇偶性。</p>
+<blockquote>
+<p>First Step</p>
+</blockquote>
+<p>我们要训练一个神经网络，总要有数据吧？现在，我们就来创造一些训练数据集，代码如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> sklearn.preprocessing <span class="keyword">as</span> pp</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">load_data</span><span class="params">(number=<span class="number">10001</span>)</span>:</span></span><br><span class="line">    temp = [i <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, number * <span class="number">2</span>)]</span><br><span class="line">    data, labels = [], []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> temp:</span><br><span class="line">        <span class="keyword">if</span> i % <span class="number">2</span> == <span class="number">0</span>:</span><br><span class="line">            data.append([i, i % <span class="number">10</span>, <span class="number">1</span>])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            data.append([i, i % <span class="number">10</span>, <span class="number">0</span>])</span><br><span class="line">    seclar = pp.MinMaxScaler(feature_range=(<span class="number">0</span>, <span class="number">1</span>))</span><br><span class="line">    data = seclar.fit_transform(data)</span><br><span class="line">    np.random.shuffle(data)</span><br><span class="line">    <span class="keyword">print</span> data</span><br><span class="line">    labels = data[:, <span class="number">-1</span>]</span><br><span class="line">    <span class="keyword">return</span> data, labels</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    load_data()</span><br></pre></td></tr></table></figure></p>
+<p>我们在这个py文件中导入了<a href="https://wizardforcel.gitbooks.io/ts-numpy-tut/content/" target="_blank" rel="noopener">numpy</a>包和<a href="https://morvanzhou.github.io/tutorials/machine-learning/sklearn/" target="_blank" rel="noopener">sklearn</a>包，这两个包是在深度学习中常用的到，numpy用于数据的处理方面，sklearn是一个机器学习模块。我们先通过python自带的列表生成式生成数据范围在[1，number]的list数据类型，然后通过np.array()将我们list对象转为numpy的核心对象ndarry，同时，我们也为每一个数生成标签，如果是偶数，那么这个数的labels是1，否则为0，这样我们就完成了数据集的构建，接下来我们看到这几段代码：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">seclar = pp.MinMaxScaler(feature_range=(<span class="number">0</span>, <span class="number">1</span>))</span><br><span class="line">data = seclar.fit_transform(data)</span><br><span class="line">np.random.shuffle(data)</span><br></pre></td></tr></table></figure></p>
+<p>这几段代码什么意思呢？我们简要分析下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">seclar = pp.MinMaxScaler(feature_range=(<span class="number">0</span>, <span class="number">1</span>))</span><br></pre></td></tr></table></figure></p>
+<p>这行代码是设置了归一化，我们对numpy.ndarry的同一列数据进行归一化操作，所谓归一化就是将所有数据缩小到[0，1]的范围内，那么归一化的数学公式呢？看下图：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">new_num = (old_num - min_value) / (max_value - min_value)</span><br></pre></td></tr></table></figure></p>
+<p>这就是归一化前和归一化后的区别：</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2018-01-01-01-24-51.png" alt="Screenshot from 2018-01-01 01-24-51"></p>
+<p>为什么要进行归一化呢？这里引用这篇<a href="http://www.cnblogs.com/subsir/articles/4761140.html" target="_blank" rel="noopener">博客（数据标准化和归一化）</a>的原文：</p>
+<blockquote>
+<p>归一化是一种简化计算的方式，即将有量纲的表达式，经过变换，化为无量纲的表达式，成为纯量。归一化是为了加快训练网络的收敛性，可以不进行归一化处理</p>
+<p>归一化的具体作用是归纳统一样本的统计分布性。归一化在0-1之间是统计的概率分布，归一化在-1–+1之间是统计的坐标分布。归一化有同一、统一和合一的意思。无论是为了建模还是为了计算，首先基本度量单位要同一，神经网络是以样本在事件中的统计分别几率来进行训练(概率计算)和预测的，归一化是同一在0-1之间的统计概率分布;SVM是以降维后线性划分距离来分类和仿真的，因此时空降维归一化是统一在-1–+1之间的统计坐标分布。</p>
+</blockquote>
+<p>现在，我们还需要将每一个数的标签单独提取出来，最为结果用于训练模型与模型预测结果比对：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">labels = data[:, <span class="number">1</span>]</span><br></pre></td></tr></table></figure></p>
+<p>这样，我们的前期工作就准备完毕了</p>
+<blockquote>
+<p>Second Step</p>
+</blockquote>
+<p>这一步，我们就开始来构建我们的神经网络模型了，读者可以先去<a href="http://keras-cn.readthedocs.io/en/latest/" target="_blank" rel="noopener">keras中文</a>了解下tensorflow高级封装的深度学习框架，这个框架适合快速上手深度学习，但是还是要回归tensorflow。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> keras.layers <span class="keyword">import</span> Dense, Dropout</span><br><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Sequential</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> load_data</span><br></pre></td></tr></table></figure></p>
+<p>我们先导入相关的包，这是等等构建模型需要用到的，像全连接层：Dense、按一定概率随机断开神经元：Dropout、序贯模型：Sequential、绘图类：pyplot以及上一步我们的创建数据的包：load_data</p>
+<p>先放上构建模型的代码：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">built_model</span><span class="params">()</span>:</span></span><br><span class="line">    model = Sequential()</span><br><span class="line">    <span class="comment"># first layers</span></span><br><span class="line">    model.add(Dense(units=<span class="number">256</span>,</span><br><span class="line">                    input_dim=<span class="number">2</span>,</span><br><span class="line">                           activation=<span class="string">'relu'</span>))</span><br><span class="line">    model.add(Dropout(<span class="number">0.5</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># second layers</span></span><br><span class="line">    model.add(Dense(units=<span class="number">128</span>,</span><br><span class="line">                    activation=<span class="string">'relu'</span>))</span><br><span class="line">    model.add(Dropout(<span class="number">0.5</span>))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># third layers</span></span><br><span class="line">    model.add(Dense(units=<span class="number">1</span>,</span><br><span class="line">                    activation=<span class="string">'sigmoid'</span>))</span><br><span class="line"></span><br><span class="line">    model.compile(loss=<span class="string">'binary_crossentropy'</span>,</span><br><span class="line">                  optimizer=<span class="string">'adam'</span>,</span><br><span class="line">                  metrics=[<span class="string">'accuracy'</span>])</span><br><span class="line">    model.summary()</span><br><span class="line">    <span class="keyword">return</span> model</span><br></pre></td></tr></table></figure></p>
+<p>我们这个模型有三层神经网络——三个全连接层（Dense），每个全连接层加了Dropout层，Dense层的作用我在上一篇文章<a href="https://liaochuntao.wordpress.com/2017/12/27/%e8%ae%b0%e4%b8%80%e6%ac%a1%e7%ab%9e%e8%b5%9b%e9%a2%98%e7%9b%ae%e6%9c%89%e6%84%9f-%e5%9b%be%e5%83%8f%e8%af%86%e5%88%ab/" target="_blank" rel="noopener">《记一次竞赛题目有感——图像识别》</a> 中解释了下Dense层的作用，但是对于Dropout层的作用我只是说了下防止模型过拟合情况，那么怎么防止这个情况呢？看来还要从全连接层中说起，首先我先放上这个模型的图示以及之前没说过的全连接层的函数表达形式：</p>
+<blockquote>
+<p>学习奇偶数的模型图示</p>
+</blockquote>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-31-19-21-00.png" alt="Screenshot from 2017-12-31 19-21-00"></p>
+<blockquote>
+<p>y = ∑i （wi * xi） + b  这个模型的第一、二层全连接层函数表达式</p>
+</blockquote>
+<p>由于图的问题，全连接层的神经元个数我并没有全部画出来来，因为全部画出来有点小多……这里就是一个简要的模型图，我们可以分清楚的看出我们的模型输入数据维度是二维的，表示我们对一个数字提取了两个特征，然后就是熟悉的全连接层的操作：每个神经元与下一层的所用神经元都有连接；接下来，我们看到在第一层与第二层的全连接层中，标注了一个记号——Dropout层作用的地方，没错，Dropout层作用的地方就是在每两层Dense层之间；为什么作用在这里？因为上一层的每个神经元与下一层的所有神经元都会连接，每个连接之间会有一个权值wi，连接数量越多，权值wi数量也会越多，而权值wi的取值其实就是这个模型的函数的待定系数取值，这个函数的含义其实就是去尽可能的描述一个数与奇偶性的关系，如果说权值wi越多，那么抓住的信息也就越多，就越能学习之间的关系，但是这不就是我们想要的吗？我们在把视线回到模型的开始之处——输入特征向量矩阵，整个模型的学习，是通过给的训练数据和对应答案来学习这二者之间的关系的，如果说我们的权值wi越多，其实学习到的关系是仅仅训练数据与答案之间的关系，相当于我们限定了自变量x的范围，我们在一个闭区间中让我们的模型去学习，那么最终，我们的模型学到的东西，也仅仅局限于这个闭区间中的内容，如果数据不在这个区间呢？那么模型就没办法处理了，这就是我们所说的模型过拟合问题，其原因就是全连接层之间神经元连接数太多导致权值wi数量也相应的增加。那么我们就想到能不能减少神经元之间的连接数量？这个工作的实现就是Dropout层来实现的，Dropout层的工作是一定几率的将某些神经元之间的连接断开（也就是让输入为0），这样我们就减少了权值wi的个数，也就一定程度上防止了我们的模型过拟合。</p>
+<blockquote>
+<p>最终完整代码</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> keras.layers <span class="keyword">import</span> Dense, Dropout</span><br><span class="line"><span class="keyword">from</span> keras.models <span class="keyword">import</span> Sequential</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> load_data</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">built_model</span><span class="params">()</span>:</span></span><br><span class="line">    model = Sequential()</span><br><span class="line">    model.add(Dense(units=<span class="number">256</span>,</span><br><span class="line">                    input_dim=<span class="number">2</span>,</span><br><span class="line">                    activation=<span class="string">'relu'</span>))</span><br><span class="line">    model.add(Dropout(<span class="number">0.5</span>))</span><br><span class="line">    model.add(Dense(units=<span class="number">128</span>,</span><br><span class="line">                    activation=<span class="string">'relu'</span>))</span><br><span class="line">    model.add(Dropout(<span class="number">0.5</span>))</span><br><span class="line">    model.add(Dense(units=<span class="number">1</span>,</span><br><span class="line">                    activation=<span class="string">'sigmoid'</span>))</span><br><span class="line">    model.compile(loss=<span class="string">'binary_crossentropy'</span>,</span><br><span class="line">                  optimizer=<span class="string">'adam'</span>,</span><br><span class="line">                  metrics=[<span class="string">'accuracy'</span>])</span><br><span class="line">    model.summary()</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">train_model</span><span class="params">(batch_size=<span class="number">32</span>, verbose=<span class="number">2</span>, validation_split=<span class="number">0.2</span>, model=None)</span>:</span></span><br><span class="line">    data, labels = load_data.load_data()</span><br><span class="line">    train_x, train_y = data[: int(len(data) * <span class="number">0.7</span>), <span class="number">0</span>: <span class="number">2</span>], labels[: int(len(labels) * <span class="number">0.7</span>)]</span><br><span class="line">    test_x, test_y = data[int(len(data) * <span class="number">0.7</span>): len(data), <span class="number">0</span>: <span class="number">2</span>], labels[int(len(labels) * <span class="number">0.7</span>): len(labels)]</span><br><span class="line">    <span class="keyword">if</span> model <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">        model = built_model()</span><br><span class="line">        history = model.fit(train_x, train_y,</span><br><span class="line">                            batch_size=batch_size,</span><br><span class="line">                            epochs=<span class="number">10</span>,</span><br><span class="line">                            verbose=verbose,</span><br><span class="line">                            validation_split=validation_split)</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"刻画损失函数的变化趋势"</span></span><br><span class="line">        plt.plot(history.history[<span class="string">'loss'</span>], label=<span class="string">'train'</span>)</span><br><span class="line">        plt.plot(history.history[<span class="string">'val_loss'</span>], label=<span class="string">'valid'</span>)</span><br><span class="line">        plt.legend()</span><br><span class="line">        plt.show()</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"模型构建成功，开始预测数据"</span></span><br><span class="line">        score = model.evaluate(test_x, test_y,</span><br><span class="line">                               batch_size=batch_size)</span><br><span class="line">        <span class="keyword">print</span> score</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"画图"</span></span><br><span class="line">        predicted = model.predict(test_x,</span><br><span class="line">                                  batch_size=batch_size,</span><br><span class="line">                                  verbose=<span class="number">0</span>)</span><br><span class="line">        rounded = [round(w) <span class="keyword">for</span> w <span class="keyword">in</span> predicted]</span><br><span class="line">        plt.scatter(test_y, list(range(len(test_y))), marker=<span class="string">'+'</span>)</span><br><span class="line">        plt.scatter(rounded, list(range(len(predicted))), marker=<span class="string">'*'</span>)</span><br><span class="line">        plt.show()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    train_model()</span><br></pre></td></tr></table></figure>
+<p>损失函数值的变化：</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/12/loss2.png" alt="loss"></p>
+<blockquote>
+<p>YouTube站点查看模型构建视频：</p>
+</blockquote>
+<p>[youtube <a href="https://www.youtube.com/watch?v=ZcS0lMsmKMY&amp;w=560&amp;h=315]" target="_blank" rel="noopener">https://www.youtube.com/watch?v=ZcS0lMsmKMY&amp;w=560&amp;h=315]</a></p>
+<blockquote>
+<p>哔哩哔哩站点查看模型构建视频：</p>
+</blockquote>
+<p><a href="https://www.bilibili.com/video/av17838797/" target="_blank" rel="noopener">https://www.bilibili.com/video/av17838797/</a></p>
+<blockquote>
+<p>源代码地址：</p>
+</blockquote>
+<p><a href="https://github.com/chuntaojun/Deeplearning/tree/master/Parity%20learning" target="_blank" rel="noopener">https://github.com/chuntaojun/Deeplearning/tree/master/Parity%20learning</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/keras/" rel="tag"># keras</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/27/deep_learning_1/" rel="next" title="记一次竞赛题目有感——图像识别">
+                <i class="fa fa-chevron-left"></i> 记一次竞赛题目有感——图像识别
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/09/java_web_6/" rel="prev" title="如何简单实现JDK的动态代理功能">
+                如何简单实现JDK的动态代理功能 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

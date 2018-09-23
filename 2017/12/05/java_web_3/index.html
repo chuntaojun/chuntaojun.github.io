@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Swagger是什么？官方的定义是：A POWERFUL INTERFACE TO YOUR API。简单来说，Swagger就是将后台提供的restful-api进行在前端展示并提供测试所用。 api文档的书写，就我个人而言，是极其难受的一件事情，首先你要将你所提供API的功能作用和使用方法向前端人员说明，不善言语的我是真的难以言表，Swagger正好解决了我的痛苦，我只需要通过在对应rest">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swagger与springMvc集成">
+<meta property="og:url" content="http://yoursite.com/2017/12/05/java_web_3/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Swagger是什么？官方的定义是：A POWERFUL INTERFACE TO YOUR API。简单来说，Swagger就是将后台提供的restful-api进行在前端展示并提供测试所用。 api文档的书写，就我个人而言，是极其难受的一件事情，首先你要将你所提供API的功能作用和使用方法向前端人员说明，不善言语的我是真的难以言表，Swagger正好解决了我的痛苦，我只需要通过在对应rest">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/e6b7b1e5baa6e688aae59bbe_e98089e68ba9e58cbae59f9f_20171205231637.png">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/e6b7b1e5baa6e688aae59bbe_20171205225124.png">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/e6b7b1e5baa6e688aae59bbe_e98089e68ba9e58cbae59f9f_20171205225312.png">
+<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/e6b7b1e5baa6e688aae59bbe_e98089e68ba9e58cbae59f9f_20171205225510.png">
+<meta property="og:updated_time" content="2018-01-21T05:32:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Swagger与springMvc集成">
+<meta name="twitter:description" content="Swagger是什么？官方的定义是：A POWERFUL INTERFACE TO YOUR API。简单来说，Swagger就是将后台提供的restful-api进行在前端展示并提供测试所用。 api文档的书写，就我个人而言，是极其难受的一件事情，首先你要将你所提供API的功能作用和使用方法向前端人员说明，不善言语的我是真的难以言表，Swagger正好解决了我的痛苦，我只需要通过在对应rest">
+<meta name="twitter:image" content="https://liaochuntao.files.wordpress.com/2017/12/e6b7b1e5baa6e688aae59bbe_e98089e68ba9e58cbae59f9f_20171205231637.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/12/05/java_web_3/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Swagger与springMvc集成 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/12/05/java_web_3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Swagger与springMvc集成
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2017-12-05 23:17:14" itemprop="dateCreated datePublished" datetime="2017-12-05T23:17:14+08:00">2017-12-05</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-01-21 13:32:02" itemprop="dateModified" datetime="2018-01-21T13:32:02+08:00">2018-01-21</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://liaochuntao.files.wordpress.com/2017/12/e6b7b1e5baa6e688aae59bbe_e98089e68ba9e58cbae59f9f_20171205231637.png" alt="深度截图_选择区域_20171205231637"></p>
+<p>Swagger是什么？官方的定义是：A POWERFUL INTERFACE TO YOUR API。简单来说，Swagger就是将后台提供的restful-api进行在前端展示并提供测试所用。</p>
+<p>api文档的书写，就我个人而言，是极其难受的一件事情，首先你要将你所提供API的功能作用和使用方法向前端人员说明，不善言语的我是真的难以言表，Swagger正好解决了我的痛苦，我只需要通过在对应restful-api的方法上提供注解，Swagger就会通过一系列反射来动态生成一个.json文件，这个.json文件的信息就是restful-api的信息，然后通过前端js的解析展现json数据，转换成前端html页面所展示的数据。具体如下图所示：</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/12/e6b7b1e5baa6e688aae59bbe_20171205225124.png" alt="深度截图_20171205225124"></p>
+<p>当我们用上Swagger之后，api文档的编写就变得异常简单，只需要通过几个注解功能就能够将api的具体功能与使用描述清楚</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/12/e6b7b1e5baa6e688aae59bbe_e98089e68ba9e58cbae59f9f_20171205225312.png" alt="深度截图_选择区域_20171205225312"></p>
+<p>在生成Swagger前端api文档后，前端人员就可以通过直接表单提交进行测试数据提交的结果返回</p>
+<p><img src="https://liaochuntao.files.wordpress.com/2017/12/e6b7b1e5baa6e688aae59bbe_e98089e68ba9e58cbae59f9f_20171205225510.png" alt="深度截图_选择区域_20171205225510"></p>
+<p>可见，Swagger的出现，极大方便了前后端人员对于api的交接与数据格式的对接。（这只是我个人感觉，可能会有理解不当之处）。</p>
+<p>但是，本文的重点是介绍如何将Swagger和spring-mvc进行结合起来的，那就开始吧。首先我们需要下载连个依赖包<br><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">compile</span> <span class="keyword">group</span>: <span class="string">'io.springfox'</span>, name: <span class="string">'springfox-swagger2'</span>, version: <span class="string">'2.7.0'</span></span><br><span class="line"><span class="keyword">compile</span> <span class="keyword">group</span>: <span class="string">'io.springfox'</span>, name: <span class="string">'springfox-swagger-ui'</span>, version: <span class="string">'2.7.0'</span></span><br><span class="line"><span class="keyword">compile</span> <span class="keyword">group</span>: <span class="string">'com.fasterxml.jackson.core'</span>, name: <span class="string">'jackson-core'</span>, version: <span class="string">'2.9.2'</span></span><br><span class="line"><span class="keyword">compile</span> <span class="keyword">group</span>: <span class="string">'com.fasterxml.jackson.core'</span>, name: <span class="string">'jackson-annotations'</span>, version: <span class="string">'2.9.2'</span></span><br><span class="line"><span class="keyword">compile</span> <span class="keyword">group</span>: <span class="string">'com.fasterxml.jackson.core'</span>, name: <span class="string">'jackson-databind'</span>, version: <span class="string">'2.9.2'</span></span><br></pre></td></tr></table></figure></p>
+<p>（我使用gradle来管理项目的，说实话，觉得maven的xml式管理我觉得太丑了）<br>下载好后，我们编写一个配置类：SwaggerConfig<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@EnableWebMvc</span></span><br><span class="line"><span class="meta">@EnableSwagger</span>2</span><br><span class="line"><span class="meta">@ComponentScan</span>(basePackages = <span class="string">"com.nblot.controller.*"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SwaggerConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SwaggerConfig</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Docket <span class="title">docket</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Docket(DocumentationType.SWAGGER_2)</span><br><span class="line">                .apiInfo(apiInfo())</span><br><span class="line">                .useDefaultResponseMessages(<span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> ApiInfo <span class="title">apiInfo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ApiInfoBuilder()</span><br><span class="line">                .title(<span class="string">"Api Documents"</span>)</span><br><span class="line">                .contact(<span class="keyword">new</span> Contact(<span class="string">"liaochuntao"</span>, <span class="string">""</span>, <span class="string">"liaochunyhm@live.com"</span>))</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>@Component是让这个类能被spring扫描到，从而是这个配置类能够起作用；<br>@Configuration是描述这个类是一个配置类；<br>@EnableSwagger2 是使swagger2生效；<br>@EnableWebMvc是启用spring-mvc相关java配置<br>@ComponentScan（basepackages=“”）是Swagger扫描提供restful-api接口的类，一般都是扫描带有requestMapping注解的类。</p>
+</blockquote>
+<p>然后，我们再sprin-config.xml配置文件上加上这些信息<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mvc:default-servlet-handler</span>/&gt;</span>;</span><br><span class="line"><span class="tag">&lt;<span class="name">mvc:resources</span> <span class="attr">mapping</span>=<span class="string">"index.html"</span> <span class="attr">location</span>=<span class="string">"classpath:/swagger/**"</span> /&gt;</span>;</span><br></pre></td></tr></table></figure></p>
+<p>为了能够使用Swagger，我们需要使用spring-mvc的默认拦截，同时我们还需要避免<br>Swagger的静态资源被sprin-mvc拦截进而导致页面无法显示的异常情况。</p>
+<p>在做完上述工作之后，我们就可以使用Swagger了。</p>
+<p>那么如何描述restful-api信息呢？Swagger提供了丰富的注解功能让我们去描述一个restful-api接口的具体功能与使用。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Api</span>(description = <span class="string">"用户信息中心接口"</span>)</span><br><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/app"</span>)</span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">UserInfoController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Resource</span>(name = <span class="string">"loginImpl"</span>)</span><br><span class="line">    <span class="keyword">private</span> loginInterface loginImpl;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Resource</span>(name = <span class="string">"uploadImpl"</span>)</span><br><span class="line">    <span class="keyword">private</span> multipartInterface uploadImpl;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Resource</span>(name = <span class="string">"sendAuthCodeImpl"</span>)</span><br><span class="line">    <span class="keyword">private</span> sendauthInterface authCodeImpl;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jwtUser</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ApiOperation</span>(value = <span class="string">"Update User Info"</span>, notes = <span class="string">"更新用户信息，在url中带上用户 username（这不是账户）"</span>)</span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/&#123;username&#125;/update/userInfo"</span>, method = RequestMethod.POST)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">updateUserInfo</span><span class="params">(JwtUser jwtUser, @PathVariable String username)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (String) loginImpl.updata(jwtUser).getData();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jwtUser</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> session</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ApiOperation</span>(value = <span class="string">"Get Auth Code"</span>, notes = <span class="string">"进行安全操作时必须获取短信验证码"</span>)</span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/get/auth_code"</span>, method = RequestMethod.GET)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getSecurityAuthCode</span><span class="params">(@ModelAttribute JwtUser jwtUser, HttpSession session)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (String) authCodeImpl.sendCode(jwtUser, session).getData();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> jwtUser</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> authCode</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> session</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ApiOperation</span>(value = <span class="string">"Modify User Password"</span>, notes = <span class="string">"用户更新账户密码"</span>)</span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/update/modify/password"</span>, method = RequestMethod.POST)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">ModifyUserPassword</span><span class="params">(@Validated JwtUser jwtUser, String authCode, HttpSession session)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (String) loginImpl.modifyPassword(authCode, jwtUser, session).getData();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     *  需要把错误信息返回至App端</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> multipartFile</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@ApiOperation</span>(value = <span class="string">"Upload Head Image"</span>, notes = <span class="string">"用户更新头像信息"</span>)</span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/&#123;username&#125;/upload/head"</span>, method = RequestMethod.PUT)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">uploadHeadImage</span><span class="params">(MultipartFile multipartFile, @PathVariable String username)</span> </span>&#123;</span><br><span class="line">        uploadImpl.uploadMultipart(multipartFile);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>@Api(description =“”）是用于描述这一个类的作用，相当于是一堆方法的老大描述<br>@ApiOperation 是用于描述一个接口的功能，相当于是对老大下面的小弟进行进一步描述<br>@ApiModel 是用于表单绑定数据的，这个是绑定一个类</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@ApiModel</span>(value = <span class="string">"User"</span>, description = <span class="string">"用户对象"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ApiModelProperty</span>(value = <span class="string">"account"</span>)</span><br><span class="line">    <span class="keyword">protected</span> String account;</span><br><span class="line">    <span class="meta">@ApiModelProperty</span>(value = <span class="string">"password"</span>)</span><br><span class="line">    <span class="keyword">protected</span> String password;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">int</span> userId;</span><br><span class="line">    <span class="keyword">protected</span> String token;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>就像这样</p>
+<blockquote>
+<p>@ApiModelProperty(value = “account”)是用于绑定表单的某一数据到对象的某一个属性</p>
+</blockquote>
+<p>通过利用@ApiModel，@ApiModelProperty这两个注解我们就可以很方便的和spring-mvc的表单绑定相结合工作。</p>
+<p>未完待续……;</p>
+<p>（继续介绍Swagger的注解方法，以及springBoot和Swagger协同工作的配置）</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/02/data_struct_9/" rel="next" title="静态查找表算法">
+                <i class="fa fa-chevron-left"></i> 静态查找表算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/07/data_struct_10/" rel="prev" title="图论相关——邻接多重表与十字链表">
+                图论相关——邻接多重表与十字链表 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

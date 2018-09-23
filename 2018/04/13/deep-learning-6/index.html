@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="什么是神经网络  接收刺激 ——&amp;gt; 产生信号 ——&amp;gt; 经验学习，这样的一组过程就是一次学习过程，而这样的一组过程，如果被放到一个容器中，那么，这个容器就是一个神经元  而神经网络，其实就是由多个神经元的组合而成的，多个神经元共同组成一个神经网络；整个学习过程可以这样文字描述：接收刺激——&amp;gt;产生信号——&amp;gt;接收刺激——&amp;gt;产生信号——&amp;gt;…——&amp;gt;经验学习   什">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Numpy手动实现全连接神经网络">
+<meta property="og:url" content="http://yoursite.com/2018/04/13/deep-learning-6/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="什么是神经网络  接收刺激 ——&amp;gt; 产生信号 ——&amp;gt; 经验学习，这样的一组过程就是一次学习过程，而这样的一组过程，如果被放到一个容器中，那么，这个容器就是一个神经元  而神经网络，其实就是由多个神经元的组合而成的，多个神经元共同组成一个神经网络；整个学习过程可以这样文字描述：接收刺激——&amp;gt;产生信号——&amp;gt;接收刺激——&amp;gt;产生信号——&amp;gt;…——&amp;gt;经验学习   什">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/deep_learning/deep_learning-6.1.png">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/deep_learning/deep_learning-6.2.png">
+<meta property="og:updated_time" content="2018-04-20T13:09:43.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Numpy手动实现全连接神经网络">
+<meta name="twitter:description" content="什么是神经网络  接收刺激 ——&amp;gt; 产生信号 ——&amp;gt; 经验学习，这样的一组过程就是一次学习过程，而这样的一组过程，如果被放到一个容器中，那么，这个容器就是一个神经元  而神经网络，其实就是由多个神经元的组合而成的，多个神经元共同组成一个神经网络；整个学习过程可以这样文字描述：接收刺激——&amp;gt;产生信号——&amp;gt;接收刺激——&amp;gt;产生信号——&amp;gt;…——&amp;gt;经验学习   什">
+<meta name="twitter:image" content="http://120.24.90.180:8080/blog/image/deep_learning/deep_learning-6.1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/13/deep-learning-6/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>使用Numpy手动实现全连接神经网络 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/13/deep-learning-6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">使用Numpy手动实现全连接神经网络
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-04-13 14:18:47" itemprop="dateCreated datePublished" datetime="2018-04-13T14:18:47+08:00">2018-04-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-04-20 21:09:43" itemprop="dateModified" datetime="2018-04-20T21:09:43+08:00">2018-04-20</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/深度学习/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>什么是神经网络</p>
+</blockquote>
+<p><code>接收刺激</code> ——&gt; <code>产生信号</code> ——&gt; <code>经验学习</code>，这样的一组过程就是一次学习过程，而这样的一组过程，如果被放到一个容器中，那么，这个容器就是一个神经元</p>
+<p><img src="http://120.24.90.180:8080/blog/image/deep_learning/deep_learning-6.1.png" alt="神经元"></p>
+<p>而神经网络，其实就是由多个神经元的组合而成的，多个神经元共同组成一个神经网络；整个学习过程可以这样文字描述：<code>接收刺激</code>——&gt;<code>产生信号</code>——&gt;<code>接收刺激</code>——&gt;<code>产生信号</code>——&gt;…——&gt;<code>经验学习</code></p>
+<p><img src="http://120.24.90.180:8080/blog/image/deep_learning/deep_learning-6.2.png" alt="神经网络"></p>
+<blockquote>
+<p>什么是前向传播</p>
+</blockquote>
+<p>假设我们有这样一组数据</p>
+<p><code>x=[(1.0, 2.3), (3.1, 0.5), (1.2, 1.3), (0.9, 0.6)]， y=[1, 1, 0, 0]</code></p>
+<p>我们需要找到从<code>x-&gt;y</code>的关系，其实也可以认为这是一个分类问题，因为当我们粗略的查看<code>x</code>、<code>y</code>两个数据时发现，当<code>x1 + x2 &gt; 3</code>时，<code>y</code>对应的是<code>1</code>，因此我们就希望找到这样一个函数<code>y = W*x + b</code>能够描述这个关系，那么就要去解出<code>W</code>与<code>b</code>这两个参数，而在解的过程，我们需要代入已知数据<code>x</code>到我们假设的函数<code>y = W * x + b</code>当中，可以得出这样的一个式子：<code>y_pre = W * xi + b，xi属于x</code>，这个过程，就是前向传播的过程，在这前向传播过程当中，我们需要去解出参数<code>W</code>、<code>b</code>，而这个解的过程，我们需要利用一个叫代价函数的东西</p>
+<blockquote>
+<p>什么是代价函数</p>
+</blockquote>
+<p>通过刚才的前向传播过程，我们得到了每一个<code>xi</code>对应的<code>y_pre</code>值，这个<code>y_pre</code>值，是根据我们假设的函数所求得的，那么怎么判断这个函数能否很好的描述出我们想要的关系呢？这就需要我们去计算<code>y_true</code>与<code>y_pre</code>的误差总和：<code>cost_function = abs(y_true - y_pre)</code>，而我们的代价函数是与<code>W</code>、<code>b</code>有关的，我们期望找到代价函数的最小值，使得函数描述能够更加准确；因此，当代价函数取到最小值时对应的<code>W</code>、<code>b</code>就是我们所需要的此时的参数<code>W</code>、<code>b</code>的解，为了解出<code>W</code>与<code>b</code>，我们采用梯度下降法，梯度下降法在<a href="https://www.liaochuntao.cn/2018/02/08/machine-learning-4/" target="_blank" rel="noopener">这篇博文</a>说了差不多了,所以就不细说了；但是，在进行梯度下降时，有一个很繁琐的问题，就是求代价函数与每一个节点的梯度，根据梯度对权重<code>W</code>进行更新操作，如何快速的求解这些梯度问题，这个时候，就需要反向传播算法了</p>
+<blockquote>
+<p>什么是反向传播</p>
+</blockquote>
+<p><img src="" alt=""></p>
+<p>对于反向传播的具体数学公式推导，<a href="https://hit-scir.gitbooks.io/neural-networks-and-deep-learning-zh_cn/content/chap2/c2s0.html" target="_blank" rel="noopener">这本书详细的说明了</a>(主要是有一些中间步骤的推导我还没完全弄明白)；反向传播算法，其实就是根据最后输出层的输出数值与实际结果之间的误差，将这个误差反向从输出层开始从右向左反向传播回输入层。假定我们的误差函数为<code>g(x)=(1/2)*(y_pre - y_true)^2</code>，<code>y=Σ(Wx)</code>，进行求偏导数，然后进行一系列数学公式推导整合之后，我们得到了更新权重<code>W</code>的公式</p>
+<p><code>△w=-n*(∂[g(x)]/∂[w]) {权值校正=(-1)*学习率*局部梯度*神经元的输入信号}</code></p>
+<p>这里之所以取反的原因是我们利用代价函数求出每个节点的梯度，梯度的方向代表了误差扩大方向，因此为了实现误差缩小，采用取反操作。因此，根据反向传播算法，我们可以确定每一个权重参数<code>wi</code>的更新公式<code>w -= △w</code></p>
+<blockquote>
+<p>具体函数实现</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Network</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="string">"""[summary]</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Arguments:</span></span><br><span class="line"><span class="string">        object &#123;[type]&#125; -- [description]</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Returns:</span></span><br><span class="line"><span class="string">        [type] -- [description]</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, sizes)</span>:</span></span><br><span class="line">        <span class="string">"""[summary]</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        Arguments:</span></span><br><span class="line"><span class="string">            sizes &#123;[type]&#125; -- [description]</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        self.num_layers = len(sizes)</span><br><span class="line">        self.sizes = sizes</span><br><span class="line">        self.biases = [np.random.randn(y, <span class="number">1</span>) <span class="keyword">for</span> y <span class="keyword">in</span> sizes[<span class="number">1</span>: ]]</span><br><span class="line">        self.weights = [np.random.randn(y, x) <span class="keyword">for</span> x, y <span class="keyword">in</span> zip(sizes[:<span class="number">-1</span>], sizes[<span class="number">1</span>:])]</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">feedfoward</span><span class="params">(self, a)</span>:</span></span><br><span class="line">        <span class="string">"""[summary]</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        Arguments:</span></span><br><span class="line"><span class="string">            a &#123;[type]&#125; -- [description]</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        Returns:</span></span><br><span class="line"><span class="string">            [type] -- [description]</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">for</span> b, w <span class="keyword">in</span> zip(self.biases, self.weights):</span><br><span class="line">            <span class="comment"># zip()函数的使用</span></span><br><span class="line">            <span class="comment"># a = [1, 2, 3]; b = [4, 5, 6]</span></span><br><span class="line">            <span class="comment"># zip(a, b) =&gt;&gt; [(1, 4), (2, 5), (3, 6)]</span></span><br><span class="line">            a = sigmoid(np.dot(w, a) + b)</span><br><span class="line">        <span class="keyword">return</span> a</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">SGD</span><span class="params">(self, training_data, epochs, mini_batch_size, learn_rate, test_data=None)</span>:</span></span><br><span class="line">        <span class="string">"""[summary]</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        Arguments:</span></span><br><span class="line"><span class="string">            training_data &#123;list&#125; -- [训练数据]</span></span><br><span class="line"><span class="string">            epochs &#123;int&#125; -- 训练轮书</span></span><br><span class="line"><span class="string">            mini_batch_size &#123;int&#125; -- [每批计算数据大小]</span></span><br><span class="line"><span class="string">            learn_rate &#123;float&#125; -- [学习率]</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        Keyword Arguments:</span></span><br><span class="line"><span class="string">            test_data &#123;list&#123;int&#125;&#125; -- [测试数据集] (default: &#123;None&#125;)</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> test_data:</span><br><span class="line">            n_test = len(test_data)</span><br><span class="line">        n = len(training_data)</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> xrange(epochs):</span><br><span class="line">            random.shuffle(training_data)</span><br><span class="line">            <span class="comment"># 根据mini_batch_size将training_data分割成小批数据用于随机梯度下降</span></span><br><span class="line">            mini_batches = [training_data[k: k + mini_batch_size] <span class="keyword">for</span> k <span class="keyword">in</span> xrange(<span class="number">0</span>, n, mini_batch_size)]</span><br><span class="line">            <span class="comment"># 循环拿取每批训练数据进行训练</span></span><br><span class="line">            <span class="keyword">for</span> mini_batch <span class="keyword">in</span> mini_batches:</span><br><span class="line">                <span class="comment"># </span></span><br><span class="line">                self.update_mini_batch(mini_batch, learn_rate)</span><br><span class="line">            <span class="keyword">if</span> test_data:</span><br><span class="line">                <span class="keyword">print</span> <span class="string">"Epoch &#123;0&#125;: &#123;1&#125; / &#123;2&#125;"</span>.format(j, self.evaluate(test_data), n_test)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">print</span> <span class="string">"Epoch &#123;0&#125; complete"</span>.format(j)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">update_mini_batch</span><span class="params">(self, mini_batch, eta)</span>:</span></span><br><span class="line">        <span class="string">"""[summary]</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        Arguments:</span></span><br><span class="line"><span class="string">            mini_batch &#123;list&#125; -- [description]</span></span><br><span class="line"><span class="string">            eta &#123;float&#125; -- [学习率]</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        nabla_b = [np.zeros(b.shape) <span class="keyword">for</span> b <span class="keyword">in</span> self.biases]</span><br><span class="line">        nabla_w = [np.zeros(w.shape) <span class="keyword">for</span> w <span class="keyword">in</span> self.weights]</span><br><span class="line">        <span class="keyword">for</span> x, y <span class="keyword">in</span> mini_batch:</span><br><span class="line">            delta_nabla_b, delta_nabla_w = self.backprop(x, y)</span><br><span class="line">            <span class="comment"># 更新对应批量的权重参数 w 与偏置参数 b</span></span><br><span class="line">            nabla_b = [nb + dnb <span class="keyword">for</span> nb, dnb <span class="keyword">in</span> zip(nabla_b, delta_nabla_b)]</span><br><span class="line">            nabla_w = [nw + dnw <span class="keyword">for</span> nw, dnw <span class="keyword">in</span> zip(nabla_w, delta_nabla_w)]</span><br><span class="line">        self.weights = [w - (eta / len(mini_batch)) * nw <span class="keyword">for</span> w, nw <span class="keyword">in</span> zip(self.weights, nabla_w)]</span><br><span class="line">        self.biases = [b - (eta / len(mini_batch)) * nb <span class="keyword">for</span> b, nb <span class="keyword">in</span> zip(self.biases, nabla_b)]</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">backprop</span><span class="params">(self, x, y)</span>:</span></span><br><span class="line">        <span class="string">"""[summary]</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        Arguments:</span></span><br><span class="line"><span class="string">            x &#123;int&#125; -- [输入信号]</span></span><br><span class="line"><span class="string">            y &#123;int&#125; -- [正确输出信号]</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        Returns:</span></span><br><span class="line"><span class="string">            [tuple(list, list)] -- [返回]</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        nabla_b = [np.zeros(b.shape) <span class="keyword">for</span> b <span class="keyword">in</span> self.biases]</span><br><span class="line">        nabla_w = [np.zeros(w.shape) <span class="keyword">for</span> w <span class="keyword">in</span> self.weights]</span><br><span class="line">        activation = x</span><br><span class="line">        activations = [x]</span><br><span class="line">        zs = []</span><br><span class="line">        <span class="keyword">for</span> b, w <span class="keyword">in</span> zip(self.biases, self.weights):</span><br><span class="line">            z = np.dot(w, activation) + b</span><br><span class="line">            zs.append(z)</span><br><span class="line">            activation = sigmoid(z)</span><br><span class="line">            activations.append(activation)</span><br><span class="line">        <span class="comment"># 计算最后一层的误差值大小</span></span><br><span class="line">        delta = self.cost_derivative(activations[<span class="number">-1</span>], y) * sigmoid_prime(zs[<span class="number">-1</span>])</span><br><span class="line">        nabla_b[<span class="number">-1</span>] = delta</span><br><span class="line">        nabla_w[<span class="number">-1</span>] = np.dot(delta, activations[<span class="number">-2</span>].transpose())</span><br><span class="line">        <span class="comment"># 利用反向传播算法求出对应权重参数 w 与偏置参数 b 的更新值</span></span><br><span class="line">        <span class="keyword">for</span> l <span class="keyword">in</span> xrange(<span class="number">2</span>, self.num_layers):</span><br><span class="line">            z = zs[-l]</span><br><span class="line">            sp = sigmoid_prime(z)</span><br><span class="line">            delta = np.dot(self.weights[-l + <span class="number">1</span>].transopse(), delta) * sp</span><br><span class="line">            nabla_b[-l] = delta</span><br><span class="line">            nabla_w[-l] = np.dot(delta, activations[-l - <span class="number">1</span>].trainspose())</span><br><span class="line">        <span class="keyword">return</span> (nabla_b, nabla_w)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">evaluate</span><span class="params">(self, test_data)</span>:</span></span><br><span class="line">        <span class="string">"""[summary]</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        Arguments:</span></span><br><span class="line"><span class="string">            test_data &#123;list&#125; -- [测试数据集]</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        Returns:</span></span><br><span class="line"><span class="string">            [int] -- [返回预测正确的个数]</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        test_result = [(np.argmax(self.feedfoward(x)), y) <span class="keyword">for</span> x, y <span class="keyword">in</span> test_data]</span><br><span class="line">        <span class="keyword">return</span> sum(int(x == y) <span class="keyword">for</span> (x, y) <span class="keyword">in</span> test_result)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">cost_derivative</span><span class="params">(self, output_activations, y)</span>:</span></span><br><span class="line">        <span class="string">"""[代价函数]</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        Arguments:</span></span><br><span class="line"><span class="string">            output_activations &#123;list&#125; -- [预测输出值]</span></span><br><span class="line"><span class="string">            y &#123;list&#125; -- [实际值]</span></span><br><span class="line"><span class="string">        </span></span><br><span class="line"><span class="string">        Returns:</span></span><br><span class="line"><span class="string">            [list] -- [返回对应项实际值与预测输出值的误差]</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">return</span> (output_activations - y)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sigmoid</span><span class="params">(z)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1.0</span> / (<span class="number">1.0</span> + np.exp(-z))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sigmoid_prime</span><span class="params">(z)</span>:</span></span><br><span class="line">    <span class="string">"""[sigmoid函数的导数公式]</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Arguments:</span></span><br><span class="line"><span class="string">        z &#123;list&#125; -- [输入信号]</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Returns:</span></span><br><span class="line"><span class="string">        [list] -- [sigmoid激活函数的导数值]</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="keyword">return</span> sigmoid(z) * (<span class="number">1</span> - sigmoid(z))</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/07/deep-learning-4/" rel="next" title="keras的回调函数的学习">
+                <i class="fa fa-chevron-left"></i> keras的回调函数的学习
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/04/java-web-8/" rel="prev" title="SpringBoot集成SpringSecurity Oauth2">
+                SpringBoot集成SpringSecurity Oauth2 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

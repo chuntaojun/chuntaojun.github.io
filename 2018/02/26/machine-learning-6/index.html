@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="之前看的机器学习的分类算法所构建的分类器都是单分类器，就是一整个算法当中，只构建了一个分类器用于分类。单分类器算法构建简单，但是缺点也很大——就是独裁，这个分类器所分类的结果就是最终的结果，缺少多方的意见，因此，就希望分类算法能够实现多方意见机制，也就是多个分类器共同分类来决定其最终的分类结果。 这个多方意见机制其实就像专家咨询机制，每一个专家的权威不同，所给出的意见也就不同，其最中的结果，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习之AdaBoost">
+<meta property="og:url" content="http://yoursite.com/2018/02/26/machine-learning-6/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="之前看的机器学习的分类算法所构建的分类器都是单分类器，就是一整个算法当中，只构建了一个分类器用于分类。单分类器算法构建简单，但是缺点也很大——就是独裁，这个分类器所分类的结果就是最终的结果，缺少多方的意见，因此，就希望分类算法能够实现多方意见机制，也就是多个分类器共同分类来决定其最终的分类结果。 这个多方意见机制其实就像专家咨询机制，每一个专家的权威不同，所给出的意见也就不同，其最中的结果，">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-05-06T02:47:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="机器学习之AdaBoost">
+<meta name="twitter:description" content="之前看的机器学习的分类算法所构建的分类器都是单分类器，就是一整个算法当中，只构建了一个分类器用于分类。单分类器算法构建简单，但是缺点也很大——就是独裁，这个分类器所分类的结果就是最终的结果，缺少多方的意见，因此，就希望分类算法能够实现多方意见机制，也就是多个分类器共同分类来决定其最终的分类结果。 这个多方意见机制其实就像专家咨询机制，每一个专家的权威不同，所给出的意见也就不同，其最中的结果，">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/02/26/machine-learning-6/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>机器学习之AdaBoost | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/26/machine-learning-6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">机器学习之AdaBoost
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-02-26 20:25:36" itemprop="dateCreated datePublished" datetime="2018-02-26T20:25:36+08:00">2018-02-26</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-05-06 10:47:02" itemprop="dateModified" datetime="2018-05-06T10:47:02+08:00">2018-05-06</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/机器学习/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>之前看的机器学习的分类算法所构建的分类器都是单分类器，就是一整个算法当中，只构建了一个分类器用于分类。单分类器算法构建简单，但是缺点也很大——就是<code>独裁</code>，这个分类器所分类的结果就是最终的结果，缺少多方的意见，因此，就希望分类算法能够实现多方意见机制，也就是多个分类器共同分类来决定其最终的分类结果。</p>
+<p>这个多方意见机制其实就像专家咨询机制，每一个专家的权威不同，所给出的意见也就不同，其最中的结果，需要综合各方的意见以及可采信程度综合得出最终的意见结果；对于分类器而言，可信度就是该分类器的采信权重alpha，其计算公式为：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">µ = 分错的样本个数 / 总样本个数</span><br><span class="line">alpha = 1 / 2 * ln((1 - µ) / µ)</span><br></pre></td></tr></table></figure>
+<p>专家个数呢？其实就是同一种分类器，根据采信程度来区分成不同的<code>分类器</code>；但是，一个分类器用一个样本训练，无论训练多少次应该只能得到一个分类器模型才对，那是怎么得到这么多不同的采信程度不同的分类器？这个adaboost算法已经解决了。</p>
+<blockquote>
+<p>AdaBoost</p>
+</blockquote>
+<p>adaboost算法是解决上面问题的一种实现方案，adaboost算法就是一种生成多个置信程度不同的分类器，然后将这些分类起器分类结果进行加权求和得到最终的分类结果，而这个权重值，就是刚刚说的aplha值：1 / 2 * ln((1 - µ) / µ)，µ = 分错的样本个数 / 总样本个数；那么分类器可以选择什么呢？可以是前面的朴素贝叶斯分类器，可以是决策树，可以是Logistic回归分类器等等等；在这里，用了最容易实现的单层决策树来作为adaboost的基分类器。</p>
+<blockquote>
+<p>单层决策树</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">stumpClassify</span><span class="params">(dataMatrix, dimen, threshVal, threshIneq)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    :param dataMatrix:</span></span><br><span class="line"><span class="string">    :param dimen:</span></span><br><span class="line"><span class="string">    :param threshVal:</span></span><br><span class="line"><span class="string">    :param threshIneq:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    retArray = np.ones((np.shape(dataMatrix)[<span class="number">0</span>], <span class="number">1</span>))</span><br><span class="line">    <span class="keyword">if</span> threshIneq == <span class="string">'lt'</span>:</span><br><span class="line">        retArray[dataMatrix[:, dimen] &lt;= threshVal] = <span class="number">-1.0</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        retArray[dataMatrix[:, dimen] &gt;= threshVal] = <span class="number">-1.0</span></span><br><span class="line">    <span class="keyword">return</span> retArray</span><br></pre></td></tr></table></figure>
+<p>利用上面的代码我们构建成了一个单层决策树，单层决策树的算法是在某个特征上取一个阈值并通过大小关系来实现二分类。</p>
+<blockquote>
+<p>得到当前最好的单决策树 </p>
+</blockquote>
+<p>分类器的好坏判别标准就是分类的准确率，遍历所有特征，同时，在某特征下，遍历所有该特征的可能取值；就这样通过双重循环，不断得到不同的单层决策树，通过计算准确率以及和最大正确率（最小错误率）比较，取得单层决策树的最优树；同时，在python的字典对象中保存最优单层决策树的特征信息：{第几个特征； 该特征的取值；正确率；错误率}</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">buildStump</span><span class="params">(dataArr, classLabels, D)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    :param dataArr:</span></span><br><span class="line"><span class="string">    :param classLabels:</span></span><br><span class="line"><span class="string">    :param D:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    dataMatrix = np.mat(dataArr);</span><br><span class="line">    labelMat = np.mat(classLabels).T</span><br><span class="line">    m, n = np.shape(dataMatrix)</span><br><span class="line">    numSteps = <span class="number">10.0</span>;</span><br><span class="line">    bestStump = &#123;&#125;;</span><br><span class="line">    bestClassEst = np.mat(np.zeros((m, <span class="number">1</span>)))</span><br><span class="line">    minError = np.inf</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">        rangeMin = dataMatrix[:, i].min();</span><br><span class="line">        rangeMax = dataMatrix[:, i].max()</span><br><span class="line">        stepSize = (rangeMax - rangeMin) / numSteps</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">-1</span>, int(numSteps) + <span class="number">1</span>):</span><br><span class="line">            <span class="keyword">for</span> inequal <span class="keyword">in</span> [<span class="string">'lt'</span>, <span class="string">'gt'</span>]:</span><br><span class="line">                threshVal = (rangeMin + np.float(j) * stepSize)</span><br><span class="line">                predictedVals = stumpClassify(dataMatrix, i, threshVal, inequal)</span><br><span class="line">                errArr = np.mat(np.ones((m, <span class="number">1</span>)))</span><br><span class="line">                errArr[predictedVals == labelMat] = <span class="number">0</span></span><br><span class="line">                weightedError = D.T * errArr</span><br><span class="line">                <span class="keyword">print</span> <span class="string">"split: dim %d, thresh %.2f, thresh ineqal: %s, the weights error is %.3f"</span> % (i, threshVal, inequal, weightedError)</span><br><span class="line">                <span class="keyword">if</span> weightedError &lt; minError:</span><br><span class="line">                    minError = weightedError</span><br><span class="line">                    bestClassEst = predictedVals.copy()</span><br><span class="line">                    bestStump[<span class="string">'dim'</span>] = i</span><br><span class="line">                    bestStump[<span class="string">'thresh'</span>] = threshVal</span><br><span class="line">                    bestStump[<span class="string">'ineq'</span>] = inequal</span><br><span class="line">    <span class="keyword">return</span> bestStump, minError, bestClassEst</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>adaboost 模型训练</p>
+</blockquote>
+<p>从上面已知最优决策树的获得方式，因此就可以通过训练模型，获得一个由最优单层决策树组成的list对象，最优单层决策树数组长度取决于最终模型训练的情况以及预初始化的数组长度；如果说模型训练的错误率小于等于给定的目标值，那么就结束模型训练，此时循环训练的轮数就是最优单层决策树数组的长度；如果训练轮数达到预初始值，那么直接结束循环，返回最优单层决策树数组。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">adaBoostTrainDS</span><span class="params">(dataArr, classLabels, numIt=<span class="number">40</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    模型训练，返回numIt个单决策树模型数组</span></span><br><span class="line"><span class="string">    :param dataArr:</span></span><br><span class="line"><span class="string">    :param classLabels:</span></span><br><span class="line"><span class="string">    :param numIt:</span></span><br><span class="line"><span class="string">    :return:</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    weakClassArr = []</span><br><span class="line">    m = np.shape(dataArr)[<span class="number">0</span>]</span><br><span class="line">    D = np.mat(np.ones((m, <span class="number">1</span>)) / m)</span><br><span class="line">    aggClassEst = np.mat(np.zeros((m, <span class="number">1</span>)))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(numIt):</span><br><span class="line">        bestStump, error, classEst = buildStump(dataArr, classLabels, D)</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"D:"</span>, D.T</span><br><span class="line">        alpha = np.float(<span class="number">0.5</span> * np.log((<span class="number">1.0</span> - error) / max(error, <span class="number">1e-16</span>)))</span><br><span class="line">        bestStump[<span class="string">'alpha'</span>] = alpha</span><br><span class="line">        weakClassArr.append(bestStump)</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"classEst:"</span>, classEst.T</span><br><span class="line">        expon = np.multiply(<span class="number">-1</span> * alpha * np.mat(classLabels).T, classEst)</span><br><span class="line">        D = np.multiply(D, np.exp(expon))</span><br><span class="line">        D = D / D.sum()</span><br><span class="line">        aggClassEst += alpha * classEst</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"aggClassEst:"</span>, aggClassEst.T</span><br><span class="line">        aggErrors = np.multiply(np.sign(aggClassEst) != np.mat(classLabels).T, np.ones((m, <span class="number">1</span>)))</span><br><span class="line">        errorRate = aggErrors.sum() / m</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"total error:"</span>, errorRate, <span class="string">'\n'</span></span><br><span class="line">        <span class="keyword">if</span> errorRate == <span class="number">0.0</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">return</span> weakClassArr</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>分类函数</p>
+</blockquote>
+<p>根据上一步获得最优单层决策树数组，计算每个最优单层决策树的分类情况，乘上对应的权重值，累加之后得到aggClassEst，之后利用np.sign函数进行计算，将向量映射到[0, 1]空间，实现最后的二分类效果。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">adaClassify</span><span class="params">(datToClass, classifierArr)</span>:</span></span><br><span class="line">    <span class="string">"""[summary]</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Arguments:</span></span><br><span class="line"><span class="string">        datToClass &#123;[type]&#125; -- [description]</span></span><br><span class="line"><span class="string">        classifierArr &#123;[type]&#125; -- [description]</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Returns:</span></span><br><span class="line"><span class="string">        [type] -- [description]</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    dataMatrix = np.mat(datToClass)</span><br><span class="line">    m = np.shape(dataMatrix)[<span class="number">0</span>]</span><br><span class="line">    aggClassEst = np.mat(np.zeros((m, <span class="number">1</span>)))</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(classifierArr)):</span><br><span class="line">        classEst = stumpClassify(dataMatrix, classifierArr[i][<span class="string">'dim'</span>], classifierArr[i][<span class="string">'thresh'</span>], classifierArr[i][<span class="string">'ineq'</span>])</span><br><span class="line">        aggClassEst += classifierArr[i][<span class="string">'alpha'</span>] * classEst</span><br><span class="line">        <span class="keyword">print</span> aggClassEst</span><br><span class="line">    <span class="keyword">return</span> np.sign(aggClassEst)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/16/machine-learning-5/" rel="next" title="机器学习之线性回归">
+                <i class="fa fa-chevron-left"></i> 机器学习之线性回归
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/15/linux-3/" rel="prev" title="linux——操作系统之实现银行家算法">
+                linux——操作系统之实现银行家算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="损失函数(Loss)在学习深度学习中，有一个很重要的部分——损失函数；在已知的深度学习框架中，都预置了常用的损失函数：binary-crossentropy、mean_squared_error、mean_absolute_error、mean_absolute_percentage_error、mean_squared_logarithmic_error、categorical_crossent">
+<meta property="og:type" content="article">
+<meta property="og:title" content="keras的回调函数的学习">
+<meta property="og:url" content="http://yoursite.com/2018/04/07/deep-learning-4/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="损失函数(Loss)在学习深度学习中，有一个很重要的部分——损失函数；在已知的深度学习框架中，都预置了常用的损失函数：binary-crossentropy、mean_squared_error、mean_absolute_error、mean_absolute_percentage_error、mean_squared_logarithmic_error、categorical_crossent">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-04-07T12:08:28.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="keras的回调函数的学习">
+<meta name="twitter:description" content="损失函数(Loss)在学习深度学习中，有一个很重要的部分——损失函数；在已知的深度学习框架中，都预置了常用的损失函数：binary-crossentropy、mean_squared_error、mean_absolute_error、mean_absolute_percentage_error、mean_squared_logarithmic_error、categorical_crossent">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/07/deep-learning-4/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>keras的回调函数的学习 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/07/deep-learning-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">keras的回调函数的学习
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-04-07 15:39:36 / Modified: 20:08:28" itemprop="dateCreated datePublished" datetime="2018-04-07T15:39:36+08:00">2018-04-07</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/深度学习/" itemprop="url" rel="index"><span itemprop="name">深度学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="损失函数-Loss"><a href="#损失函数-Loss" class="headerlink" title="损失函数(Loss)"></a>损失函数(Loss)</h4><p>在学习深度学习中，有一个很重要的部分——损失函数；在已知的深度学习框架中，都预置了常用的损失函数：<code>binary-crossentropy</code>、<code>mean_squared_error</code>、<code>mean_absolute_error</code>、<code>mean_absolute_percentage_error</code>、<code>mean_squared_logarithmic_error</code>、<code>categorical_crossentropy</code>……这些损失函数是在构建模型中最长用到的损失函数了；像深度学习入门的几个经典例子——[0-9]的手写数字识别、识别图片中的狗和猫，这两个经典模型中用到的损失函数就是<code>categorical-crossentropy</code>[用于多分类的交叉熵]和<code>binary-crossentropy</code>[用于二分类的交叉熵]；又比如时序回归问题(rnn递归神经网络)中又常常用到的是<code>mean_squared_error</code>、<code>mean_absolute_percentage_error</code>等等。</p>
+<p>损失函数的重要性在于与待解决问题的实际贴合，每一种问题都有适合的损失函数来进行优化：分类问题我们不会采用时序回归预测的损失函数；时序回归预测我们不会采用分类的损失函数。每一个损失函数都有适合的问题模型，因此，对于深度学习框架中的几个预置的损失函数，就是常见的深度学习模型所经常采用的。但是，有时候，我们需要的损失函数需要对已有的损失函数进行变形，亦或者是我们有一个新的，更好的损失函数，但是框架中并没有这个损失函数的实现，那么这个时候应该如何解决？</p>
+<p>对于我这个用keras深度学习框架的学习者来说，上面这个问题是比较常见到的，因此需要手动去实现自定义的损失函数；损失函数的定义，实际上就是操作tensor(张量，你可以参考向量的概念去理解)，具体操作如下</p>
+<blockquote>
+<p>引入keras的backend</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> keras <span class="keyword">import</span> backend <span class="keyword">as</span> K</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>利用实现的基本数学操作去实现损失函数的定义，假设我们需要计算真实值与预测值之间的差</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">my_loss</span><span class="params">(y_true,y_pred)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> K.mean((y_pred-y_true),axis = <span class="number">-1</span>)</span><br></pre></td></tr></table></figure>
+<p>y_true是真实值，y_pred是预测值，K.mean()在给定轴上求张量元素之均值，<code>axis=-1</code>表示按每行来计算；具体更多的数学基本操作都在<a href="https://keras-cn.readthedocs.io/en/latest/backend/" target="_blank" rel="noopener">keras.io</a>中</p>
+<h4 id="性能评估-Mertices"><a href="#性能评估-Mertices" class="headerlink" title="性能评估(Mertices)"></a>性能评估(Mertices)</h4><p>一个模型的好不好，可能我们从损失函数来看，并不是那么清楚，因此，就有一个性能评估(Mertices)。性能评估器可以看作是对一个模型好坏的度量，像分类问题，可以用<code>accuracy</code>(正确率)来判断、回归预测问题可以用<code>mean_suqared_error</code>(均方差)来判断；但是，就像损失函数一样，有时候性能评估我们会采用其他的度量方式，像<code>PR-AUC</code>、<code>ROC-AUC</code>等等，那么这个，在keras的框架中是没有预置的，那要怎么实现呢？这时候就要用到keras的回调函数这一个函数了。</p>
+<p>回调函数是一组在训练的特定阶段被调用的函数集，就比如一个分类模型在每一个epochs结束后，进行一次计算，计算出本次epochs的accuracy；如果有30个epochs，那么就会出现30次accuracy。一个好的模型，accuracy会呈现上升的趋势，所以，我们又可以从每一次epochs的mertices计算中看出模型的变化情况。</p>
+<p>现在以二分类来说，有<code>acuracy</code>和<code>PR-AUC</code>两种mertices，当二分类为平衡分类时，这两种mertices都可以；但是，如果是对于不平衡分类(某个或某些类别下的样本数远大于另一些类别下的样本数目。即类别不平衡)的情况下，则更多采用精度-召回曲线下面积来充当性能评估器(PR-AUC的值越接近1，则表明该模型越好)。凑巧的是，keras并没有实现PR-AU的计算，sklearn机器学习库中有相关的实现，因此，我们可以利用keras的回调函数的方法，利用sklern来实现PR-AUC的计算。创建一个python对象，去继承<code>keras.callbacks.Callback</code>回调函数对象，在<code>on_batch_end()</code>与<code>on_epochs_end</code>实现相关mertices的计算，并且，可以通过self.validation_data获取每一次epchs的从batch中抽取出部分数据用来充当验证集的数据(并在每个epoch结束后测试的模型的指标，如损失函数、精确度等)</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> keras <span class="keyword">import</span> backend <span class="keyword">as</span> K</span><br><span class="line"><span class="keyword">from</span> keras.callbacks <span class="keyword">import</span> Callback</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> average_precision_score</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PRAucEvaluation</span><span class="params">(Callback)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, predict_batch_size=<span class="number">1024</span>, include_on_batch=False)</span>:</span></span><br><span class="line">        super(PRAucEvaluation, self).__init__()</span><br><span class="line">        self.predict_batch_size = predict_batch_size</span><br><span class="line">        self.include_on_batch = include_on_batch</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">on_batch_begin</span><span class="params">(self, batch, logs=&#123;&#125;)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">on_batch_end</span><span class="params">(self, batch, logs=&#123;&#125;)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> (self.include_on_batch):</span><br><span class="line">            logs[<span class="string">'pr_auc_val'</span>] = float(<span class="string">'-inf'</span>)</span><br><span class="line">            <span class="keyword">if</span> (self.validation_data):</span><br><span class="line">                logs[<span class="string">'pr_auc_val'</span>] = average_precision_score(self.validation_data[<span class="number">1</span>],</span><br><span class="line">                                                             self.model.predict(self.validation_data[<span class="number">0</span>], batch_size=self.predict_batch_size))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">on_train_begin</span><span class="params">(self, logs=&#123;&#125;)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> (<span class="string">'pr_auc_val'</span> <span class="keyword">in</span> self.params[<span class="string">'metrics'</span>]):</span><br><span class="line">            self.params[<span class="string">'metrics'</span>].append(<span class="string">'pr_auc_val'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">on_train_end</span><span class="params">(self, logs=&#123;&#125;)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">on_epoch_begin</span><span class="params">(self, epoch, logs=&#123;&#125;)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">on_epoch_end</span><span class="params">(self, epoch, logs=&#123;&#125;)</span>:</span></span><br><span class="line">        logs[<span class="string">'pr_auc_val'</span>] = float(<span class="string">'-inf'</span>)</span><br><span class="line">        <span class="keyword">if</span> (self.validation_data):</span><br><span class="line">            logs[<span class="string">'pr_auc_val'</span>] = average_precision_score(self.validation_data[<span class="number">1</span>],</span><br><span class="line">                                                         self.model.predict(self.validation_data[<span class="number">0</span>],</span><br><span class="line">                                                                            batch_size=self.predict_batch_size))</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/07/machine-learning-7/" rel="next" title="无监督学习算法——KMeans聚类">
+                <i class="fa fa-chevron-left"></i> 无监督学习算法——KMeans聚类
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/13/deep-learning-6/" rel="prev" title="使用Numpy手动实现全连接神经网络">
+                使用Numpy手动实现全连接神经网络 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#损失函数-Loss"><span class="nav-number">1.</span> <span class="nav-text">损失函数(Loss)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#性能评估-Mertices"><span class="nav-number">2.</span> <span class="nav-text">性能评估(Mertices)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

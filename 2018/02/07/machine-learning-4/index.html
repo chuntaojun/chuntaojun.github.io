@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="之前说了利用knn，决策树，朴素贝叶斯来实现分类的机器学习算法，各有优缺点；这次学习了新的用于分类的机器学习算法——Logistic回归的分类算法 Logistic算法最重要的就是为现有的数据集建立回归公式，得到回归直线，举一个例子：  上图就是一个典型的Logistic分类的应用，图中蓝色矩形色块和红色圆形色块是两个不同的类别，图中的直线就是一条回归直线。可以看到这条直线将蓝色矩形色块和红色圆">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习之Logistic回归">
+<meta property="og:url" content="http://yoursite.com/2018/02/07/machine-learning-4/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="之前说了利用knn，决策树，朴素贝叶斯来实现分类的机器学习算法，各有优缺点；这次学习了新的用于分类的机器学习算法——Logistic回归的分类算法 Logistic算法最重要的就是为现有的数据集建立回归公式，得到回归直线，举一个例子：  上图就是一个典型的Logistic分类的应用，图中蓝色矩形色块和红色圆形色块是两个不同的类别，图中的直线就是一条回归直线。可以看到这条直线将蓝色矩形色块和红色圆">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://120.24.90.180/blog/image/machine_learning/machine-learning-4.1.png">
+<meta property="og:image" content="http://120.24.90.180/blog/image/machine_learning/machine-learning-4.2.png">
+<meta property="og:image" content="http://120.24.90.180/blog/image/machine_learning/machine-learning-4.3.png">
+<meta property="og:image" content="http://120.24.90.180/blog/image/machine_learning/machine-learning-4.4.png">
+<meta property="og:image" content="http://120.24.90.180/blog/image/machine_learning/machine-learning-4.5.png">
+<meta property="og:updated_time" content="2018-05-06T02:48:21.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="机器学习之Logistic回归">
+<meta name="twitter:description" content="之前说了利用knn，决策树，朴素贝叶斯来实现分类的机器学习算法，各有优缺点；这次学习了新的用于分类的机器学习算法——Logistic回归的分类算法 Logistic算法最重要的就是为现有的数据集建立回归公式，得到回归直线，举一个例子：  上图就是一个典型的Logistic分类的应用，图中蓝色矩形色块和红色圆形色块是两个不同的类别，图中的直线就是一条回归直线。可以看到这条直线将蓝色矩形色块和红色圆">
+<meta name="twitter:image" content="http://120.24.90.180/blog/image/machine_learning/machine-learning-4.1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/02/07/machine-learning-4/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>机器学习之Logistic回归 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/07/machine-learning-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">机器学习之Logistic回归
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-02-07 17:41:53" itemprop="dateCreated datePublished" datetime="2018-02-07T17:41:53+08:00">2018-02-07</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-05-06 10:48:21" itemprop="dateModified" datetime="2018-05-06T10:48:21+08:00">2018-05-06</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/机器学习/" itemprop="url" rel="index"><span itemprop="name">机器学习</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>之前说了利用knn，决策树，朴素贝叶斯来实现分类的机器学习算法，各有优缺点；这次学习了新的用于分类的机器学习算法——Logistic回归的分类算法</p>
+<p>Logistic算法最重要的就是为现有的数据集建立回归公式，得到回归直线，举一个例子：</p>
+<p><img src="http://120.24.90.180/blog/image/machine_learning/machine-learning-4.1.png" alt="machine-learning-4.1"></p>
+<p>上图就是一个典型的Logistic分类的应用，图中蓝色矩形色块和红色圆形色块是两个不同的类别，图中的直线就是一条回归直线。可以看到这条直线将蓝色矩形色块和红色圆形色块分割开来了，如果这个看作是一个分类问题的话，那么位于直线上方的点归类到蓝色矩形色块中，位于直线下方的点可以归类到红色圆形色块中，而这条回归直线，就是分类标准，而得到这条直线的过程，就是所要说的Logistic回归了。</p>
+<blockquote>
+<p>Logistic回归</p>
+</blockquote>
+<p>回归，也可以称作最佳拟合，就拿上面的例子说，希望找到一条最好的直线能够最大化的区分蓝色矩形色块与红色圆形色块，那么这条回归直线的参数就是所需要求的，并且希望得到一组最优参数，使得得到的直线是最优拟合的直线。</p>
+<blockquote>
+<p>sigmoid函数</p>
+</blockquote>
+<p>sigmoid(z) = 1 / (1 + exp(-z)) {z = w0 <em> x + w1 </em> x + w2 <em> x + … + wn </em> x}，这是sigmoid函数的表达式，z是自变量，z的表示式就是花括号里面的式子；sigmoid函数常用于二分类当中，这是由于sigmoid函数图像决定的，sigmoid函数的值域是(0, 1)，0处的取值是0.5，所以对于二分类来说，如果sigmoid函数的值小于0.5，就归类于第一个分类，否则就归类于第二个分类。</p>
+<p><img src="http://120.24.90.180/blog/image/machine_learning/machine-learning-4.2.png" alt="machine-learning-4.2"></p>
+<p>在sigmoid函数的z变量的表示式中，看到了这个式子：z = w0 <em> x + w1 </em> x + w2 <em> x + … + wn </em> x；这里的x，就是向分类器中输入的事物的特征值，而w0，w1，w2，…，wn，则是参数，这些个参数，就是需要求的最优参数了。但是这个w参数，有什么意义呢？重新看这个z自变量的表达式：x是事物的特征值，既然是要做分类，那么肯定是需要参考事物的特征来实现分类的，但是事物的特征有很多，到底该用哪些特征来作为分类的依据呢？w参数就是做这个的，每种特征对应一个特征的权重wi，wi的大小决定了这个特征是否是用于分类的重要特征，所以，又可以知道，w参数的个数与事物的特征数目有关。接下来，就是如何去求解这么多个特征的权重参数wi了。</p>
+<blockquote>
+<p>梯度下降（上升）法</p>
+</blockquote>
+<p>如何求解多个参数的最优值，普遍的做法是采用梯度下降（上升）法来求解。梯度下降（上升）法是用于求解凹（凸）函数的最大（小）值的方法，到这里可能会有疑惑，梯度是什么？梯度实际上就是高等数学里面的对函数的每个自变量求偏导数，然后这些偏导数和起来组成的向量就是梯度，用更专业一点的话说：表示某一函数在该点处的方向导数沿着该方向取得最大值，即函数在该点处沿着该方向（此梯度的方向）变化最快，变化率最大（为该梯度的模）。 所以，只需要沿着梯度的方向，就能够快速接近函数的最大（小）值。</p>
+<p><img src="http://120.24.90.180/blog/image/machine_learning/machine-learning-4.3.png" alt="machine-learning-4.3.png"></p>
+<p>所以，Logistic回归可以说是求一组特征权重的过程，特征权重的好与坏直接影响到最终分类的好坏，并且，Logistic回归最核心的部分，就是如何求的特征权重的取值，现在来看看代码是如何实现Logistic回归算法的。</p>
+<blockquote>
+<p>代码实现</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loadDataSet</span><span class="params">()</span>:</span></span><br><span class="line">    dataMat = []</span><br><span class="line">    labelMat = []</span><br><span class="line">    fr = open(<span class="string">'testSet.txt'</span>)</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> fr.readlines():</span><br><span class="line">        lineArr = line.strip().split()</span><br><span class="line">        <span class="comment"># 提取特征值</span></span><br><span class="line">        dataMat.append([<span class="number">1.0</span>, float(lineArr[<span class="number">0</span>]), float(lineArr[<span class="number">1</span>])])</span><br><span class="line">        labelMat.append(int(lineArr[<span class="number">2</span>]))</span><br><span class="line">    <span class="keyword">return</span> dataMat, labelMat</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sigmoid</span><span class="params">(inX)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">1.0</span> / (<span class="number">1</span> + np.exp(-inX))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gradAscent</span><span class="params">(dataMatIn, classLabels)</span>:</span></span><br><span class="line">    dataMatrix = np.mat(dataMatIn)</span><br><span class="line">    labelMat = np.mat(classLabels).transpose()</span><br><span class="line">    m, n = np.shape(dataMatrix)</span><br><span class="line">    alpha = <span class="number">0.001</span></span><br><span class="line">    maxCycles = <span class="number">500</span></span><br><span class="line">    weights = np.ones((n, <span class="number">1</span>))</span><br><span class="line">    <span class="comment"># 实现梯度上升算法</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(maxCycles):</span><br><span class="line">        h = sigmoid(dataMatrix * weights)</span><br><span class="line">        error = labelMat - h</span><br><span class="line">        <span class="comment"># 更新权重wi</span></span><br><span class="line">        weights = weights + alpha * dataMatrix.transpose() * error</span><br><span class="line">    <span class="keyword">return</span> weights</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    dataMatIn, classLabels = loadDataSet()</span><br><span class="line">    print(gradAscent(dataMatIn, classLabels))</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>样本示例</p>
+</blockquote>
+<p><img src="http://120.24.90.180/blog/image/machine_learning/machine-learning-4.4.png" alt="machine-learning-4.4"></p>
+<blockquote>
+<p>结果</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/python /Volumes/Extended/code/PythonProject/maching-learning/Logistic/Logistic.py</span><br><span class="line">[[ 4.12414349]</span><br><span class="line"> [ 0.48007329]</span><br><span class="line"> [-0.6168482 ]]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>最终的回归线与样本展示</p>
+</blockquote>
+<p>最后我们求的权重参数是三个维度，每一种特征对应一个特征权重。在函数gradascent中实现了梯度上升的算法。我们在循环中看到，每次都是运算整个样本量进行更新权重参数wi，并且是经过500轮的计算，虽然样本测试得出结果的速度非常快，但是对于实际操作中，样本容量动不动就是千万甚至亿级的样本量，这样的计算量就显得非常庞大了。这个时候，就要改进下梯度上升（下降）算法了——采用随机梯度上升（下降）算法。</p>
+<blockquote>
+<p>改进的梯度上升（下降）算法</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gradAscent</span><span class="params">(dataMatIn, classLabels)</span>:</span></span><br><span class="line">    dataMatrix = np.mat(dataMatIn)</span><br><span class="line">    labelMat = np.mat(classLabels).transpose()</span><br><span class="line">    m, n = np.shape(dataMatrix)</span><br><span class="line">    alpha = <span class="number">0.001</span></span><br><span class="line">    weights = np.ones(n)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(m):</span><br><span class="line">        h = sigmoid(np.sum(dataMatrix[i] * weights))</span><br><span class="line">        error = labelMat[i] - h</span><br><span class="line">        weights = weights + alpha * dataMatrix[i] * error</span><br><span class="line">    <span class="keyword">return</span> weights</span><br></pre></td></tr></table></figure>
+<p>我们对样本每一次取等量的一部分进行更新特征取值，这样就减少了每一次更新特征权重所需的计算量大小</p>
+<blockquote>
+<p>优化后的随机梯度上升计算结果</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/python /Volumes/Extended/code/PythonProject/maching-learning/Logistic/Logistic.py</span><br><span class="line">[ 1.01702007  0.85914348 -0.36579921]</span><br></pre></td></tr></table></figure>
+<p>可以看出，随机梯度上升计算的结果跟梯度上升计算的结果相差很大，原因是随机梯度上升（下降）算法虽然相比梯度上升（下降）算法减少了更多的计算量，但是却无法到达函数的最大（小）值点，只能在附近动荡，因此，我们还需要在稍稍优化下随机梯度上升（下降）算法</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">stocGradAscent1</span><span class="params">(dataMatrix, classLabels, numIter=<span class="number">150</span>)</span>:</span></span><br><span class="line">    m, n = shape(dataMatrix)</span><br><span class="line">    weights = ones(n)</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(numIter):</span><br><span class="line">        dataIndex = range(m)</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(m):</span><br><span class="line">            alpha = <span class="number">4</span> / (<span class="number">1.0</span> + j + i) + <span class="number">0.0001</span></span><br><span class="line">            randIndex = int(random.uniform(<span class="number">0</span>, len(dataIndex)))</span><br><span class="line">            h = sigmoid(sum(dataMatrix[randIndex] * weights))</span><br><span class="line">            error = classLabels[randIndex] - h</span><br><span class="line">            weights = weights + alpha * error * dataMatrix[randIndex]</span><br><span class="line">            <span class="keyword">del</span> (dataIndex[randIndex])</span><br><span class="line">    <span class="keyword">return</span> weights</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>计算结果</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/python /Volumes/Extended/code/PythonProject/maching-learning/Logistic/Logistic.py</span><br><span class="line">[13.19641216  1.05126524 -1.73315744]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>结果可视化</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plotBestFit</span><span class="params">(weights)</span>:</span></span><br><span class="line">    <span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line">    dataMat,labelMat=loadDataSet()</span><br><span class="line">    dataArr = array(dataMat)</span><br><span class="line">    n = shape(dataArr)[<span class="number">0</span>] </span><br><span class="line">    xcord1 = []; ycord1 = []</span><br><span class="line">    xcord2 = []; ycord2 = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">        <span class="keyword">if</span> int(labelMat[i])== <span class="number">1</span>:</span><br><span class="line">            xcord1.append(dataArr[i,<span class="number">1</span>]); ycord1.append(dataArr[i,<span class="number">2</span>])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            xcord2.append(dataArr[i,<span class="number">1</span>]); ycord2.append(dataArr[i,<span class="number">2</span>])</span><br><span class="line">    fig = plt.figure()</span><br><span class="line">    ax = fig.add_subplot(<span class="number">111</span>)</span><br><span class="line">    ax.scatter(xcord1, ycord1, s=<span class="number">30</span>, c=<span class="string">'red'</span>, marker=<span class="string">'s'</span>)</span><br><span class="line">    ax.scatter(xcord2, ycord2, s=<span class="number">30</span>, c=<span class="string">'green'</span>)</span><br><span class="line">    x = arange(<span class="number">-3.0</span>, <span class="number">3.0</span>, <span class="number">0.1</span>)</span><br><span class="line">    y = (-weights[<span class="number">0</span>]-weights[<span class="number">1</span>]*x)/weights[<span class="number">2</span>]</span><br><span class="line">    ax.plot(x, y)</span><br><span class="line">    plt.xlabel(<span class="string">'X1'</span>); plt.ylabel(<span class="string">'X2'</span>);</span><br><span class="line">    plt.show()</span><br></pre></td></tr></table></figure>
+<p><img src="http://120.24.90.180/blog/image/machine_learning/machine-learning-4.5.png" alt="machine-learning-4.5.png"></p>
+<blockquote>
+<p>source code</p>
+</blockquote>
+<p><a href="https://github.com/chuntaojun/machine-learning-pr/tree/master/Logistic" target="_blank" rel="noopener">https://github.com/chuntaojun/machine-learning-pr/tree/master/Logistic</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/01/machine-learning-3/" rel="next" title="机器学习之朴素贝叶斯">
+                <i class="fa fa-chevron-left"></i> 机器学习之朴素贝叶斯
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/09/deep-learning-3/" rel="prev" title="记一次竞赛题目有感——根据姓名预测男女性别">
+                记一次竞赛题目有感——根据姓名预测男女性别 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">49</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

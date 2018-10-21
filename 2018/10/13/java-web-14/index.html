@@ -108,28 +108,25 @@
 
 
 
-  <meta name="description" content="竟然立了一个flag，说好的每个星期一篇数据结构的博文……….顿时心塞 开始把开始吧 今天我们来了解并实现循环队列（静态数组）这一数据结构。 队列和栈都是两种非常重要而且非常常见的数据结构类型。前一期我们说了栈这个结构是后进先出；而今天讲的队列这个结构呢，是先进先出，后进后出，类似于排队买票，先排的人先买到票，后排的人后买到票。这个就是队列的特殊地方。 讲完了队列这个结构。现在我们讲讲如何用代码去">
-<meta name="keywords" content="队列">
+  <meta name="description" content="什么是nginxnginx中文文档 什么是RefererReferer 首部包含了当前请求页面的来源页面的地址，即表示当前页面是通过此来源页面里的链接进入的。服务端一般使用 Referer 首部识别访问来源，可能会以此进行统计分析、日志记录以及缓存优化等。 通俗来说，假如我通过Google搜索去搜索referer，然后搜索引擎给出了一堆链接，这个时候，我点击链接，那么http头就会带上refere">
+<meta name="keywords" content="nginx">
 <meta property="og:type" content="article">
-<meta property="og:title" content="循环队列的实现（静态数组实现）">
-<meta property="og:url" content="http://yoursite.com/2017/10/06/data_struct_2/index.html">
+<meta property="og:title" content="关于使用nginx实现图片防盗链">
+<meta property="og:url" content="http://yoursite.com/2018/10/13/java-web-14/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="竟然立了一个flag，说好的每个星期一篇数据结构的博文……….顿时心塞 开始把开始吧 今天我们来了解并实现循环队列（静态数组）这一数据结构。 队列和栈都是两种非常重要而且非常常见的数据结构类型。前一期我们说了栈这个结构是后进先出；而今天讲的队列这个结构呢，是先进先出，后进后出，类似于排队买票，先排的人先买到票，后排的人后买到票。这个就是队列的特殊地方。 讲完了队列这个结构。现在我们讲讲如何用代码去">
+<meta property="og:description" content="什么是nginxnginx中文文档 什么是RefererReferer 首部包含了当前请求页面的来源页面的地址，即表示当前页面是通过此来源页面里的链接进入的。服务端一般使用 Referer 首部识别访问来源，可能会以此进行统计分析、日志记录以及缓存优化等。 通俗来说，假如我通过Google搜索去搜索referer，然后搜索引擎给出了一堆链接，这个时候，我点击链接，那么http头就会带上refere">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/10/deepinscreenshot_select-area_20171006205231.png">
-<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/10/deepinscreenshot_select-area_20171006205249.png">
-<meta property="og:updated_time" content="2018-01-21T05:21:52.000Z">
+<meta property="og:updated_time" content="2018-10-21T09:47:05.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="循环队列的实现（静态数组实现）">
-<meta name="twitter:description" content="竟然立了一个flag，说好的每个星期一篇数据结构的博文……….顿时心塞 开始把开始吧 今天我们来了解并实现循环队列（静态数组）这一数据结构。 队列和栈都是两种非常重要而且非常常见的数据结构类型。前一期我们说了栈这个结构是后进先出；而今天讲的队列这个结构呢，是先进先出，后进后出，类似于排队买票，先排的人先买到票，后排的人后买到票。这个就是队列的特殊地方。 讲完了队列这个结构。现在我们讲讲如何用代码去">
-<meta name="twitter:image" content="https://liaochuntao.files.wordpress.com/2017/10/deepinscreenshot_select-area_20171006205231.png">
+<meta name="twitter:title" content="关于使用nginx实现图片防盗链">
+<meta name="twitter:description" content="什么是nginxnginx中文文档 什么是RefererReferer 首部包含了当前请求页面的来源页面的地址，即表示当前页面是通过此来源页面里的链接进入的。服务端一般使用 Referer 首部识别访问来源，可能会以此进行统计分析、日志记录以及缓存优化等。 通俗来说，假如我通过Google搜索去搜索referer，然后搜索引擎给出了一堆链接，这个时候，我点击链接，那么http头就会带上refere">
 
 
 
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/10/06/data_struct_2/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/10/13/java-web-14/"/>
 
 
 
@@ -139,7 +136,7 @@
   };
 </script>
 
-  <title>循环队列的实现（静态数组实现） | Hexo</title>
+  <title>关于使用nginx实现图片防盗链 | Hexo</title>
   
 
 
@@ -292,7 +289,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/06/data_struct_2/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/13/java-web-14/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="John Doe">
@@ -309,7 +306,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">循环队列的实现（静态数组实现）
+          <h1 class="post-title" itemprop="name headline">关于使用nginx实现图片防盗链
               
             
           </h1>
@@ -334,7 +331,7 @@
                 
               
 
-              <time title="Created: 2017-10-06 21:29:39" itemprop="dateCreated datePublished" datetime="2017-10-06T21:29:39+08:00">2017-10-06</time>
+              <time title="Created: 2018-10-13 14:25:07" itemprop="dateCreated datePublished" datetime="2018-10-13T14:25:07+08:00">2018-10-13</time>
             
 
             
@@ -351,7 +348,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-01-21 13:21:52" itemprop="dateModified" datetime="2018-01-21T13:21:52+08:00">2018-01-21</time>
+                <time title="Modified: 2018-10-21 17:47:05" itemprop="dateModified" datetime="2018-10-21T17:47:05+08:00">2018-10-21</time>
               
             
           </span>
@@ -368,7 +365,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数据结构/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
 
                 
                 
@@ -402,18 +399,26 @@
       
 
       
-        <p>竟然立了一个flag，说好的每个星期一篇数据结构的博文……….顿时心塞</p>
-<p>开始把开始吧</p>
-<p>今天我们来了解并实现循环队列（静态数组）这一数据结构。</p>
-<p>队列和栈都是两种非常重要而且非常常见的数据结构类型。前一期我们说了栈这个结构是后进先出；而今天讲的队列这个结构呢，是先进先出，后进后出，类似于排队买票，先排的人先买到票，后排的人后买到票。这个就是队列的特殊地方。</p>
-<p>讲完了队列这个结构。现在我们讲讲如何用代码去实现这个数据结构。</p>
-<p>队列这个结构可以用链表，也可以用静态数组实现。链表实现的形式其实很简单，只需要将上一期的栈结构的代码稍作改动就可以实现队列这个结构。今天我们来讲讲用静态数组来实现，还是循环队列。（这里盗用下某篇博客的图片）</p>
-<p><img src="https://liaochuntao.files.wordpress.com/2017/10/deepinscreenshot_select-area_20171006205231.png" alt="DeepinScreenshot_select-area_20171006205231.png"></p>
-<p>我们可以看到，在普通的静态数组实现的队列这一数据结构中，如果一开始1,2,3三个数据入队列后再出列，那么头结点就在3这个位置，这个时候在将4,5,6三个数据入队列，之后就会告诉你队列已经“满了”，然而这个满不是真的满，为了有效的利用空间，我们就想，能不能将这个数组循环起来，以便于充分的利用空间——因此才有了循环队列的数组实现形式。（再次盗用下某篇博客的图片）</p>
-<p><img src="https://liaochuntao.files.wordpress.com/2017/10/deepinscreenshot_select-area_20171006205249.png" alt="DeepinScreenshot_select-area_20171006205249"></p>
-<p>我们可以看到，我们已经将静态数组“循环化”，很容易看出，队列空的状态条件为queue.front==queue.rear，队列满的条件也是queue.front==queue.rear，这里就有一个问题。这两个状态如何区分？很简单，有两种解决方案，一是像图中所示，我们牺牲一个单元，用来区分；二是加入一个操作判别状态，如果你是执行入队操作，那么操作判别状态为插入，此时如果queue.front==queue.rear时，就是队列已经满了，如果是出队操作，那么操作判别状态为出队，在下一次进行入队操作时，如果上一次操作状态为出队，此时的queue.front==queue.rear，则此时队列为空。在这里，我们将采用第一种解决方式，即牺牲一个存储单元进行区分。</p>
-<p>那么，第一种方式的队列满和空的判别是如何实现呢？首先说下队列空的判别，就是queue.front==queue.rear，此时队列为空队列，如果(queue.rear+1) % MAXSIZE == queue.front时，队列已经满了。这个公式的得来是由于我们约定以“队列头指针front在队尾指针rear的下一个位置上”作为队列“满”状态的标志。我们不清楚当前的队列的对头结点是不是在0这个位置，如果是，那么对头与对尾的位置差为MAXSIZE-1，求余就是因为循环这个特殊的性质。接下来，我们来看看具体的代码实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> <span class="built_in">queue</span>[<span class="number">6</span>];</span><br><span class="line">    <span class="keyword">int</span> front;</span><br><span class="line">    <span class="keyword">int</span> rear;</span><br><span class="line">&#125; LQueue;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">InitQueue</span><span class="params">(LQueue &amp;amp;Lq)</span> </span>&#123;</span><br><span class="line">    Lq.front = Lq.rear = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">IntoQueue</span><span class="params">(LQueue &amp;amp;Lq, <span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ((Lq.rear + <span class="number">1</span>) % <span class="number">6</span> == Lq.front)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    Lq.<span class="built_in">queue</span>[Lq.rear] = i;</span><br><span class="line">    Lq.rear = (Lq.rear + <span class="number">1</span>) % <span class="number">6</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">OutQueue</span><span class="params">(LQueue &amp;amp;Lq, <span class="keyword">int</span> &amp;amp;e)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Lq.rear == Lq.front)</span><br><span class="line">        <span class="keyword">return</span>;   <span class="comment">//可能队列为空，没有元素可以出队列</span></span><br><span class="line">    e = Lq.<span class="built_in">queue</span>[Lq.front];</span><br><span class="line">    Lq.front = (Lq.front + <span class="number">1</span>) % <span class="number">6</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    LQueue <span class="built_in">queue</span>;</span><br><span class="line">    InitQueue(<span class="built_in">queue</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>（我学习的某篇博客：<a href="http://blog.csdn.net/u010429311/article/details/51043149" target="_blank" rel="noopener">csdn博客地址</a> ）</p>
+        <h4 id="什么是nginx"><a href="#什么是nginx" class="headerlink" title="什么是nginx"></a>什么是nginx</h4><p><a href="https://wizardforcel.gitbooks.io/nginx-doc/content/Text/1.1_overview.html" target="_blank" rel="noopener">nginx中文文档</a></p>
+<h4 id="什么是Referer"><a href="#什么是Referer" class="headerlink" title="什么是Referer"></a>什么是Referer</h4><p>Referer 首部包含了当前请求页面的来源页面的地址，即表示当前页面是通过此来源页面里的链接进入的。服务端一般使用 Referer 首部识别访问来源，可能会以此进行统计分析、日志记录以及缓存优化等。</p>
+<p>通俗来说，假如我通过Google搜索去搜索<code>referer</code>，然后搜索引擎给出了一堆链接，这个时候，我点击链接，那么http头就会带上referer字段信息，并且值就是Google搜索的url地址<code>https://www.google.com</code>；因此，假设从A网址到B网址，那么这个referer字段就告诉B网址该请求是从A网址发起的。</p>
+<h4 id="nginx实现防盗链的原理"><a href="#nginx实现防盗链的原理" class="headerlink" title="nginx实现防盗链的原理"></a>nginx实现防盗链的原理</h4><p>既然http头部会带有referer字段，因此，就可以从这个字段入手，我们只需要确认我们的referer白名单，就可以成功的实现防盗链功能，因此，就需要拦截你所想拦截的请求，然后，去读取每一个请求的referer字段信息，如果存在空值或者referer字段的值不在白名单中，就可以返回相应的http状态码(404，403d等等)</p>
+<h4 id="具体配置代码"><a href="#具体配置代码" class="headerlink" title="具体配置代码"></a>具体配置代码</h4><blockquote>
+<p>摘抄自<a href="https://wizardforcel.gitbooks.io/nginx-doc/content/Text/1.1_overview.html" target="_blank" rel="noopener">nginx中文文档</a></p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">location ~* \.(gif|jpg|png|swf|flv)$ &#123;  </span><br><span class="line">  root html  </span><br><span class="line">  valid_referers none blocked *.nginxcn.com;  </span><br><span class="line">  if ($invalid_referer) &#123;  </span><br><span class="line">    rewrite ^/ [www.nginx.cn](http://www.nginx.cn/)  </span><br><span class="line">    #return 404;  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p><code>valid_referers</code>就是所有请求通过拦截后根据referer白名单对比的结果</p>
+</li>
+<li><p><code>none blocked</code>就是指后面的域名、ip就是referer白名单的值</p>
+</li>
+<li><p><code>*.nginxcn.com</code>就是referer白名单</p>
+</li>
+</ol>
+<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><blockquote>
+<p>referer可伪造</p>
+</blockquote>
+<p>像Java的httpclient，可以伪造一个referer去实现一个资源请求，然后顺利的下载资源，因此，通过referer所实现的防盗链接面对这样的操作，就是摆设。</p>
 
       
     </div>
@@ -434,7 +439,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/队列/" rel="tag"># 队列</a>
+            <a href="/tags/nginx/" rel="tag"># nginx</a>
           
         </div>
       
@@ -447,8 +452,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/09/25/data_struct_1/" rel="next" title="用链表实现栈结构">
-                <i class="fa fa-chevron-left"></i> 用链表实现栈结构
+              <a href="/2018/09/16/java-web-13/" rel="next" title="Java实现class文件热替换">
+                <i class="fa fa-chevron-left"></i> Java实现class文件热替换
               </a>
             
           </div>
@@ -456,10 +461,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/10/06/java_web_1/" rel="prev" title="Bootstrap Table 加入弹出框">
-                Bootstrap Table 加入弹出框 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -504,8 +505,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -616,6 +626,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是nginx"><span class="nav-number">1.</span> <span class="nav-text">什么是nginx</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是Referer"><span class="nav-number">2.</span> <span class="nav-text">什么是Referer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#nginx实现防盗链的原理"><span class="nav-number">3.</span> <span class="nav-text">nginx实现防盗链的原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#具体配置代码"><span class="nav-number">4.</span> <span class="nav-text">具体配置代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#缺点"><span class="nav-number">5.</span> <span class="nav-text">缺点</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

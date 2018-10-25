@@ -400,7 +400,7 @@
 
       
         <h4 id="SpringSecuriry-方法权限控制"><a href="#SpringSecuriry-方法权限控制" class="headerlink" title="SpringSecuriry 方法权限控制"></a>SpringSecuriry 方法权限控制</h4><p>在java-web中，经常会涉及权限问题：restful接口的权限访问、数据库接口权限访问、方法权限访问等等，这些权限的问题，如果要手动去实现的话，对于restful接口的权限访问还比较好解决，写一个<code>HttpFilter</code>拦截器，拦截需要验证的<code>url</code>进行相应的权限验证即可；但是方法呢？方法可没有像<code>HttpFiler</code>一样的东西呀，怎么去实现这个方法的权限拦截验证？这时，SpringSecurity解决了这个问题，利用注解以及依赖注入、动态代理，成功的解决了方法的权限拦截这个问题。</p>
-<h4 id="利用代理将方法执行方反转"><a href="#利用代理将方法执行方反转" class="headerlink" title="利用代理将方法执行方反转"></a>利用代理将方法执行方反转</h4><p><a href="https://www.liaochuntao.cn/2018/01/09/java_web_6/" target="_blank" rel="noopener">参考以前的一篇文章——如何简单实现JDK的动态代理功能</a></p>
+<h4 id="利用代理将方法执行方反转"><a href="#利用代理将方法执行方反转" class="headerlink" title="利用代理将方法执行方反转"></a>利用代理将方法执行方反转</h4><p><a href="https://www.liaochuntao.cn/2018/01/09/java_web_6/">参考以前的一篇文章——如何简单实现JDK的动态代理功能</a></p>
 <h4 id="实现注解扫描"><a href="#实现注解扫描" class="headerlink" title="实现注解扫描"></a>实现注解扫描</h4><p>实现了方法的拦截后，还有一个问题，怎么才能知道，那些方法是需要权限验证的？简单的来说，就是怎么去查找到那些被注解的类以及方法。这个时候，就需要使用JDK中线程运行的上下文类环境，通过代码</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">String filePath = packageName.replace(<span class="string">'.'</span>, <span class="string">'/'</span>);</span><br><span class="line">Enumeration&lt;URL&gt; dirs = Thread.currentThread().getContextClassLoader().getResources(filePath)</span><br></pre></td></tr></table></figure>
 <p>就可以扫描所指定的包，扫描的结果都存放在了<code>Enumeration&lt;URL&gt; dirs</code>中，随后，我们可以通过对<code>URL</code>的协议进行分别处理，在这里，我只简单的处理了——只对<code>file</code>协议进行扫描</p>
@@ -560,7 +560,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">50</span>
+                    <span class="site-state-item-count">51</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>

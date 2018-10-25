@@ -417,7 +417,7 @@
 <blockquote>
 <p>什么是代价函数</p>
 </blockquote>
-<p>通过刚才的前向传播过程，我们得到了每一个<code>xi</code>对应的<code>y_pre</code>值，这个<code>y_pre</code>值，是根据我们假设的函数所求得的，那么怎么判断这个函数能否很好的描述出我们想要的关系呢？这就需要我们去计算<code>y_true</code>与<code>y_pre</code>的误差总和：<code>cost_function = abs(y_true - y_pre)</code>，而我们的代价函数是与<code>W</code>、<code>b</code>有关的，我们期望找到代价函数的最小值，使得函数描述能够更加准确；因此，当代价函数取到最小值时对应的<code>W</code>、<code>b</code>就是我们所需要的此时的参数<code>W</code>、<code>b</code>的解，为了解出<code>W</code>与<code>b</code>，我们采用梯度下降法，梯度下降法在<a href="https://www.liaochuntao.cn/2018/02/08/machine-learning-4/" target="_blank" rel="noopener">这篇博文</a>说了差不多了,所以就不细说了；但是，在进行梯度下降时，有一个很繁琐的问题，就是求代价函数与每一个节点的梯度，根据梯度对权重<code>W</code>进行更新操作，如何快速的求解这些梯度问题，这个时候，就需要反向传播算法了</p>
+<p>通过刚才的前向传播过程，我们得到了每一个<code>xi</code>对应的<code>y_pre</code>值，这个<code>y_pre</code>值，是根据我们假设的函数所求得的，那么怎么判断这个函数能否很好的描述出我们想要的关系呢？这就需要我们去计算<code>y_true</code>与<code>y_pre</code>的误差总和：<code>cost_function = abs(y_true - y_pre)</code>，而我们的代价函数是与<code>W</code>、<code>b</code>有关的，我们期望找到代价函数的最小值，使得函数描述能够更加准确；因此，当代价函数取到最小值时对应的<code>W</code>、<code>b</code>就是我们所需要的此时的参数<code>W</code>、<code>b</code>的解，为了解出<code>W</code>与<code>b</code>，我们采用梯度下降法，梯度下降法在<a href="https://www.liaochuntao.cn/2018/02/08/machine-learning-4/">这篇博文</a>说了差不多了,所以就不细说了；但是，在进行梯度下降时，有一个很繁琐的问题，就是求代价函数与每一个节点的梯度，根据梯度对权重<code>W</code>进行更新操作，如何快速的求解这些梯度问题，这个时候，就需要反向传播算法了</p>
 <blockquote>
 <p>什么是反向传播</p>
 </blockquote>
@@ -528,7 +528,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">50</span>
+                    <span class="site-state-item-count">51</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>

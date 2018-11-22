@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前话之前在接商业外包的时候，遇到了一个需要服务端主动推送消息的需求，当时由于对Netty的不熟悉以及没有很好的理解Netty的websocket，因此用了SSE去解决了这个问题，但是缺点就是会占用大量的带宽 Netty的websocketNetty的一个链接就是一个channel(通道)，因此，如果要实现服务端的主动消息推送，那么就要实现对channel的统一管理；幸运的是，Netty其内部已">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用Netty、SpringBoot以及Dubbo构建一个分布式的消息通知系统(初版)">
+<meta property="og:url" content="https://www.liaochuntao.cn/2018/11/19/java-web-17/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="前话之前在接商业外包的时候，遇到了一个需要服务端主动推送消息的需求，当时由于对Netty的不熟悉以及没有很好的理解Netty的websocket，因此用了SSE去解决了这个问题，但是缺点就是会占用大量的带宽 Netty的websocketNetty的一个链接就是一个channel(通道)，因此，如果要实现服务端的主动消息推送，那么就要实现对channel的统一管理；幸运的是，Netty其内部已">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-11-22T07:20:23.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="利用Netty、SpringBoot以及Dubbo构建一个分布式的消息通知系统(初版)">
+<meta name="twitter:description" content="前话之前在接商业外包的时候，遇到了一个需要服务端主动推送消息的需求，当时由于对Netty的不熟悉以及没有很好的理解Netty的websocket，因此用了SSE去解决了这个问题，但是缺点就是会占用大量的带宽 Netty的websocketNetty的一个链接就是一个channel(通道)，因此，如果要实现服务端的主动消息推送，那么就要实现对channel的统一管理；幸运的是，Netty其内部已">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2018/11/19/java-web-17/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>利用Netty、SpringBoot以及Dubbo构建一个分布式的消息通知系统(初版) | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/11/19/java-web-17/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">利用Netty、SpringBoot以及Dubbo构建一个分布式的消息通知系统(初版)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2018-11-19 21:47:13" itemprop="dateCreated datePublished" datetime="2018-11-19T21:47:13+08:00">2018-11-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-11-22 15:20:23" itemprop="dateModified" datetime="2018-11-22T15:20:23+08:00">2018-11-22</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="前话"><a href="#前话" class="headerlink" title="前话"></a>前话</h4><p>之前在接商业外包的时候，遇到了一个需要服务端主动推送消息的需求，当时由于对Netty的不熟悉以及没有很好的理解Netty的websocket，因此用了<code>SSE</code>去解决了这个问题，但是缺点就是会占用大量的带宽</p>
+<h4 id="Netty的websocket"><a href="#Netty的websocket" class="headerlink" title="Netty的websocket"></a>Netty的websocket</h4><p>Netty的一个链接就是一个<code>channel</code>(通道)，因此，如果要实现服务端的主动消息推送，那么就要实现对channel的统一管理；幸运的是，Netty其内部已经实现了对channel的统一管理的容器——<code>ChannelGroup</code>，ChannelGroup其内部用了一个<code>ConcurrentMap&lt;ChannelId, Channel&gt;</code>来作为channel的承载容器，而channelId是channel的一个属性，但是，如果仅仅依靠ChannelGroup还不能够实现真正可用于生产环境中的消息推送系统，因为channelId与业务是完全没有关联的，因此，我这里又用了一个<code>ConcurrentMap&lt;String, ChannelId&gt;</code>来实现用户的业务标识与channelId的对应关系：当客户端需要连接消息推送中心时，需要带上自己的业务编号信息，然后，服务端接收消息后将用户业务编号解析并与channel一同存储到自定义的管理容器中</p>
+<blockquote>
+<p>代码实现</p>
+</blockquote>
+<p>Netty的websocket实现端</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NoticeChannelHandlerImpl</span> <span class="keyword">extends</span> <span class="title">SimpleChannelInboundHandler</span>&lt;<span class="title">TextWebSocketFrame</span>&gt;</span></span><br><span class="line"><span class="class">        <span class="keyword">implements</span> <span class="title">NoticeChannelHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 仅仅通知学生用户</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> ChannelGroup studentChannels = <span class="keyword">new</span> DefaultChannelGroup(GlobalEventExecutor.INSTANCE);</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 仅仅通知教师用户</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> ChannelGroup teacherChannels = <span class="keyword">new</span> DefaultChannelGroup(GlobalEventExecutor.INSTANCE);</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 全局通知所有用户</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> ChannelGroup globalChannels = <span class="keyword">new</span> DefaultChannelGroup(GlobalEventExecutor.INSTANCE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 客户端首次接入时，需发送用户编号信息</span></span><br><span class="line"><span class="comment">     * 客户端发送的信息：&#123;ChannelGroupType&#125;-&#123;user_uuid&#125;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> ctx</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> msg</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">channelRead0</span><span class="params">(ChannelHandlerContext ctx, TextWebSocketFrame msg)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Channel channel = ctx.channel();</span><br><span class="line">        String[] contexts = msg.text().split(<span class="string">"-"</span>);</span><br><span class="line">        <span class="keyword">int</span> clientContextSplitNum = <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (contexts.length != clientContextSplitNum) &#123;</span><br><span class="line">            channel.writeAndFlush(<span class="keyword">new</span> TextWebSocketFrame(StringsValue.CN.CLIENT_SEND_ERR_MSG));</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ChannelIdPool.add(contexts[<span class="number">1</span>], channel.id());</span><br><span class="line">            addToChannelGroup(contexts[<span class="number">0</span>], channel);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        log.info(<span class="string">"新接入编号为 [&#123;&#125;] 的客户端"</span>, ctx.channel().id());</span><br><span class="line">        <span class="keyword">super</span>.channelActive(ctx);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelInactive</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.channelInactive(ctx);</span><br><span class="line">        log.info(<span class="string">"客户端编号为 [&#123;&#125;] 已断开链接"</span>, ctx.channel().id());</span><br><span class="line">        ChannelIdPool.remove(ctx.channel().id());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(ChannelHandlerContext ctx, Throwable cause)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.exceptionCaught(ctx, cause);</span><br><span class="line">        log.error(<span class="string">"客户端编号为 [&#123;&#125;] 报错：[&#123;&#125;]"</span>, ctx.channel().id(), cause.getMessage());</span><br><span class="line">        ctx.close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ConcurrentMap&lt;String, ChannelId&gt;容器的实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChannelIdPool</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ConcurrentHashMap&lt;String, ChannelId&gt; channelIdMap;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        channelIdMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ChannelIdPool</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Optional&lt;ChannelId&gt; <span class="title">get</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Optional.ofNullable(channelIdMap.get(key));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(String key, ChannelId channelId)</span> </span>&#123;</span><br><span class="line">        channelIdMap.put(key, channelId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        channelIdMap.remove(key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(ChannelId channelId)</span> </span>&#123;</span><br><span class="line">        Iterator&lt;Map.Entry&lt;String, ChannelId&gt;&gt; iterator = channelIdMap.entrySet().iterator();</span><br><span class="line">        <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">            Map.Entry&lt;String, ChannelId&gt; entry = iterator.next();</span><br><span class="line">            <span class="keyword">if</span> (entry.getValue().compareTo(channelId) == <span class="number">0</span>) &#123;</span><br><span class="line">                iterator.remove();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="如何设置Netty服务端相关配置"><a href="#如何设置Netty服务端相关配置" class="headerlink" title="如何设置Netty服务端相关配置"></a>如何设置Netty服务端相关配置</h4><blockquote>
+<p>Netty 服务端的配置</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PropertySource</span>(value = <span class="string">"classpath:netty-server.properties"</span>)</span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NettyServerConfigure</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;netty.server.tcp.port&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> tcpPort;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;netty.server.boss.thread.count&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> bossCount;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;netty.server.worker.thread.count&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> workerCount;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;netty.server.so.keepalive&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> keepAlive;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;netty.server.so.backlog&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> backlog;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(value = <span class="string">"ServerBootstrap"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ServerBootstrap <span class="title">bootstrap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ServerBootstrap b = <span class="keyword">new</span> ServerBootstrap();</span><br><span class="line">        b.group(bossGroup(), workerGroup())</span><br><span class="line">                .channel(NioServerSocketChannel.class)</span><br><span class="line">                .handler(<span class="keyword">new</span> LoggingHandler(LogLevel.DEBUG))</span><br><span class="line">                .childHandler(nettyWebSocketChannelInitializer);</span><br><span class="line">        Map&lt;ChannelOption&lt;?&gt;, Object&gt; tcpChannelOptions = tcpChannelOptions();</span><br><span class="line">        Set&lt;ChannelOption&lt;?&gt;&gt; keySet = tcpChannelOptions.keySet();</span><br><span class="line">        <span class="keyword">for</span> (<span class="meta">@SuppressWarnings</span>(<span class="string">"rawtypes"</span>) ChannelOption option : keySet) &#123;</span><br><span class="line">            b.option(option, tcpChannelOptions.get(option));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier</span>(<span class="string">"ChannelInitializer"</span>)</span><br><span class="line">    <span class="keyword">private</span> NettyWebSocketChannelInitializer nettyWebSocketChannelInitializer;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(name = <span class="string">"tcpChannelOptions"</span>)</span><br><span class="line">    <span class="keyword">public</span> Map&lt;ChannelOption&lt;?&gt;, Object&gt; tcpChannelOptions() &#123;</span><br><span class="line">        Map&lt;ChannelOption&lt;?&gt;, Object&gt; options = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        options.put(ChannelOption.SO_KEEPALIVE, keepAlive);</span><br><span class="line">        options.put(ChannelOption.SO_BACKLOG, backlog);</span><br><span class="line">        <span class="keyword">return</span> options;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(name = <span class="string">"bossGroup"</span>, destroyMethod = <span class="string">"shutdownGracefully"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> NioEventLoopGroup <span class="title">bossGroup</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> NioEventLoopGroup(bossCount);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(name = <span class="string">"workerGroup"</span>, destroyMethod = <span class="string">"shutdownGracefully"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> NioEventLoopGroup <span class="title">workerGroup</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> NioEventLoopGroup(workerCount);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(name = <span class="string">"tcpSocketAddress"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> InetSocketAddress <span class="title">tcpPort</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> InetSocketAddress(tcpPort);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Netty的websocket的初始化配置</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Qualifier</span>(<span class="string">"ChannelInitializer"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NettyWebSocketChannelInitializer</span> <span class="keyword">extends</span> <span class="title">ChannelInitializer</span>&lt;<span class="title">SocketChannel</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel ch)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        ChannelPipeline pipeline = ch.pipeline();</span><br><span class="line"></span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> HttpServerCodec());</span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> HttpObjectAggregator(<span class="number">65536</span>));</span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> ChunkedWriteHandler());</span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> WebSocketServerProtocolHandler(<span class="string">"/notice"</span>));</span><br><span class="line">        <span class="comment">// 心跳机制</span></span><br><span class="line"><span class="comment">//        pipeline.addLast("ping", new IdleStateHandler(25, 15, 10, TimeUnit.SECONDS));</span></span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> NoticeChannelHandlerImpl());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>真正的Tcp服务端启动相关配置</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TcpServerConfigure</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier</span>(<span class="string">"ServerBootstrap"</span>)</span><br><span class="line">    <span class="keyword">private</span> ServerBootstrap serverBootstrap;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier</span>(<span class="string">"tcpSocketAddress"</span>)</span><br><span class="line">    <span class="keyword">private</span> InetSocketAddress tcpPort;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Channel serverChannel;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        serverChannel =  serverBootstrap.bind(tcpPort).sync().channel().closeFuture().sync().channel();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PreDestroy</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        serverChannel.close();</span><br><span class="line">        serverChannel.parent().close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ServerBootstrap <span class="title">getServerBootstrap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> serverBootstrap;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setServerBootstrap</span><span class="params">(ServerBootstrap serverBootstrap)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.serverBootstrap = serverBootstrap;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> InetSocketAddress <span class="title">getTcpPort</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tcpPort;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTcpPort</span><span class="params">(InetSocketAddress tcpPort)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.tcpPort = tcpPort;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="消息发布、消费中心"><a href="#消息发布、消费中心" class="headerlink" title="消息发布、消费中心"></a>消息发布、消费中心</h4><blockquote>
+<p>消息发布中心</p>
+</blockquote>
+<p>对于消息发布中心，其职能就只限与接收由发布者需要发布的消息，将消息缓存在一个消息发布容器中，为什么需要缓存起来？因为可能有些用户是这些消息的接收者，但是由于没有登陆，也就没有对应的channel注册，因此需要将消息缓存在容器中，当消息的所有接收者都接收到消息时，将该消息从容器中移除，至此，一个消息在消息发布中心的生命到此结束。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NoticePublishCenterImpl</span> <span class="keyword">extends</span> <span class="title">Observable</span> <span class="keyword">implements</span> <span class="title">NoticePublishCenter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Object lock = <span class="keyword">new</span> Object();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span> <span class="keyword">private</span> NoticeConsumerCenter noticeConsumerCenter;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> ConcurrentHashMap&lt;String, NoticePackage&gt; noticeCenterPool;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        noticeCenterPool = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NoticePublishCenterImpl</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        addObserver(noticeConsumerCenter);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">createNoticeGroup</span><span class="params">(NoticePackage noticePackage)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (noticeCenterPool.containsKey(noticePackage.getNoticeLabel())) &#123;</span><br><span class="line">            noticeCenterPool.put(noticePackage.getNoticeLabel(), noticePackage);</span><br><span class="line">            notifyObservers(noticePackage);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 该推送任务已完成，从通知消息池中销毁该通知消息</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> groupName</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">finishNotice</span><span class="params">(String groupName)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">            noticeCenterPool.remove(groupName);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 由消息消费者中心通知回调告知通知发布中心该消息消费结果</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> o</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> arg</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(Observable o, Object arg)</span> </span>&#123;</span><br><span class="line">        NoticePackage noticePackage = (NoticePackage) arg;</span><br><span class="line">        <span class="keyword">if</span> (noticePackage.getTotalReceivers() == <span class="number">0</span>) &#123;</span><br><span class="line">            finishNotice(noticePackage.getNoticeLabel());</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            noticeCenterPool.put(noticePackage.getNoticeLabel(), noticePackage);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在代码中看到了观察者模式所特有的<code>addObserver</code>以及<code>notifyObservers</code>，在这里，我将消息发布中心与消费中心用了观察者模式分解；当消息发布中心接收到发布事件后，通知消息消费中心准备开始执行消息发布任务，通知有，消息发布中心就不需要阻塞等待消息消费中心的作业完成结果，而是继续做自己的事情；而消息消费中心同样也实现了观察者模式，当消息消费中心完了消息发布中心所通知的任务后，将任务完成结果通知消息发布中心，剩下的关于消息消费的结果的处理就完全扔给了消息发布中心，而消息消费中心则可以继续自己的其他消息消费任务</p>
+<blockquote>
+<p>消息消费中心</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NoticeConsumerCenterImpl</span> <span class="keyword">extends</span> <span class="title">Observable</span> <span class="keyword">implements</span> <span class="title">NoticeConsumerCenter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ConcurrentLinkedQueue&lt;String&gt; receivers = <span class="keyword">new</span> ConcurrentLinkedQueue&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> NoticeChannelHandler noticeChannelHandler;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> NoticePublishCenter publishCenter;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ThreadPoolExecutor PublishThreadPool;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        addObserver(publishCenter);</span><br><span class="line">        PublishThreadPool = <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">4</span>,</span><br><span class="line">                <span class="number">12</span>,</span><br><span class="line">                <span class="number">60</span>,</span><br><span class="line">                TimeUnit.SECONDS,</span><br><span class="line">                <span class="keyword">new</span> LinkedBlockingQueue&lt;&gt;(<span class="number">100</span>),</span><br><span class="line">                <span class="keyword">new</span> NoticeThreadFactory(),</span><br><span class="line">                <span class="keyword">new</span> RejectHandler());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(Observable o, Object arg)</span> </span>&#123;</span><br><span class="line">        NoticePackage noticePackage = (NoticePackage) arg;</span><br><span class="line">        PublishThreadPool.execute(<span class="keyword">new</span> NoticeCallable(noticePackage));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addReceiver</span><span class="params">(String receiver)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!receivers.contains(receiver)) &#123;</span><br><span class="line">            receivers.add(receiver);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeReceiver</span><span class="params">(String receiver)</span> </span>&#123;</span><br><span class="line">        receivers.remove(receiver);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">NoticeCallable</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> NoticePackage noticePackage;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">NoticeCallable</span><span class="params">(NoticePackage noticePackage)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.noticePackage = noticePackage;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            List&lt;String&gt; tmpReceivers = noticePackage.getReceivers();</span><br><span class="line">            tmpReceivers.stream().filter(receiver -&gt; receivers.contains(receiver)).flatMap(receiver -&gt; &#123;</span><br><span class="line">                noticePackage.setUserId(receiver);</span><br><span class="line">                noticeChannelHandler.publishMsg(noticePackage);</span><br><span class="line">                noticePackage.setTotalReceivers(noticePackage.getTotalReceivers() - <span class="number">1</span>);</span><br><span class="line">                <span class="keyword">return</span> Stream.of(noticePackage);</span><br><span class="line">            &#125;).flatMap(noticePackage -&gt; &#123;</span><br><span class="line">                <span class="keyword">if</span> (noticePackage.getTotalReceivers() == <span class="number">0</span>) &#123;</span><br><span class="line">                    notifyObservers(noticePackage);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> Stream.empty();</span><br><span class="line">            &#125;).count();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 线程池任务拒绝策略</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">RejectHandler</span> <span class="keyword">implements</span> <span class="title">RejectedExecutionHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">rejectedExecution</span><span class="params">(Runnable r, ThreadPoolExecutor executor)</span> </span>&#123;</span><br><span class="line">            log.error(<span class="string">"消息推送服务任务被拒绝。 &#123;&#125;"</span>, executor.toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">NoticeThreadFactory</span> <span class="keyword">implements</span> <span class="title">ThreadFactory</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> String namePrefix;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> AtomicInteger nextId = <span class="keyword">new</span> AtomicInteger(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        NoticeThreadFactory() &#123;</span><br><span class="line">            namePrefix = <span class="string">"消息推送-工作线程-"</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Thread <span class="title">newThread</span><span class="params">(Runnable r)</span> </span>&#123;</span><br><span class="line">            String name = namePrefix + nextId.getAndDecrement();</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Thread(r, name);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="哔哩哔哩项目演示视频"><a href="#哔哩哔哩项目演示视频" class="headerlink" title="哔哩哔哩项目演示视频"></a>哔哩哔哩项目演示视频</h4><p><a href="https://www.bilibili.com/video/av36497338/" target="_blank" rel="noopener">哔哩哔哩项目演示视频：利用Netty、SpringBoot以及Dubbo构建一个分布式的消息通知系统(初版)</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/06/java-web-16/" rel="next" title="微服务之Dubbo初体验">
+                <i class="fa fa-chevron-left"></i> 微服务之Dubbo初体验
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">53</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">16</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前话"><span class="nav-number">1.</span> <span class="nav-text">前话</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Netty的websocket"><span class="nav-number">2.</span> <span class="nav-text">Netty的websocket</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何设置Netty服务端相关配置"><span class="nav-number">3.</span> <span class="nav-text">如何设置Netty服务端相关配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#消息发布、消费中心"><span class="nav-number">4.</span> <span class="nav-text">消息发布、消费中心</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#哔哩哔哩项目演示视频"><span class="nav-number">5.</span> <span class="nav-text">哔哩哔哩项目演示视频</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

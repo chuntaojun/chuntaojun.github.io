@@ -108,28 +108,28 @@
 
 
 
-  <meta name="description" content="竟然立了一个flag，说好的每个星期一篇数据结构的博文……….顿时心塞 开始把开始吧 今天我们来了解并实现循环队列（静态数组）这一数据结构。 队列和栈都是两种非常重要而且非常常见的数据结构类型。前一期我们说了栈这个结构是后进先出；而今天讲的队列这个结构呢，是先进先出，后进后出，类似于排队买票，先排的人先买到票，后排的人后买到票。这个就是队列的特殊地方。 讲完了队列这个结构。现在我们讲讲如何用代码去">
-<meta name="keywords" content="队列">
+  <meta name="description" content="jenkins what is jenkins  Jenkins——采用java语言编写的持续集成服务器  What can it do   软件构建自动化  构建可持续的自动化检查  构建可持续的自动化测试  生成后后续过程的自动化   安装步骤此处建议安装非docker镜像的jenkins，因为官方的jenkins镜像并不集成docker；所以要么安装非docker版本的jenkins，要">
 <meta property="og:type" content="article">
-<meta property="og:title" content="循环队列的实现（静态数组实现）">
-<meta property="og:url" content="https://www.liaochuntao.cn/2017/10/06/data_struct_2/index.html">
+<meta property="og:title" content="记一次jenkins+docker+node的自动化部署">
+<meta property="og:url" content="https://www.liaochuntao.cn/2018/11/30/java-web-20/index.html">
 <meta property="og:site_name" content="唉&#39;s Blog">
-<meta property="og:description" content="竟然立了一个flag，说好的每个星期一篇数据结构的博文……….顿时心塞 开始把开始吧 今天我们来了解并实现循环队列（静态数组）这一数据结构。 队列和栈都是两种非常重要而且非常常见的数据结构类型。前一期我们说了栈这个结构是后进先出；而今天讲的队列这个结构呢，是先进先出，后进后出，类似于排队买票，先排的人先买到票，后排的人后买到票。这个就是队列的特殊地方。 讲完了队列这个结构。现在我们讲讲如何用代码去">
+<meta property="og:description" content="jenkins what is jenkins  Jenkins——采用java语言编写的持续集成服务器  What can it do   软件构建自动化  构建可持续的自动化检查  构建可持续的自动化测试  生成后后续过程的自动化   安装步骤此处建议安装非docker镜像的jenkins，因为官方的jenkins镜像并不集成docker；所以要么安装非docker版本的jenkins，要">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/10/deepinscreenshot_select-area_20171006205231.png">
-<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/10/deepinscreenshot_select-area_20171006205249.png">
-<meta property="og:updated_time" content="2018-01-21T05:21:52.000Z">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-20-1.png">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-20-2.png">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-20-3.png">
+<meta property="og:updated_time" content="2018-11-30T08:46:28.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="循环队列的实现（静态数组实现）">
-<meta name="twitter:description" content="竟然立了一个flag，说好的每个星期一篇数据结构的博文……….顿时心塞 开始把开始吧 今天我们来了解并实现循环队列（静态数组）这一数据结构。 队列和栈都是两种非常重要而且非常常见的数据结构类型。前一期我们说了栈这个结构是后进先出；而今天讲的队列这个结构呢，是先进先出，后进后出，类似于排队买票，先排的人先买到票，后排的人后买到票。这个就是队列的特殊地方。 讲完了队列这个结构。现在我们讲讲如何用代码去">
-<meta name="twitter:image" content="https://liaochuntao.files.wordpress.com/2017/10/deepinscreenshot_select-area_20171006205231.png">
+<meta name="twitter:title" content="记一次jenkins+docker+node的自动化部署">
+<meta name="twitter:description" content="jenkins what is jenkins  Jenkins——采用java语言编写的持续集成服务器  What can it do   软件构建自动化  构建可持续的自动化检查  构建可持续的自动化测试  生成后后续过程的自动化   安装步骤此处建议安装非docker镜像的jenkins，因为官方的jenkins镜像并不集成docker；所以要么安装非docker版本的jenkins，要">
+<meta name="twitter:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-20-1.png">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.liaochuntao.cn/2017/10/06/data_struct_2/"/>
+  <link rel="canonical" href="https://www.liaochuntao.cn/2018/11/30/java-web-20/"/>
 
 
 
@@ -139,7 +139,7 @@
   };
 </script>
 
-  <title>循环队列的实现（静态数组实现） | 唉's Blog</title>
+  <title>记一次jenkins+docker+node的自动化部署 | 唉's Blog</title>
   
 
 
@@ -292,7 +292,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2017/10/06/data_struct_2/">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/11/30/java-web-20/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="liaochuntao">
@@ -309,7 +309,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">循环队列的实现（静态数组实现）
+          <h1 class="post-title" itemprop="name headline">记一次jenkins+docker+node的自动化部署
               
             
           </h1>
@@ -334,24 +334,12 @@
                 
               
 
-              <time title="Created: 2017-10-06 21:29:39" itemprop="dateCreated datePublished" datetime="2017-10-06T21:29:39+08:00">2017-10-06</time>
+              <time title="Created: 2018-11-30 12:13:20 / Modified: 16:46:28" itemprop="dateCreated datePublished" datetime="2018-11-30T12:13:20+08:00">2018-11-30</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2018-01-21 13:21:52" itemprop="dateModified" datetime="2018-01-21T13:21:52+08:00">2018-01-21</time>
               
             
           </span>
@@ -368,7 +356,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数据结构/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
 
                 
                 
@@ -402,18 +390,45 @@
       
 
       
-        <p>竟然立了一个flag，说好的每个星期一篇数据结构的博文……….顿时心塞</p>
-<p>开始把开始吧</p>
-<p>今天我们来了解并实现循环队列（静态数组）这一数据结构。</p>
-<p>队列和栈都是两种非常重要而且非常常见的数据结构类型。前一期我们说了栈这个结构是后进先出；而今天讲的队列这个结构呢，是先进先出，后进后出，类似于排队买票，先排的人先买到票，后排的人后买到票。这个就是队列的特殊地方。</p>
-<p>讲完了队列这个结构。现在我们讲讲如何用代码去实现这个数据结构。</p>
-<p>队列这个结构可以用链表，也可以用静态数组实现。链表实现的形式其实很简单，只需要将上一期的栈结构的代码稍作改动就可以实现队列这个结构。今天我们来讲讲用静态数组来实现，还是循环队列。（这里盗用下某篇博客的图片）</p>
-<p><img src="https://liaochuntao.files.wordpress.com/2017/10/deepinscreenshot_select-area_20171006205231.png" alt="DeepinScreenshot_select-area_20171006205231.png"></p>
-<p>我们可以看到，在普通的静态数组实现的队列这一数据结构中，如果一开始1,2,3三个数据入队列后再出列，那么头结点就在3这个位置，这个时候在将4,5,6三个数据入队列，之后就会告诉你队列已经“满了”，然而这个满不是真的满，为了有效的利用空间，我们就想，能不能将这个数组循环起来，以便于充分的利用空间——因此才有了循环队列的数组实现形式。（再次盗用下某篇博客的图片）</p>
-<p><img src="https://liaochuntao.files.wordpress.com/2017/10/deepinscreenshot_select-area_20171006205249.png" alt="DeepinScreenshot_select-area_20171006205249"></p>
-<p>我们可以看到，我们已经将静态数组“循环化”，很容易看出，队列空的状态条件为queue.front==queue.rear，队列满的条件也是queue.front==queue.rear，这里就有一个问题。这两个状态如何区分？很简单，有两种解决方案，一是像图中所示，我们牺牲一个单元，用来区分；二是加入一个操作判别状态，如果你是执行入队操作，那么操作判别状态为插入，此时如果queue.front==queue.rear时，就是队列已经满了，如果是出队操作，那么操作判别状态为出队，在下一次进行入队操作时，如果上一次操作状态为出队，此时的queue.front==queue.rear，则此时队列为空。在这里，我们将采用第一种解决方式，即牺牲一个存储单元进行区分。</p>
-<p>那么，第一种方式的队列满和空的判别是如何实现呢？首先说下队列空的判别，就是queue.front==queue.rear，此时队列为空队列，如果(queue.rear+1) % MAXSIZE == queue.front时，队列已经满了。这个公式的得来是由于我们约定以“队列头指针front在队尾指针rear的下一个位置上”作为队列“满”状态的标志。我们不清楚当前的队列的对头结点是不是在0这个位置，如果是，那么对头与对尾的位置差为MAXSIZE-1，求余就是因为循环这个特殊的性质。接下来，我们来看看具体的代码实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> <span class="built_in">queue</span>[<span class="number">6</span>];</span><br><span class="line">    <span class="keyword">int</span> front;</span><br><span class="line">    <span class="keyword">int</span> rear;</span><br><span class="line">&#125; LQueue;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">InitQueue</span><span class="params">(LQueue &amp;amp;Lq)</span> </span>&#123;</span><br><span class="line">    Lq.front = Lq.rear = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">IntoQueue</span><span class="params">(LQueue &amp;amp;Lq, <span class="keyword">int</span> i)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> ((Lq.rear + <span class="number">1</span>) % <span class="number">6</span> == Lq.front)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    Lq.<span class="built_in">queue</span>[Lq.rear] = i;</span><br><span class="line">    Lq.rear = (Lq.rear + <span class="number">1</span>) % <span class="number">6</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">OutQueue</span><span class="params">(LQueue &amp;amp;Lq, <span class="keyword">int</span> &amp;amp;e)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Lq.rear == Lq.front)</span><br><span class="line">        <span class="keyword">return</span>;   <span class="comment">//可能队列为空，没有元素可以出队列</span></span><br><span class="line">    e = Lq.<span class="built_in">queue</span>[Lq.front];</span><br><span class="line">    Lq.front = (Lq.front + <span class="number">1</span>) % <span class="number">6</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    LQueue <span class="built_in">queue</span>;</span><br><span class="line">    InitQueue(<span class="built_in">queue</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>（我学习的某篇博客：<a href="http://blog.csdn.net/u010429311/article/details/51043149" target="_blank" rel="noopener">csdn博客地址</a> ）</p>
+        <h4 id="jenkins"><a href="#jenkins" class="headerlink" title="jenkins"></a>jenkins</h4><blockquote>
+<p>what is jenkins</p>
+</blockquote>
+<p>Jenkins——采用java语言编写的持续集成服务器</p>
+<blockquote>
+<p>What can it do</p>
+</blockquote>
+<ol>
+<li><p>软件构建自动化</p>
+</li>
+<li><p>构建可持续的自动化检查</p>
+</li>
+<li><p>构建可持续的自动化测试</p>
+</li>
+<li><p>生成后后续过程的自动化</p>
+</li>
+</ol>
+<h4 id="安装步骤"><a href="#安装步骤" class="headerlink" title="安装步骤"></a>安装步骤</h4><p>此处建议安装非docker镜像的jenkins，因为官方的jenkins镜像并不集成docker；所以要么安装非docker版本的jenkins，要么自己编写一个集成docker的jenkins或者使用已经集成docker的jenkins镜像</p>
+<blockquote>
+<p>linux(ubuntu/debain系列) 安装</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -</span><br><span class="line"><span class="built_in">echo</span> deb http://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install jenkins</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>备注</p>
+</blockquote>
+<ol>
+<li><p>在进行以上的操作时，首先确保有jdk环境</p>
+</li>
+<li><p>jenkins的默认端口为<code>8080</code>端口，如果需要更改的话，前往<code>/etc/default/jenkins</code>进行修改<code>HTTP_PORT</code></p>
+</li>
+<li><p>如果想将jenkins的用户提升为root，那么前往<code>/etc/default/jenkiins</code>修改<code>JENKINS_USER</code>以及<code>JENKINS_GROUP</code></p>
+</li>
+</ol>
+<h4 id="编写Dockerfile"><a href="#编写Dockerfile" class="headerlink" title="编写Dockerfile"></a>编写Dockerfile</h4><p>在进行jenkins结合docker之前，我们首先要为我们的项目编写<code>Dockerfile</code>，告知docker该如何构建我们项目的镜像</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> ubuntu</span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get update \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apt-get install -y nodejs npm</span></span><br><span class="line"><span class="bash">COPY . /root/web</span></span><br><span class="line"><span class="bash">WORKDIR /root/web</span></span><br><span class="line"><span class="bash">EXPOSE 8077</span></span><br><span class="line"><span class="bash">RUN npm -g install http-server</span></span><br><span class="line"><span class="bash">CMD [<span class="string">"http-server"</span>, <span class="string">"-p"</span>, <span class="string">"8077 "</span>]</span></span><br></pre></td></tr></table></figure>
+<h4 id="jenkins相关设置"><a href="#jenkins相关设置" class="headerlink" title="jenkins相关设置"></a>jenkins相关设置</h4><p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-20-1.png" alt="jenkins设置"></p>
+<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-20-2.png" alt="jenkins设置"></p>
+<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-20-3.png" alt="jenkins设置"></p>
+<h4 id="测试一下"><a href="#测试一下" class="headerlink" title="测试一下"></a>测试一下</h4><p><a href="">哔哩哔哩演示视频</a></p>
 
       
     </div>
@@ -432,12 +447,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/队列/" rel="tag"># 队列</a>
-          
-        </div>
-      
 
       
       
@@ -447,8 +456,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/09/25/data_struct_1/" rel="next" title="用链表实现栈结构">
-                <i class="fa fa-chevron-left"></i> 用链表实现栈结构
+              <a href="/2018/11/19/java-web-17/" rel="next" title="利用Netty、SpringBoot以及Dubbo构建一个分布式的消息通知系统(初版)">
+                <i class="fa fa-chevron-left"></i> 利用Netty、SpringBoot以及Dubbo构建一个分布式的消息通知系统(初版)
               </a>
             
           </div>
@@ -456,10 +465,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/10/06/java_web_1/" rel="prev" title="Bootstrap Table 加入弹出框">
-                Bootstrap Table 加入弹出框 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -504,8 +509,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -616,6 +630,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#jenkins"><span class="nav-number">1.</span> <span class="nav-text">jenkins</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#安装步骤"><span class="nav-number">2.</span> <span class="nav-text">安装步骤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#编写Dockerfile"><span class="nav-number">3.</span> <span class="nav-text">编写Dockerfile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#jenkins相关设置"><span class="nav-number">4.</span> <span class="nav-text">jenkins相关设置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#测试一下"><span class="nav-number">5.</span> <span class="nav-text">测试一下</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

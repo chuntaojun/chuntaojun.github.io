@@ -108,29 +108,24 @@
 
 
 
-  <meta name="description" content="上面这幅图是从维基百科上截取的，我们可以看到，常见的排序算法有：冒泡排序、选择排序、插入排序、堆排序、归并排序、快速排序、希尔排序、计数排序、桶排序以及基数排序；在图中都已经体现了每个排序算法的时间复杂度和空间复杂度以及排序算法的稳定性（排序算法的稳定性是指如果存在两个或以上的相同元素，在排序过程中，如果ri=rj，且i&amp;lt;j，在排序过程中这种关系保持不变的则称该排序算法具有稳定性）。 今天">
-<meta name="keywords" content="排序">
+  <meta name="description" content="题目123456789101112给出一个区间的集合，请合并所有重叠的区间。示例 1:输入: [[1,3],[2,6],[8,10],[15,18]]输出: [[1,6],[8,10],[15,18]]解释: 区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].示例 2:输入: [[1,4],[4,5]]输出: [[1,5]]解释: 区间 [1,4] 和 [4,5] 可被视为重叠区">
 <meta property="og:type" content="article">
-<meta property="og:title" content="排序算法一之插入排序与希尔排序">
-<meta property="og:url" content="https://www.liaochuntao.cn/2017/12/16/data_struct_12/index.html">
+<meta property="og:title" content="leetcode回顾——Merge Intervals">
+<meta property="og:url" content="https://www.liaochuntao.cn/2018/12/19/leetcode-8/index.html">
 <meta property="og:site_name" content="唉&#39;s Blog">
-<meta property="og:description" content="上面这幅图是从维基百科上截取的，我们可以看到，常见的排序算法有：冒泡排序、选择排序、插入排序、堆排序、归并排序、快速排序、希尔排序、计数排序、桶排序以及基数排序；在图中都已经体现了每个排序算法的时间复杂度和空间复杂度以及排序算法的稳定性（排序算法的稳定性是指如果存在两个或以上的相同元素，在排序过程中，如果ri=rj，且i&amp;lt;j，在排序过程中这种关系保持不变的则称该排序算法具有稳定性）。 今天">
+<meta property="og:description" content="题目123456789101112给出一个区间的集合，请合并所有重叠的区间。示例 1:输入: [[1,3],[2,6],[8,10],[15,18]]输出: [[1,6],[8,10],[15,18]]解释: 区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].示例 2:输入: [[1,4],[4,5]]输出: [[1,5]]解释: 区间 [1,4] 和 [4,5] 可被视为重叠区">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-16-14-23-40.png">
-<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-16-14-51-05.png">
-<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-16-17-17-08.png">
-<meta property="og:updated_time" content="2018-01-22T08:11:10.000Z">
+<meta property="og:updated_time" content="2018-12-19T14:46:00.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="排序算法一之插入排序与希尔排序">
-<meta name="twitter:description" content="上面这幅图是从维基百科上截取的，我们可以看到，常见的排序算法有：冒泡排序、选择排序、插入排序、堆排序、归并排序、快速排序、希尔排序、计数排序、桶排序以及基数排序；在图中都已经体现了每个排序算法的时间复杂度和空间复杂度以及排序算法的稳定性（排序算法的稳定性是指如果存在两个或以上的相同元素，在排序过程中，如果ri=rj，且i&amp;lt;j，在排序过程中这种关系保持不变的则称该排序算法具有稳定性）。 今天">
-<meta name="twitter:image" content="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-16-14-23-40.png">
+<meta name="twitter:title" content="leetcode回顾——Merge Intervals">
+<meta name="twitter:description" content="题目123456789101112给出一个区间的集合，请合并所有重叠的区间。示例 1:输入: [[1,3],[2,6],[8,10],[15,18]]输出: [[1,6],[8,10],[15,18]]解释: 区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].示例 2:输入: [[1,4],[4,5]]输出: [[1,5]]解释: 区间 [1,4] 和 [4,5] 可被视为重叠区">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.liaochuntao.cn/2017/12/16/data_struct_12/"/>
+  <link rel="canonical" href="https://www.liaochuntao.cn/2018/12/19/leetcode-8/"/>
 
 
 
@@ -140,7 +135,7 @@
   };
 </script>
 
-  <title>排序算法一之插入排序与希尔排序 | 唉's Blog</title>
+  <title>leetcode回顾——Merge Intervals | 唉's Blog</title>
   
 
 
@@ -293,7 +288,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2017/12/16/data_struct_12/">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/12/19/leetcode-8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="liaochuntao">
@@ -310,7 +305,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">排序算法一之插入排序与希尔排序
+          <h1 class="post-title" itemprop="name headline">leetcode回顾——Merge Intervals
               
             
           </h1>
@@ -335,24 +330,12 @@
                 
               
 
-              <time title="Created: 2017-12-16 17:23:46" itemprop="dateCreated datePublished" datetime="2017-12-16T17:23:46+08:00">2017-12-16</time>
+              <time title="Created: 2018-12-19 22:24:04 / Modified: 22:46:00" itemprop="dateCreated datePublished" datetime="2018-12-19T22:24:04+08:00">2018-12-19</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2018-01-22 16:11:10" itemprop="dateModified" datetime="2018-01-22T16:11:10+08:00">2018-01-22</time>
               
             
           </span>
@@ -369,7 +352,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数据结构/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a></span>
 
                 
                 
@@ -403,24 +386,23 @@
       
 
       
-        <p><img src="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-16-14-23-40.png" alt="Screenshot from 2017-12-16 14-23-40.png"></p>
-<p>上面这幅图是从维基百科上截取的，我们可以看到，常见的排序算法有：冒泡排序、选择排序、插入排序、堆排序、归并排序、快速排序、希尔排序、计数排序、桶排序以及基数排序；在图中都已经体现了每个排序算法的时间复杂度和空间复杂度以及排序算法的稳定性（排序算法的稳定性是指如果存在两个或以上的相同元素，在排序过程中，如果ri=rj，且i&lt;j，在排序过程中这种关系保持不变的则称该排序算法具有稳定性）。</p>
-<p>今天，我们来讲讲插入排序以及希尔排序。</p>
-<h4 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h4><p>插入排序，假设有N个数，那么通过N-1趟循环对元素进行位置的正确 插入排序，而插入排序依靠这样一个事实，在第m次排序时（就是到了第m个元素的时候），前m-1个元素都是有序的事实，下面，我们来通过一张表来看看插入排序是如何实现的（假设数组名为A）</p>
-<p><img src="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-16-14-51-05.png" alt="Screenshot from 2017-12-16 14-51-05"></p>
-<p>当m=1时，我们从数组下标为1的元素作为第m个元素，那么，由插入排序依靠的事实——前m-1个元素有序，因此，我们对A[m]和A[0..m-1]进行比较找到A[m]适合的位置进行插入，然后我们不断改变第m个元素的位置，不断的对m-1个元素进行寻找适合他们自己插入的位置，当m为数组长度时，已经完成了对整个数组元素的排序，此时就可以跳出循环。</p>
+        <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">给出一个区间的集合，请合并所有重叠的区间。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: [[1,3],[2,6],[8,10],[15,18]]</span><br><span class="line">输出: [[1,6],[8,10],[15,18]]</span><br><span class="line">解释: 区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: [[1,4],[4,5]]</span><br><span class="line">输出: [[1,5]]</span><br><span class="line">解释: 区间 [1,4] 和 [4,5] 可被视为重叠区间。</span><br></pre></td></tr></table></figure>
+<h4 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h4><p>其实这道题还是很快想到办法的，两个区间的位置关系就三种</p>
 <blockquote>
-<p>插入排序代码</p>
+<p>第一种 无交集</p>
 </blockquote>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Insert</span><span class="params">(ElementType A[], <span class="keyword">int</span> N)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> j, m;</span><br><span class="line">    ElementType type, temp;</span><br><span class="line">    <span class="keyword">for</span>(m =<span class="number">1</span>; m &lt; N; m ++)&#123;</span><br><span class="line">        temp = A[m];</span><br><span class="line">        <span class="keyword">for</span>(j = m; j &gt;<span class="number">0</span> &amp;&amp; A[j <span class="number">-1</span>]&gt; temp; j --)&#123;</span><br><span class="line">            A[j] = A[j - <span class="number">1</span>]</span><br><span class="line">        &#125;</span><br><span class="line">        A[j] = temp;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个算法就是插入算法，是不是很简单？现在，我们来分析下插入排序的时间复杂度是如何算的，我们观察算法，算法的主体实际是两个for循环，当m=1时，内层循环做了一次；当m=2时，内层循环做了两次……因此，我们可以算出时间复杂度为：1+2+3+4+…+N=O(N^2)</p>
-<h4 id="希尔排序"><a href="#希尔排序" class="headerlink" title="希尔排序"></a>希尔排序</h4><p>希尔排序可以看作是优化过的插入排序，只不过从原来的相邻开始进行插入排序，变成了相隔n个元素进行插入排序，而算法的结束就是当相隔的距离减小到只比较相邻两个元素为止；在使用增量序列进行排序时，每一趟的排序结果，对于每一个i，都有A[i]&lt;A[i+mk]，所有相隔mk的元素都被排序，因此叫做mk-排序；在这里，希尔排序有一个很重要的性质：一个mk-排序后的序列，保持他的mk-排序性。这里有一个排序分步表让我们来理解下希尔排序：</p>
-<p><img src="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-16-17-17-08.png" alt="Screenshot from 2017-12-16 17-17-08"></p>
-<p>对于希尔排序中间隔大小组成的序列m0、m1、m2、…m(k-1)，我们称这个序列为增量序列，只要m0=1的增量序列都是可行的，但是对于算法的影响，不同的增量序列影响不同，可能增量序列h1比增量序列h2更好，因此便存在一个最有的增量序列。对于增量序列，目前流行的使用是Shell建议的序列（但是这个增量序列不是最优的）：mt=N/2（向上取整）和mk=m（k+1）/ 2（向上取整）。然后我放上希尔排序的算法，其实和上面的插入排序的算法只是多了一点对于增量的选取计算循环而已：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">                1--2--3--4--5--6--7--8--9</span><br><span class="line">区间一：[2,3]       [---]    </span><br><span class="line">区间二：[5,6]                [---]</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>希尔排序代码</p>
+<p>第二种 部分相交</p>
 </blockquote>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShellSort</span><span class="params">(ElementType A[], <span class="keyword">int</span> N)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i, j, increment;</span><br><span class="line">    ElementType temp;</span><br><span class="line">    <span class="keyword">for</span>(increment = N /<span class="number">2</span>; increment &gt;<span class="number">0</span>; increment /=<span class="number">2</span>)&#123;</span><br><span class="line">        <span class="keyword">for</span>(i = increment; i &lt; N; i ++)&#123;</span><br><span class="line">            temp = A[i];</span><br><span class="line">            <span class="keyword">for</span>(j = i; j &gt;= increment; j -= increment)&#123;</span><br><span class="line">                <span class="keyword">if</span>(temp &lt; A[J - increment])</span><br><span class="line">                    A[j] = A[j - increment];</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            A[j] = temp;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">                1--2--3--4--5--6--7--8--9</span><br><span class="line">区间一：[2,5]       [--------]    </span><br><span class="line">区间二：[4,6]             [------]</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>第三种 包含</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">                1--2--3--4--5--6--7--8--9</span><br><span class="line">区间一：[2,8]       [------------------]    </span><br><span class="line">区间二：[4,6]             [------]</span><br></pre></td></tr></table></figure>
+<p>因此，只需要理清这三种关系中，每个区间的左右两个端点的值的大小关系就能解出这道题了。</p>
+<p>为了能够一次遍历实现区间合并，还需要对参数<code>intervals</code>进行一些操作，利用<code>lambda</code>表达式设置排序的比较对象，使得元素排序根据区间的左端点的大小进行升序排序，然后就按上面的三种情况进行仔细区分分析就可以了</p>
+<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">merge</span><span class="params">(self, intervals)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type intervals: List[Interval]</span></span><br><span class="line"><span class="string">        :rtype: List[Interval]</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> len(intervals) &lt;= <span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span> intervals</span><br><span class="line">        intervals.sort(key=<span class="keyword">lambda</span> x: x.start)</span><br><span class="line">        a = <span class="number">0</span>; b = <span class="number">1</span></span><br><span class="line">        <span class="keyword">while</span> a &lt; len(intervals):</span><br><span class="line">            <span class="keyword">if</span> b == len(intervals):</span><br><span class="line">                a += <span class="number">1</span></span><br><span class="line">                b = a + <span class="number">1</span></span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            t_1 = intervals[a]</span><br><span class="line">            t_2 = intervals[b]</span><br><span class="line">            <span class="keyword">if</span> t_1.end &gt;= t_2.start:</span><br><span class="line">                intervals[a].end = max(t_1.end, t_2.end)</span><br><span class="line">                intervals.pop(b)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                a += <span class="number">1</span></span><br><span class="line">                b += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> intervals</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -438,12 +420,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/排序/" rel="tag"># 排序</a>
-          
-        </div>
-      
 
       
       
@@ -453,8 +429,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/12/10/data_struct_11/" rel="next" title="平衡树——AVL树">
-                <i class="fa fa-chevron-left"></i> 平衡树——AVL树
+              <a href="/2018/12/14/leetcode-7/" rel="next" title="双指针问题——字符串的排列">
+                <i class="fa fa-chevron-left"></i> 双指针问题——字符串的排列
               </a>
             
           </div>
@@ -462,10 +438,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/12/18/data_struct_13/" rel="prev" title="优先队列——堆数据结构">
-                优先队列——堆数据结构 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -641,7 +613,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#插入排序"><span class="nav-number">1.</span> <span class="nav-text">插入排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#希尔排序"><span class="nav-number">2.</span> <span class="nav-text">希尔排序</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#题解"><span class="nav-number">2.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AC代码"><span class="nav-number">3.</span> <span class="nav-text">AC代码</span></a></li></ol></div>
             
 
           </div>

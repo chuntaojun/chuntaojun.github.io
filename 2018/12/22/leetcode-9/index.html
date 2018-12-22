@@ -108,34 +108,24 @@
 
 
 
-  <meta name="description" content="什么是solr引用于维基百科开发者    Apache软件基金会稳定版本6.6.0 （2017年6月6日，​11个月前 ）开发状态    活跃编程语言    Java操作系统    跨平台类型    企业搜索服务器软件许可协议    Apache许可证 2.0网站    lucene.apache.org/solr/源代码库    git.apache.org/lucene-solr.gitSol">
-<meta name="keywords" content="solr">
+  <meta name="description" content="题目12345678910在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序。示例 1:输入: 4-&amp;gt;2-&amp;gt;1-&amp;gt;3输出: 1-&amp;gt;2-&amp;gt;3-&amp;gt;4示例 2:输入: -1-&amp;gt;5-&amp;gt;3-&amp;gt;4-&amp;gt;0输出: -1-&amp;gt;0-&amp;gt;3-&amp;gt;4-&amp;gt;5 题解归并排序的首要就是将数据均分成两部分，如果是传统的数组的话，直">
 <meta property="og:type" content="article">
-<meta property="og:title" content="solr快速搭建">
-<meta property="og:url" content="https://www.liaochuntao.cn/2018/05/26/java-web-10/index.html">
+<meta property="og:title" content="leetcode回顾——链表的归并排序">
+<meta property="og:url" content="https://www.liaochuntao.cn/2018/12/22/leetcode-9/index.html">
 <meta property="og:site_name" content="唉&#39;s Blog">
-<meta property="og:description" content="什么是solr引用于维基百科开发者    Apache软件基金会稳定版本6.6.0 （2017年6月6日，​11个月前 ）开发状态    活跃编程语言    Java操作系统    跨平台类型    企业搜索服务器软件许可协议    Apache许可证 2.0网站    lucene.apache.org/solr/源代码库    git.apache.org/lucene-solr.gitSol">
+<meta property="og:description" content="题目12345678910在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序。示例 1:输入: 4-&amp;gt;2-&amp;gt;1-&amp;gt;3输出: 1-&amp;gt;2-&amp;gt;3-&amp;gt;4示例 2:输入: -1-&amp;gt;5-&amp;gt;3-&amp;gt;4-&amp;gt;0输出: -1-&amp;gt;0-&amp;gt;3-&amp;gt;4-&amp;gt;5 题解归并排序的首要就是将数据均分成两部分，如果是传统的数组的话，直">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-1.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-2.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-3.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-4.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-5.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-6.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-7.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-8.png">
-<meta property="og:updated_time" content="2018-06-07T13:51:20.000Z">
+<meta property="og:updated_time" content="2018-12-22T15:13:24.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="solr快速搭建">
-<meta name="twitter:description" content="什么是solr引用于维基百科开发者    Apache软件基金会稳定版本6.6.0 （2017年6月6日，​11个月前 ）开发状态    活跃编程语言    Java操作系统    跨平台类型    企业搜索服务器软件许可协议    Apache许可证 2.0网站    lucene.apache.org/solr/源代码库    git.apache.org/lucene-solr.gitSol">
-<meta name="twitter:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-1.png">
+<meta name="twitter:title" content="leetcode回顾——链表的归并排序">
+<meta name="twitter:description" content="题目12345678910在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序。示例 1:输入: 4-&amp;gt;2-&amp;gt;1-&amp;gt;3输出: 1-&amp;gt;2-&amp;gt;3-&amp;gt;4示例 2:输入: -1-&amp;gt;5-&amp;gt;3-&amp;gt;4-&amp;gt;0输出: -1-&amp;gt;0-&amp;gt;3-&amp;gt;4-&amp;gt;5 题解归并排序的首要就是将数据均分成两部分，如果是传统的数组的话，直">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.liaochuntao.cn/2018/05/26/java-web-10/"/>
+  <link rel="canonical" href="https://www.liaochuntao.cn/2018/12/22/leetcode-9/"/>
 
 
 
@@ -145,7 +135,7 @@
   };
 </script>
 
-  <title>solr快速搭建 | 唉's Blog</title>
+  <title>leetcode回顾——链表的归并排序 | 唉's Blog</title>
   
 
 
@@ -298,7 +288,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/05/26/java-web-10/">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/12/22/leetcode-9/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="liaochuntao">
@@ -315,7 +305,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">solr快速搭建
+          <h1 class="post-title" itemprop="name headline">leetcode回顾——链表的归并排序
               
             
           </h1>
@@ -340,24 +330,12 @@
                 
               
 
-              <time title="Created: 2018-05-26 17:30:02" itemprop="dateCreated datePublished" datetime="2018-05-26T17:30:02+08:00">2018-05-26</time>
+              <time title="Created: 2018-12-22 23:05:13 / Modified: 23:13:24" itemprop="dateCreated datePublished" datetime="2018-12-22T23:05:13+08:00">2018-12-22</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2018-06-07 21:51:20" itemprop="dateModified" datetime="2018-06-07T21:51:20+08:00">2018-06-07</time>
               
             
           </span>
@@ -374,7 +352,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a></span>
 
                 
                 
@@ -408,55 +386,9 @@
       
 
       
-        <h4 id="什么是solr"><a href="#什么是solr" class="headerlink" title="什么是solr"></a>什么是solr</h4><h3 id="引用于维基百科"><a href="#引用于维基百科" class="headerlink" title="引用于维基百科"></a>引用于维基百科</h3><p>开发者    Apache软件基金会<br>稳定版本<br>6.6.0 （2017年6月6日，​11个月前 ）<br>开发状态    活跃<br>编程语言    Java<br>操作系统    跨平台<br>类型    企业搜索服务器软件<br>许可协议    Apache许可证 2.0<br>网站    lucene.apache.org/solr/<br>源代码库    git.apache.org/lucene-solr.git<br>Solr（读作“solar”）是Apache Lucene项目的开源企业搜索平台。其主要功能包括全文检索、命中标示[1]、分面搜索、动态聚类、数据库集成，以及富文本（如Word、PDF）的处理。Solr是高度可扩展的，并提供了分布式搜索和索引复制。Solr是最流行的企业级搜索引擎，[2]Solr 4还增加了NoSQL支持。[3]<br>Solr是用Java编写、运行在Servlet容器（如Apache Tomcat或Jetty）的一个独立的全文搜索服务器。 Solr采用了Lucene Java搜索库为核心的全文索引和搜索，并具有类似REST的HTTP/XML和JSON的API。 Solr强大的外部配置功能使得无需进行Java编码，便可对其进行调整以适应多种类型的应用程序。Solr有一个插件架构，以支持更多的高级定制。<br>因为2010年Apache Lucene和Apache Solr项目合并，两个项目是由同一个Apache软件基金会开发团队制作实现的。提到技术或产品时，Lucene/Solr或Solr/Lucene是一样的。</p>
-<h4 id="搭建solr"><a href="#搭建solr" class="headerlink" title="搭建solr"></a>搭建solr</h4><ol>
-<li><p>进入Apache官网，找到solr下载，下载后的文件名为：solr-7.3.0.tgz（我的是7.3.0版本的solr）</p>
-</li>
-<li><p>解压文件<code>solr-7.3.0.tgz</code>，文件目录为</p>
-</li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-1.png" alt="解压后的目录"></p>
-<ol start="3">
-<li>进入目录<code>/solr-7.3.0/bin</code>，使用执行<code>solr start</code>，然后打开 localhost:{执行命令后显示的端口}</li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-2.png" alt="执行成功后的返回"></p>
-<blockquote>
-<p>创建collection</p>
-</blockquote>
-<ol>
-<li><p>执行命令<code>solr create -c {collection_name}</code>(我的collection名称为listing_new)</p>
-</li>
-<li><p>然后我们进入<code>/solr-7.3.0/srever/solr</code>中，会找到我们刚刚创建的collection</p>
-</li>
-</ol>
-<blockquote>
-<p>collection设置</p>
-</blockquote>
-<ol>
-<li>进入该collection目录里面的conf目录，会看到<code>managed-schema</code>文件，这个文件是用来定义导入solr的数据，数据定义部分如图所示</li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-3.png" alt="managed-schema文件内容"></p>
-<ol start="2">
-<li>然后我们会退到{collection_name}目录下，创建<code>solr-data-config.xmnl</code>用于定义导入数据的一些操作</li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-4.png" alt="solr-data-config.xml"></p>
-<ol start="3">
-<li>接着，我们进入{collection_name}/conf目录下，找到solrconfig.xml文件，打开并编辑，将我们刚刚创建的<code>solr-data-config.xml</code>文件导入到配置文件中去</li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-5.png" alt="solrconfig.xml"></p>
-<h4 id="数据导入"><a href="#数据导入" class="headerlink" title="数据导入"></a>数据导入</h4><ol>
-<li>数据导入方面我用的是传统关系型数据库MySQL，然后创建数据库-表，然后自己导入一些数据，等等这些数据将要被导入到solr中{如果是中文的话需要提前进行中文分词}。然后打开网页<code>http://127.0.0.1:8983</code>，然后在<code>core</code>的选项框中选中<code>listing_new</code></li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-6.png" alt="core-listing_new"></p>
-<ol start="2">
-<li>选中该collection之后，我们会看到DataImport这个选项，点击这个选项，会看到这个页面</li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-7.png" alt="DataImport"></p>
-<p>然后执行execute，等待最后数据导入成功</p>
-<h4 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h4><p>在DataImport的同级目录下找到<code>Query</code>这个功能，接着你就可以在这里体验下你的搜索引擎了</p>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-8.png" alt="Query"></p>
-<h4 id="哔哩哔哩视频演示"><a href="#哔哩哔哩视频演示" class="headerlink" title="哔哩哔哩视频演示"></a>哔哩哔哩视频演示</h4><p><a href="https://www.bilibili.com/video/av24486975/" target="_blank" rel="noopener">solr搜索引擎初识</a></p>
-
+        <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: 4-&gt;2-&gt;1-&gt;3</span><br><span class="line">输出: 1-&gt;2-&gt;3-&gt;4</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: -1-&gt;5-&gt;3-&gt;4-&gt;0</span><br><span class="line">输出: -1-&gt;0-&gt;3-&gt;4-&gt;5</span><br></pre></td></tr></table></figure>
+<h4 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h4><p>归并排序的首要就是将数据均分成两部分，如果是传统的数组的话，直接获取数组长度然后直接求出中点进行左右划分，但是链表的话，是没办法直接获取长度的(仅针对此题的链表数据结构)，这时，可以利用快慢指针，来实现中点划分：设置快指针的速度是慢指针的两倍，那么，当快指针走到链表的末端时，慢指针的位置一定是链表的中点位置，这样就实现了归并的数据划分操作；剩下的，就和数组的归并排序差不多了，只不过，中间存放变量从数组变为了指针，因此需要确保每次merge的时候指针能够指向正确的位置即可</p>
+<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ListNode</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        self.val = x</span><br><span class="line">        self.next = <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">sortList</span><span class="params">(self, head)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span> <span class="keyword">if</span> head == <span class="keyword">None</span> <span class="keyword">else</span> self.mergeSort(node=head)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">mergeSort</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        快慢指针，</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> node.next == <span class="keyword">None</span>:</span><br><span class="line">            <span class="keyword">return</span> node</span><br><span class="line">        p = node; q = node; pre = <span class="keyword">None</span></span><br><span class="line">        <span class="keyword">while</span> q != <span class="keyword">None</span> <span class="keyword">and</span> q.next != <span class="keyword">None</span>:</span><br><span class="line">            pre = p</span><br><span class="line">            p = p.next</span><br><span class="line">            q = q.next.next</span><br><span class="line">        pre.next = <span class="keyword">None</span></span><br><span class="line">        l = self.mergeSort(node)</span><br><span class="line">        r = self.mergeSort(p)</span><br><span class="line">        <span class="keyword">return</span> self.merge(l1=l, l2=r)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">merge</span><span class="params">(self, l1, l2)</span>:</span></span><br><span class="line">        node = ListNode(<span class="number">-1</span>)</span><br><span class="line">        tmp = node</span><br><span class="line">        <span class="keyword">while</span> l1 != <span class="keyword">None</span> <span class="keyword">and</span> l2 != <span class="keyword">None</span>:</span><br><span class="line">            <span class="keyword">if</span> l1.val &lt;= l2.val:</span><br><span class="line">                tmp.next = l1</span><br><span class="line">                l1 = l1.next</span><br><span class="line">                tmp = tmp.next</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                tmp.next = l2</span><br><span class="line">                l2 = l2.next</span><br><span class="line">                tmp = tmp.next</span><br><span class="line">        <span class="keyword">while</span> l1 != <span class="keyword">None</span>:</span><br><span class="line">            tmp.next = l1</span><br><span class="line">            l1 = l1.next</span><br><span class="line">            tmp = tmp.next</span><br><span class="line">        <span class="keyword">while</span> l2 != <span class="keyword">None</span>:</span><br><span class="line">            tmp.next = l2</span><br><span class="line">            l2 = l2.next</span><br><span class="line">            tmp = tmp.next</span><br><span class="line">        tmp = <span class="keyword">None</span></span><br><span class="line">        <span class="keyword">return</span> node.next</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -474,12 +406,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/solr/" rel="tag"># solr</a>
-          
-        </div>
-      
 
       
       
@@ -489,8 +415,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/05/04/java-web-8/" rel="next" title="SpringBoot集成SpringSecurity Oauth2">
-                <i class="fa fa-chevron-left"></i> SpringBoot集成SpringSecurity Oauth2
+              <a href="/2018/12/19/leetcode-8/" rel="next" title="leetcode回顾——Merge Intervals">
+                <i class="fa fa-chevron-left"></i> leetcode回顾——Merge Intervals
               </a>
             
           </div>
@@ -498,10 +424,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/06/15/java-web-11/" rel="prev" title="手动实现spring中的@RequestMapping注解">
-                手动实现spring中的@RequestMapping注解 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -691,7 +613,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是solr"><span class="nav-number">1.</span> <span class="nav-text">什么是solr</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#引用于维基百科"><span class="nav-number"></span> <span class="nav-text">引用于维基百科</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#搭建solr"><span class="nav-number">1.</span> <span class="nav-text">搭建solr</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据导入"><span class="nav-number">2.</span> <span class="nav-text">数据导入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看"><span class="nav-number">3.</span> <span class="nav-text">查看</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#哔哩哔哩视频演示"><span class="nav-number">4.</span> <span class="nav-text">哔哩哔哩视频演示</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#题解"><span class="nav-number">2.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AC代码"><span class="nav-number">3.</span> <span class="nav-text">AC代码</span></a></li></ol></div>
             
 
           </div>

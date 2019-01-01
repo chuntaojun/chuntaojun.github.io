@@ -108,25 +108,24 @@
 
 
 
-  <meta name="description" content="123456789101112systemctl stop mssql-serverecho &quot;关闭 Microsoft SQL-Server 成功&quot;service mysql stopecho &quot;关闭 Mysql 成功&quot;echo &quot;关机指令： 是否关机 [yes/no]&quot;read ansif [ &quot;$ans&quot;x = &quot;yes&quot;x ];then sudo shutdown now fi 这两行命令">
-<meta name="keywords" content="database,linix">
+  <meta name="description" content="题目1234567891011合并 k 个排序链表，返回合并后的排序链表。请分析和描述算法的复杂度。示例:输入:[  1-&amp;gt;4-&amp;gt;5,  1-&amp;gt;3-&amp;gt;4,  2-&amp;gt;6]输出: 1-&amp;gt;1-&amp;gt;2-&amp;gt;3-&amp;gt;4-&amp;gt;4-&amp;gt;5-&amp;gt;6 题解这其实就是归并排序从二路变为多路，原来二路的适合，可以直接比较两路得出较小的数字，而现在换成了多路，因">
 <meta property="og:type" content="article">
-<meta property="og:title" content="linux 下利用脚本关闭数据库引擎避免关机错误">
-<meta property="og:url" content="https://www.liaochuntao.cn/2017/09/06/linux_1/index.html">
+<meta property="og:title" content="leeetcode回顾——Merge k Sorted Lists">
+<meta property="og:url" content="https://www.liaochuntao.cn/2018/12/29/leetcode-12/index.html">
 <meta property="og:site_name" content="唉&#39;s Blog">
-<meta property="og:description" content="123456789101112systemctl stop mssql-serverecho &quot;关闭 Microsoft SQL-Server 成功&quot;service mysql stopecho &quot;关闭 Mysql 成功&quot;echo &quot;关机指令： 是否关机 [yes/no]&quot;read ansif [ &quot;$ans&quot;x = &quot;yes&quot;x ];then sudo shutdown now fi 这两行命令">
+<meta property="og:description" content="题目1234567891011合并 k 个排序链表，返回合并后的排序链表。请分析和描述算法的复杂度。示例:输入:[  1-&amp;gt;4-&amp;gt;5,  1-&amp;gt;3-&amp;gt;4,  2-&amp;gt;6]输出: 1-&amp;gt;1-&amp;gt;2-&amp;gt;3-&amp;gt;4-&amp;gt;4-&amp;gt;5-&amp;gt;6 题解这其实就是归并排序从二路变为多路，原来二路的适合，可以直接比较两路得出较小的数字，而现在换成了多路，因">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-01-21T05:20:40.000Z">
+<meta property="og:updated_time" content="2019-01-01T14:28:44.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="linux 下利用脚本关闭数据库引擎避免关机错误">
-<meta name="twitter:description" content="123456789101112systemctl stop mssql-serverecho &quot;关闭 Microsoft SQL-Server 成功&quot;service mysql stopecho &quot;关闭 Mysql 成功&quot;echo &quot;关机指令： 是否关机 [yes/no]&quot;read ansif [ &quot;$ans&quot;x = &quot;yes&quot;x ];then sudo shutdown now fi 这两行命令">
+<meta name="twitter:title" content="leeetcode回顾——Merge k Sorted Lists">
+<meta name="twitter:description" content="题目1234567891011合并 k 个排序链表，返回合并后的排序链表。请分析和描述算法的复杂度。示例:输入:[  1-&amp;gt;4-&amp;gt;5,  1-&amp;gt;3-&amp;gt;4,  2-&amp;gt;6]输出: 1-&amp;gt;1-&amp;gt;2-&amp;gt;3-&amp;gt;4-&amp;gt;4-&amp;gt;5-&amp;gt;6 题解这其实就是归并排序从二路变为多路，原来二路的适合，可以直接比较两路得出较小的数字，而现在换成了多路，因">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.liaochuntao.cn/2017/09/06/linux_1/"/>
+  <link rel="canonical" href="https://www.liaochuntao.cn/2018/12/29/leetcode-12/"/>
 
 
 
@@ -136,7 +135,7 @@
   };
 </script>
 
-  <title>linux 下利用脚本关闭数据库引擎避免关机错误 | 唉's Blog</title>
+  <title>leeetcode回顾——Merge k Sorted Lists | 唉's Blog</title>
   
 
 
@@ -289,7 +288,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2017/09/06/linux_1/">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/12/29/leetcode-12/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="liaochuntao">
@@ -306,7 +305,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">linux 下利用脚本关闭数据库引擎避免关机错误
+          <h1 class="post-title" itemprop="name headline">leeetcode回顾——Merge k Sorted Lists
               
             
           </h1>
@@ -331,7 +330,7 @@
                 
               
 
-              <time title="Created: 2017-09-06 16:08:55" itemprop="dateCreated datePublished" datetime="2017-09-06T16:08:55+08:00">2017-09-06</time>
+              <time title="Created: 2018-12-29 12:47:03" itemprop="dateCreated datePublished" datetime="2018-12-29T12:47:03+08:00">2018-12-29</time>
             
 
             
@@ -348,7 +347,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-01-21 13:20:40" itemprop="dateModified" datetime="2018-01-21T13:20:40+08:00">2018-01-21</time>
+                <time title="Modified: 2019-01-01 22:28:44" itemprop="dateModified" datetime="2019-01-01T22:28:44+08:00">2019-01-01</time>
               
             
           </span>
@@ -365,7 +364,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a></span>
 
                 
                 
@@ -399,21 +398,9 @@
       
 
       
-        <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop mssql-server</span><br><span class="line">echo "关闭 Microsoft SQL-Server 成功"</span><br><span class="line"></span><br><span class="line">service mysql stop</span><br><span class="line">echo "关闭 Mysql 成功"</span><br><span class="line"></span><br><span class="line">echo "关机指令： 是否关机 [yes/no]"</span><br><span class="line">read ans</span><br><span class="line">if [ "$ans"x = "yes"x ];</span><br><span class="line">then</span><br><span class="line"> sudo shutdown now </span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
-<p>这两行命令是关闭mssql与mysql数据库引擎的,主要是为了避免linux系统关机时不定期出现卡死在关闭数据库引擎导致无法正常关机,强制关机却又导致数据库数据丢失、损坏等问题</p>
-<p>这两条命令保存在后缀名为.sh的文本中</p>
-<p>然后打开终端, 找到该文件所在的文件目录</p>
-<p>输入 <code>sh xxx.sh</code> 敲击回车即可看到结果</p>
-<p>若出现<code>service not found</code>，则是mysql的service相关服务尚未开始</p>
-<p>我们来通过视频来看看怎么使用这个脚本吧！</p>
-<blockquote>
-<p>YouTube站点</p>
-</blockquote>
-<p>[youtube <a href="https://www.youtube.com/watch?v=-ehDEPR2Q-I&amp;w=560&amp;h=315]" target="_blank" rel="noopener">https://www.youtube.com/watch?v=-ehDEPR2Q-I&amp;w=560&amp;h=315]</a></p>
-<blockquote>
-<p>哔哩哔哩站点</p>
-</blockquote>
-<p><a href="https://www.bilibili.com/video/av17472310/" target="_blank" rel="noopener">https://www.bilibili.com/video/av17472310/</a></p>
+        <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">合并 k 个排序链表，返回合并后的排序链表。请分析和描述算法的复杂度。</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">输入:</span><br><span class="line">[</span><br><span class="line">  1-&gt;4-&gt;5,</span><br><span class="line">  1-&gt;3-&gt;4,</span><br><span class="line">  2-&gt;6</span><br><span class="line">]</span><br><span class="line">输出: 1-&gt;1-&gt;2-&gt;3-&gt;4-&gt;4-&gt;5-&gt;6</span><br></pre></td></tr></table></figure>
+<h4 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h4><p>这其实就是归并排序从二路变为多路，原来二路的适合，可以直接比较两路得出较小的数字，而现在换成了多路，因此就可以考虑使用小顶堆这个数据结构，每次将k路的开头元素放入堆中；每取出一个最小值后，将该最小值所对应的路的开头元素放入小顶堆中，开始新一轮的选取排序</p>
+<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">mergeKLists</span><span class="params">(self, lists)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type lists: List[ListNode]</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">import</span> heapq</span><br><span class="line">        h = []</span><br><span class="line">        head = ListNode(<span class="number">-1</span>)</span><br><span class="line">        tmp = head</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(lists)):</span><br><span class="line">            <span class="keyword">if</span> lists[i] != <span class="keyword">None</span>:</span><br><span class="line">                heapq.heappush(h, (lists[i].val, i))</span><br><span class="line">        <span class="keyword">while</span> len(h) != <span class="number">0</span>:</span><br><span class="line">            _, loc = heapq.heappop(h)</span><br><span class="line">            tmp.next = lists[loc]</span><br><span class="line">            tmp = tmp.next</span><br><span class="line">            lists[loc] = lists[loc].next</span><br><span class="line">            <span class="keyword">if</span> lists[loc] != <span class="keyword">None</span>:</span><br><span class="line">                heapq.heappush(h, (lists[loc].val, loc))</span><br><span class="line">        <span class="keyword">return</span> head.next</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -432,14 +419,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/database/" rel="tag"># database</a>
-          
-            <a href="/tags/linix/" rel="tag"># linix</a>
-          
-        </div>
-      
 
       
       
@@ -449,14 +428,18 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018/12/26/leetcode-11/" rel="next" title="leetcode回顾——Diagonal Traverse">
+                <i class="fa fa-chevron-left"></i> leetcode回顾——Diagonal Traverse
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2017/09/13/linux_2/" rel="prev" title="linux下各种编程语言安装">
-                linux下各种编程语言安装 <i class="fa fa-chevron-right"></i>
+              <a href="/2018/12/30/leetcode-13/" rel="prev" title="leetcode回顾——Kth Largest Element in an Array">
+                leetcode回顾——Kth Largest Element in an Array <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -502,8 +485,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -628,6 +620,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#题解"><span class="nav-number">2.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AC代码"><span class="nav-number">3.</span> <span class="nav-text">AC代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

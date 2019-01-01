@@ -108,25 +108,24 @@
 
 
 
-  <meta name="description" content="123456789101112systemctl stop mssql-serverecho &quot;关闭 Microsoft SQL-Server 成功&quot;service mysql stopecho &quot;关闭 Mysql 成功&quot;echo &quot;关机指令： 是否关机 [yes/no]&quot;read ansif [ &quot;$ans&quot;x = &quot;yes&quot;x ];then sudo shutdown now fi 这两行命令">
-<meta name="keywords" content="database,linix">
+  <meta name="description" content="题目12345678910111213在未排序的数组中找到第 k 个最大的元素。请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。示例 1:输入: [3,2,1,5,6,4] 和 k = 2输出: 5示例 2:输入: [3,2,3,1,2,4,5,5,6] 和 k = 4输出: 4说明:你可以假设 k 总是有效的，且 1 ≤ k ≤ 数组的长度。 AC代码 二分查找">
 <meta property="og:type" content="article">
-<meta property="og:title" content="linux 下利用脚本关闭数据库引擎避免关机错误">
-<meta property="og:url" content="https://www.liaochuntao.cn/2017/09/06/linux_1/index.html">
+<meta property="og:title" content="leetcode回顾——Kth Largest Element in an Array">
+<meta property="og:url" content="https://www.liaochuntao.cn/2018/12/30/leetcode-13/index.html">
 <meta property="og:site_name" content="唉&#39;s Blog">
-<meta property="og:description" content="123456789101112systemctl stop mssql-serverecho &quot;关闭 Microsoft SQL-Server 成功&quot;service mysql stopecho &quot;关闭 Mysql 成功&quot;echo &quot;关机指令： 是否关机 [yes/no]&quot;read ansif [ &quot;$ans&quot;x = &quot;yes&quot;x ];then sudo shutdown now fi 这两行命令">
+<meta property="og:description" content="题目12345678910111213在未排序的数组中找到第 k 个最大的元素。请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。示例 1:输入: [3,2,1,5,6,4] 和 k = 2输出: 5示例 2:输入: [3,2,3,1,2,4,5,5,6] 和 k = 4输出: 4说明:你可以假设 k 总是有效的，且 1 ≤ k ≤ 数组的长度。 AC代码 二分查找">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-01-21T05:20:40.000Z">
+<meta property="og:updated_time" content="2018-12-30T12:45:56.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="linux 下利用脚本关闭数据库引擎避免关机错误">
-<meta name="twitter:description" content="123456789101112systemctl stop mssql-serverecho &quot;关闭 Microsoft SQL-Server 成功&quot;service mysql stopecho &quot;关闭 Mysql 成功&quot;echo &quot;关机指令： 是否关机 [yes/no]&quot;read ansif [ &quot;$ans&quot;x = &quot;yes&quot;x ];then sudo shutdown now fi 这两行命令">
+<meta name="twitter:title" content="leetcode回顾——Kth Largest Element in an Array">
+<meta name="twitter:description" content="题目12345678910111213在未排序的数组中找到第 k 个最大的元素。请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。示例 1:输入: [3,2,1,5,6,4] 和 k = 2输出: 5示例 2:输入: [3,2,3,1,2,4,5,5,6] 和 k = 4输出: 4说明:你可以假设 k 总是有效的，且 1 ≤ k ≤ 数组的长度。 AC代码 二分查找">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.liaochuntao.cn/2017/09/06/linux_1/"/>
+  <link rel="canonical" href="https://www.liaochuntao.cn/2018/12/30/leetcode-13/"/>
 
 
 
@@ -136,7 +135,7 @@
   };
 </script>
 
-  <title>linux 下利用脚本关闭数据库引擎避免关机错误 | 唉's Blog</title>
+  <title>leetcode回顾——Kth Largest Element in an Array | 唉's Blog</title>
   
 
 
@@ -289,7 +288,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2017/09/06/linux_1/">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/12/30/leetcode-13/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="liaochuntao">
@@ -306,7 +305,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">linux 下利用脚本关闭数据库引擎避免关机错误
+          <h1 class="post-title" itemprop="name headline">leetcode回顾——Kth Largest Element in an Array
               
             
           </h1>
@@ -331,24 +330,12 @@
                 
               
 
-              <time title="Created: 2017-09-06 16:08:55" itemprop="dateCreated datePublished" datetime="2017-09-06T16:08:55+08:00">2017-09-06</time>
+              <time title="Created: 2018-12-30 20:41:22 / Modified: 20:45:56" itemprop="dateCreated datePublished" datetime="2018-12-30T20:41:22+08:00">2018-12-30</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2018-01-21 13:20:40" itemprop="dateModified" datetime="2018-01-21T13:20:40+08:00">2018-01-21</time>
               
             
           </span>
@@ -365,7 +352,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a></span>
 
                 
                 
@@ -399,21 +386,15 @@
       
 
       
-        <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop mssql-server</span><br><span class="line">echo "关闭 Microsoft SQL-Server 成功"</span><br><span class="line"></span><br><span class="line">service mysql stop</span><br><span class="line">echo "关闭 Mysql 成功"</span><br><span class="line"></span><br><span class="line">echo "关机指令： 是否关机 [yes/no]"</span><br><span class="line">read ans</span><br><span class="line">if [ "$ans"x = "yes"x ];</span><br><span class="line">then</span><br><span class="line"> sudo shutdown now </span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
-<p>这两行命令是关闭mssql与mysql数据库引擎的,主要是为了避免linux系统关机时不定期出现卡死在关闭数据库引擎导致无法正常关机,强制关机却又导致数据库数据丢失、损坏等问题</p>
-<p>这两条命令保存在后缀名为.sh的文本中</p>
-<p>然后打开终端, 找到该文件所在的文件目录</p>
-<p>输入 <code>sh xxx.sh</code> 敲击回车即可看到结果</p>
-<p>若出现<code>service not found</code>，则是mysql的service相关服务尚未开始</p>
-<p>我们来通过视频来看看怎么使用这个脚本吧！</p>
-<blockquote>
-<p>YouTube站点</p>
+        <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">在未排序的数组中找到第 k 个最大的元素。请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: [3,2,1,5,6,4] 和 k = 2</span><br><span class="line">输出: 5</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: [3,2,3,1,2,4,5,5,6] 和 k = 4</span><br><span class="line">输出: 4</span><br><span class="line">说明:</span><br><span class="line"></span><br><span class="line">你可以假设 k 总是有效的，且 1 ≤ k ≤ 数组的长度。</span><br></pre></td></tr></table></figure>
+<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><blockquote>
+<p>二分查找的实现</p>
 </blockquote>
-<p>[youtube <a href="https://www.youtube.com/watch?v=-ehDEPR2Q-I&amp;w=560&amp;h=315]" target="_blank" rel="noopener">https://www.youtube.com/watch?v=-ehDEPR2Q-I&amp;w=560&amp;h=315]</a></p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">findKthLargest</span><span class="params">(nums []<span class="keyword">int</span>, k <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	right := <span class="number">65535</span></span><br><span class="line">	left := <span class="number">-65535</span></span><br><span class="line">	<span class="keyword">for</span> left &lt; right &#123;</span><br><span class="line">		mid := (left + right) / <span class="number">2</span></span><br><span class="line">		kth, ok := minTh(nums, mid)</span><br><span class="line">		<span class="keyword">if</span> kth == k &amp;&amp; ok &#123;</span><br><span class="line">			<span class="keyword">return</span> mid</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> kth &gt; k &#123;</span><br><span class="line">			left = mid + <span class="number">1</span></span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			right = mid - <span class="number">1</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> left</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">minTh</span><span class="params">(nums []<span class="keyword">int</span>, target <span class="keyword">int</span>)</span> <span class="params">(<span class="keyword">int</span>, <span class="keyword">bool</span>)</span></span> &#123;</span><br><span class="line">	a := <span class="number">0</span></span><br><span class="line">	k := <span class="literal">false</span></span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="built_in">len</span>(nums); i ++ &#123;</span><br><span class="line">		<span class="keyword">if</span> nums[i] &gt; target &#123;</span><br><span class="line">			a ++</span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span> nums[i] == target &#123;</span><br><span class="line">			k = <span class="literal">true</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> a + <span class="number">1</span>, k</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>哔哩哔哩站点</p>
+<p>快速选择的实现</p>
 </blockquote>
-<p><a href="https://www.bilibili.com/video/av17472310/" target="_blank" rel="noopener">https://www.bilibili.com/video/av17472310/</a></p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">findKthLargest</span><span class="params">(nums []<span class="keyword">int</span>, k <span class="keyword">int</span>)</span> <span class="title">int</span></span> &#123;</span><br><span class="line">	QuickChoose(&amp;nums, <span class="number">0</span>, <span class="built_in">len</span>(nums) - <span class="number">1</span>, k - <span class="number">1</span>)</span><br><span class="line">	<span class="keyword">return</span> nums[k - <span class="number">1</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">QuickChoose</span><span class="params">(nums *[]<span class="keyword">int</span>, start, end, k <span class="keyword">int</span>)</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> start &lt; end &#123;</span><br><span class="line">		i, j := start, end</span><br><span class="line">		mid := (*nums)[(i + j) / <span class="number">2</span>]</span><br><span class="line">		<span class="keyword">for</span> i &lt;= j &#123;</span><br><span class="line">			<span class="keyword">for</span> (*nums)[i] &gt; mid &#123;</span><br><span class="line">				i ++</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">for</span> (*nums)[j] &lt; mid &#123;</span><br><span class="line">				j --</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> i &lt;= j &#123;</span><br><span class="line">				(*nums)[i], (*nums)[j] = (*nums)[j], (*nums)[i]</span><br><span class="line">				i++</span><br><span class="line">				j--</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> k &lt;= j &#123;</span><br><span class="line">			QuickChoose(nums, start, j, k)</span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span> k &gt;= i &#123;</span><br><span class="line">			QuickChoose(nums, i, end, k)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -432,14 +413,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/database/" rel="tag"># database</a>
-          
-            <a href="/tags/linix/" rel="tag"># linix</a>
-          
-        </div>
-      
 
       
       
@@ -449,15 +422,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018/12/29/leetcode-12/" rel="next" title="leeetcode回顾——Merge k Sorted Lists">
+                <i class="fa fa-chevron-left"></i> leeetcode回顾——Merge k Sorted Lists
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/09/13/linux_2/" rel="prev" title="linux下各种编程语言安装">
-                linux下各种编程语言安装 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -502,8 +475,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -628,6 +610,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AC代码"><span class="nav-number">2.</span> <span class="nav-text">AC代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

@@ -115,7 +115,7 @@
 <meta property="og:site_name" content="唉&#39;s Blog">
 <meta property="og:description" content="ConcurrentHashMap的并发实现 transient volatile Node&amp;lt;K,V&amp;gt;[] table；确保了table对所有线程的可见性 transient volatile Node&amp;lt;K,V&amp;gt;[] nextTable；用于hashmap重新resize时 确定元素在hashmap中的位置   123static final &amp;lt;K,V&amp;gt; Nod">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-17T07:40:49.000Z">
+<meta property="og:updated_time" content="2019-02-17T07:47:29.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java源码解析之ConcurrentHashMap">
 <meta name="twitter:description" content="ConcurrentHashMap的并发实现 transient volatile Node&amp;lt;K,V&amp;gt;[] table；确保了table对所有线程的可见性 transient volatile Node&amp;lt;K,V&amp;gt;[] nextTable；用于hashmap重新resize时 确定元素在hashmap中的位置   123static final &amp;lt;K,V&amp;gt; Nod">
@@ -364,7 +364,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-02-17 15:40:49" itemprop="dateModified" datetime="2019-02-17T15:40:49+08:00">2019-02-17</time>
+                <time title="Modified: 2019-02-17 15:47:29" itemprop="dateModified" datetime="2019-02-17T15:47:29+08:00">2019-02-17</time>
               
             
           </span>
@@ -407,12 +407,13 @@
 <li><p>更新table数组中的元素</p>
 <ul>
 <li><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> &lt;K,V&gt; <span class="function"><span class="keyword">boolean</span> <span class="title">casTabAt</span><span class="params">(Node&lt;K,V&gt;[] tab, <span class="keyword">int</span> i, Node&lt;K,V&gt; c, Node&lt;K,V&gt; v)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> U.compareAndSwapObject(tab, ((<span class="keyword">long</span>)i &lt;&lt; ASHIFT) + ABASE, c, v);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>  通过源码可以看出，在更新table数组中的元素操作中，jdk使用了Unsafe类的CAS原子算法，实现元素的更改操作</p>
+<p>通过源码可以看出，在更新table数组中的元素操作中，jdk使用了Unsafe类的CAS原子算法，实现元素的更改操作</p>
 </li>
 </ul>
 </li>
 </ul>
-<pre><code>* <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> &lt;K,V&gt; <span class="function"><span class="keyword">void</span> <span class="title">setTabAt</span><span class="params">(Node&lt;K,V&gt;[] tab, <span class="keyword">int</span> i, Node&lt;K,V&gt; v)</span> </span>&#123;</span><br><span class="line">    U.putObjectVolatile(tab, ((<span class="keyword">long</span>)i &lt;&lt; ASHIFT) + ABASE, v);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<pre><code>*   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> &lt;K,V&gt; <span class="function"><span class="keyword">void</span> <span class="title">setTabAt</span><span class="params">(Node&lt;K,V&gt;[] tab, <span class="keyword">int</span> i, Node&lt;K,V&gt; v)</span> </span>&#123;</span><br><span class="line">    U.putObjectVolatile(tab, ((<span class="keyword">long</span>)i &lt;&lt; ASHIFT) + ABASE, v);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 
     通过源码可以看出，在更新table数组中的元素操作中，以volatile写的形式更新table数组(volatile写的形式jvm会强制将写的数据刷新到主内存，使用volatile关键字的话，当线程2进行修改时，会导致线程1的工作内存中缓存变量tab的缓存行无效)
 </code></pre><ul>

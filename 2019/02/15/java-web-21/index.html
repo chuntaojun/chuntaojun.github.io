@@ -115,7 +115,7 @@
 <meta property="og:site_name" content="唉&#39;s Blog">
 <meta property="og:description" content="ConcurrentHashMap的并发实现 transient volatile Node&amp;lt;K,V&amp;gt;[] table；确保了table对所有线程的可见性 transient volatile Node&amp;lt;K,V&amp;gt;[] nextTable；用于hashmap重新resize时 确定元素在hashmap中的位置   123static final &amp;lt;K,V&amp;gt; Nod">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-17T07:47:29.000Z">
+<meta property="og:updated_time" content="2019-02-17T07:49:21.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java源码解析之ConcurrentHashMap">
 <meta name="twitter:description" content="ConcurrentHashMap的并发实现 transient volatile Node&amp;lt;K,V&amp;gt;[] table；确保了table对所有线程的可见性 transient volatile Node&amp;lt;K,V&amp;gt;[] nextTable；用于hashmap重新resize时 确定元素在hashmap中的位置   123static final &amp;lt;K,V&amp;gt; Nod">
@@ -364,7 +364,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-02-17 15:47:29" itemprop="dateModified" datetime="2019-02-17T15:47:29+08:00">2019-02-17</time>
+                <time title="Modified: 2019-02-17 15:49:21" itemprop="dateModified" datetime="2019-02-17T15:49:21+08:00">2019-02-17</time>
               
             
           </span>
@@ -438,12 +438,14 @@
 </li>
 <li><p>遍历操作(弱一致性)</p>
 <ul>
-<li>ConcurrentHashMap<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> Map.<span class="function">Entry&lt;K,V&gt; <span class="title">next</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Node&lt;K,V&gt; p;</span><br><span class="line">    <span class="keyword">if</span> ((p = next) == <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NoSuchElementException();</span><br><span class="line">    K k = p.key;</span><br><span class="line">    V v = p.val;</span><br><span class="line">    lastReturned = p;</span><br><span class="line">    advance();</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> MapEntry&lt;K,V&gt;(k, v, map);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<li><p>ConcurrentHashMap</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> Map.<span class="function">Entry&lt;K,V&gt; <span class="title">next</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Node&lt;K,V&gt; p;</span><br><span class="line">    <span class="keyword">if</span> ((p = next) == <span class="keyword">null</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NoSuchElementException();</span><br><span class="line">    K k = p.key;</span><br><span class="line">    V v = p.val;</span><br><span class="line">    lastReturned = p;</span><br><span class="line">    advance();</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> MapEntry&lt;K,V&gt;(k, v, map);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 </li>
 </ul>
 <pre><code>* HashMap
+
     <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">EntryIterator</span> <span class="keyword">extends</span> <span class="title">HashIterator</span> <span class="keyword">implements</span> <span class="title">Iterator</span>&lt;<span class="title">Map</span>.<span class="title">Entry</span>&lt;<span class="title">K</span>,<span class="title">V</span>&gt;&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> Map.<span class="function">Entry&lt;K,V&gt; <span class="title">next</span><span class="params">()</span> </span>&#123; </span><br><span class="line">        <span class="keyword">return</span> nextNode(); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 

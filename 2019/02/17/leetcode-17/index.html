@@ -108,27 +108,24 @@
 
 
 
-  <meta name="description" content="今天，我们要讲最后一个排序内容——快速排序，快速排序目前是用的最多的排序方法，在排序算法一 中我们有一张图，上面记录了快速排序的时间复杂度为O（NlogN），并且快速排序和归并排序一样是一种分治的递归算法。 快速排序算法其实总的来说由四个步骤组成：  判断元素个数，个数为0 or 1 直接返回； 从元素数组中取出一个数作为枢纽元； 讲初枢纽元外的元素进行分类，枢纽元左边的为小于枢纽元的数，枢纽元右">
-<meta name="keywords" content="排序">
+  <meta name="description" content="题目12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152给定一个二叉树，编写一个函数来获取这个树的最大宽度。树的宽度是所有层中的最大宽度。这个二叉树与满二叉树（full binary tree）结构相同，但一些节点为空。每一层的宽度被定义为两个端点（该层最左和最">
 <meta property="og:type" content="article">
-<meta property="og:title" content="排序算法三之快速排序">
-<meta property="og:url" content="https://www.liaochuntao.cn/2017/12/27/data_struct_15/index.html">
+<meta property="og:title" content="leetcode-17">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/02/17/leetcode-17/index.html">
 <meta property="og:site_name" content="唉&#39;s Blog">
-<meta property="og:description" content="今天，我们要讲最后一个排序内容——快速排序，快速排序目前是用的最多的排序方法，在排序算法一 中我们有一张图，上面记录了快速排序的时间复杂度为O（NlogN），并且快速排序和归并排序一样是一种分治的递归算法。 快速排序算法其实总的来说由四个步骤组成：  判断元素个数，个数为0 or 1 直接返回； 从元素数组中取出一个数作为枢纽元； 讲初枢纽元外的元素进行分类，枢纽元左边的为小于枢纽元的数，枢纽元右">
+<meta property="og:description" content="题目12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152给定一个二叉树，编写一个函数来获取这个树的最大宽度。树的宽度是所有层中的最大宽度。这个二叉树与满二叉树（full binary tree）结构相同，但一些节点为空。每一层的宽度被定义为两个端点（该层最左和最">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-27-00-44-21.png">
-<meta property="og:updated_time" content="2018-01-22T08:11:34.000Z">
+<meta property="og:updated_time" content="2019-02-17T06:04:08.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="排序算法三之快速排序">
-<meta name="twitter:description" content="今天，我们要讲最后一个排序内容——快速排序，快速排序目前是用的最多的排序方法，在排序算法一 中我们有一张图，上面记录了快速排序的时间复杂度为O（NlogN），并且快速排序和归并排序一样是一种分治的递归算法。 快速排序算法其实总的来说由四个步骤组成：  判断元素个数，个数为0 or 1 直接返回； 从元素数组中取出一个数作为枢纽元； 讲初枢纽元外的元素进行分类，枢纽元左边的为小于枢纽元的数，枢纽元右">
-<meta name="twitter:image" content="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-27-00-44-21.png">
+<meta name="twitter:title" content="leetcode-17">
+<meta name="twitter:description" content="题目12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152给定一个二叉树，编写一个函数来获取这个树的最大宽度。树的宽度是所有层中的最大宽度。这个二叉树与满二叉树（full binary tree）结构相同，但一些节点为空。每一层的宽度被定义为两个端点（该层最左和最">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.liaochuntao.cn/2017/12/27/data_struct_15/"/>
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/02/17/leetcode-17/"/>
 
 
 
@@ -138,7 +135,7 @@
   };
 </script>
 
-  <title>排序算法三之快速排序 | 唉's Blog</title>
+  <title>leetcode-17 | 唉's Blog</title>
   
 
 
@@ -308,7 +305,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2017/12/27/data_struct_15/">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/02/17/leetcode-17/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="liaochuntao">
@@ -325,7 +322,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">排序算法三之快速排序
+          <h1 class="post-title" itemprop="name headline">leetcode-17
               
             
           </h1>
@@ -350,46 +347,16 @@
                 
               
 
-              <time title="Created: 2017-12-27 01:07:14" itemprop="dateCreated datePublished" datetime="2017-12-27T01:07:14+08:00">2017-12-27</time>
+              <time title="Created: 2019-02-17 13:04:33 / Modified: 14:04:08" itemprop="dateCreated datePublished" datetime="2019-02-17T13:04:33+08:00">2019-02-17</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2018-01-22 16:11:34" itemprop="dateModified" datetime="2018-01-22T16:11:34+08:00">2018-01-22</time>
               
             
           </span>
 
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数据结构/" itemprop="url" rel="index"><span itemprop="name">数据结构</span></a></span>
-
-                
-                
-              
-            </span>
           
 
           
@@ -418,19 +385,9 @@
       
 
       
-        <p>今天，我们要讲最后一个排序内容——快速排序，快速排序目前是用的最多的排序方法，在<a href="https://liaochuntao.wordpress.com/2017/12/16/%e6%8e%92%e5%ba%8f%e7%ae%97%e6%b3%95%e4%b8%80%e4%b9%8b%e6%8f%92%e5%85%a5%e6%8e%92%e5%ba%8f%e4%b8%8e%e5%b8%8c%e5%b0%94%e6%8e%92%e5%ba%8f/" target="_blank" rel="noopener">排序算法一</a></p>
-<p>中我们有一张图，上面记录了快速排序的时间复杂度为O（NlogN），并且快速排序和归并排序一样是一种分治的递归算法。</p>
-<p>快速排序算法其实总的来说由四个步骤组成：</p>
-<ol>
-<li>判断元素个数，个数为0 or 1 直接返回；</li>
-<li>从元素数组中取出一个数作为枢纽元；</li>
-<li>讲初枢纽元外的元素进行分类，枢纽元左边的为小于枢纽元的数，枢纽元右边为大于枢纽元的数，如果等于枢纽元呢？左右两边都可以；</li>
-<li>对枢纽元两边的元素数组分别执行3步骤，这样递归下去。<br>这里在第三步中，我们有一个选取枢纽元的步骤，那么我们是怎么选取枢纽元的呢？选取枢纽元的方法采用了三数中值取法；所谓三数中值取法就是我们取元素数组的第一个元素，最后一个元素和处于数组中间的元素[（left + right）/ 2]，然后，我们对这三个进行排序，选择三个数中大小处于中间的数，假设我们有：8、1、4、9、6、3、5、2、7、0，第一个元素和最后一个元素分别是8和0，数组中间的元素是6，我们对这三个数排序=&gt;0&lt;6&lt;8，因此我们选择6作为枢纽元</li>
-</ol>
-<p>用一张图来描述下快速排序的步骤：</p>
-<p><img src="https://liaochuntao.files.wordpress.com/2017/12/screenshot-from-2017-12-27-00-44-21.png" alt="Screenshot from 2017-12-27 00-44-21.png"></p>
-<p>接下来就是快速排序的代码：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ElementType <span class="title">Median3</span><span class="params">(ElementType A[], <span class="keyword">int</span> left, <span class="keyword">int</span> right)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> center =(left + right)/<span class="number">2</span></span><br><span class="line">    <span class="keyword">if</span>(A[left]&gt; A[center])</span><br><span class="line">        Swap(&amp;A[left],&amp;A[center]);</span><br><span class="line">    <span class="keyword">if</span>(A[left]&gt; A[right])</span><br><span class="line">        Swap(&amp;A[left],&amp;A[right]);</span><br><span class="line">    <span class="keyword">if</span>(A[center]&gt; A[right])</span><br><span class="line">        Swap(&amp;A[center],&amp;A[right]);</span><br><span class="line">    Swap(&amp;A[center],&amp;A[right <span class="number">-1</span>])</span><br><span class="line">    <span class="keyword">return</span> A[right <span class="number">-1</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Qsort</span><span class="params">(ElementType A[], <span class="keyword">int</span> left, <span class="keyword">int</span> right)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i, j;</span><br><span class="line">    ElementType pivot;</span><br><span class="line">    pivot = Median3(A, left, right);</span><br><span class="line">    i = left;</span><br><span class="line">    j = right - <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span>(<span class="literal">true</span>) &#123;</span><br><span class="line">        <span class="keyword">while</span>(A[++i]&lt; pivot)&#123;&#125;</span><br><span class="line">        <span class="keyword">while</span>(A[--j]&gt; pivot)&#123;&#125;</span><br><span class="line">        <span class="keyword">if</span>(i &lt; j)</span><br><span class="line">            Swap(&amp;A[i],&amp;A[j])</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Swap(&amp;A[i],&amp;A[right <span class="number">-1</span>]);</span><br><span class="line">    Qsort(A, left, i <span class="number">-1</span>)</span><br><span class="line">    Qsort(A, i +<span class="number">1</span>, right)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-
+        <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">给定一个二叉树，编写一个函数来获取这个树的最大宽度。树的宽度是所有层中的最大宽度。这个二叉树与满二叉树（full binary tree）结构相同，但一些节点为空。</span><br><span class="line">每一层的宽度被定义为两个端点（该层最左和最右的非空节点，两端点间的null节点也计入长度）之间的长度。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: </span><br><span class="line"></span><br><span class="line">           1</span><br><span class="line">         /   \</span><br><span class="line">        3     2</span><br><span class="line">       / \     \  </span><br><span class="line">      5   3     9 </span><br><span class="line"></span><br><span class="line">输出: 4</span><br><span class="line">解释: 最大值出现在树的第 3 层，宽度为 4 (5,3,null,9)。</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: </span><br><span class="line"></span><br><span class="line">          1</span><br><span class="line">         /  </span><br><span class="line">        3    </span><br><span class="line">       / \       </span><br><span class="line">      5   3     </span><br><span class="line"></span><br><span class="line">输出: 2</span><br><span class="line">解释: 最大值出现在树的第 3 层，宽度为 2 (5,3)。</span><br><span class="line">示例 3:</span><br><span class="line"></span><br><span class="line">输入: </span><br><span class="line"></span><br><span class="line">          1</span><br><span class="line">         / \</span><br><span class="line">        3   2 </span><br><span class="line">       /        </span><br><span class="line">      5      </span><br><span class="line"></span><br><span class="line">输出: 2</span><br><span class="line">解释: 最大值出现在树的第 2 层，宽度为 2 (3,2)。</span><br><span class="line">示例 4:</span><br><span class="line"></span><br><span class="line">输入: </span><br><span class="line"></span><br><span class="line">          1</span><br><span class="line">         / \</span><br><span class="line">        3   2</span><br><span class="line">       /     \  </span><br><span class="line">      5       9 </span><br><span class="line">     /         \</span><br><span class="line">    6           7</span><br><span class="line">输出: 8</span><br><span class="line">解释: 最大值出现在树的第 4 层，宽度为 8 (6,null,null,null,null,null,null,7)。</span><br></pre></td></tr></table></figure>
+<h4 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h4><p>解题的关键在于题目提到了一个关键信息——满二叉树，满二叉树或着完全二叉树可以利用数组来存储，假设节点所在的数组下标为indx，那么该节点的左子节点所在的数组下标index为 (2 <em> index)，右子节点所在的数组下标index为 (2 </em> index + 1)，因此仅需层次遍历二叉树，利用每层的最右节点的index值与最左节点的index来得出每层的最大宽度即可</p>
+<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">widthOfBinaryTree</span><span class="params">(self, root)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type root: TreeNode</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> root == <span class="keyword">None</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        maxWidth = <span class="number">1</span></span><br><span class="line">        stack = []</span><br><span class="line">        stack.append((root, <span class="number">1</span>))</span><br><span class="line">        l = len(stack)</span><br><span class="line">        tmp = []</span><br><span class="line">        <span class="keyword">while</span> len(stack):</span><br><span class="line">            <span class="keyword">if</span> l == <span class="number">0</span>:</span><br><span class="line">                maxWidth = max(maxWidth, tmp[<span class="number">-1</span>][<span class="number">1</span>] - tmp[<span class="number">0</span>][<span class="number">1</span>] + <span class="number">1</span>)</span><br><span class="line">                tmp = []</span><br><span class="line">                l = len(stack)</span><br><span class="line">            p = stack.pop(<span class="number">0</span>)</span><br><span class="line">            l -= <span class="number">1</span></span><br><span class="line">            tmp.append(p)</span><br><span class="line">            <span class="keyword">if</span> p[<span class="number">0</span>].left:</span><br><span class="line">                stack.append((p[<span class="number">0</span>].left, <span class="number">2</span> * p[<span class="number">1</span>]))</span><br><span class="line">            <span class="keyword">if</span> p[<span class="number">0</span>].right:</span><br><span class="line">                stack.append((p[<span class="number">0</span>].right, <span class="number">2</span> * p[<span class="number">1</span>] + <span class="number">1</span>))</span><br><span class="line">        <span class="keyword">if</span> len(tmp):</span><br><span class="line">            maxWidth = max(maxWidth, tmp[<span class="number">-1</span>][<span class="number">1</span>] - tmp[<span class="number">0</span>][<span class="number">1</span>] + <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> maxWidth</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -448,12 +405,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/排序/" rel="tag"># 排序</a>
-          
-        </div>
-      
 
       
       
@@ -463,8 +414,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/12/21/data_struct_14/" rel="next" title="排序算法二之堆排序与归并排序">
-                <i class="fa fa-chevron-left"></i> 排序算法二之堆排序与归并排序
+              <a href="/2019/02/16/leetcode-16/" rel="next" title="leetcode回顾——[164] Maximum Gap">
+                <i class="fa fa-chevron-left"></i> leetcode回顾——[164] Maximum Gap
               </a>
             
           </div>
@@ -472,10 +423,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/12/27/deep_learning_1/" rel="prev" title="记一次竞赛题目有感——图像识别">
-                记一次竞赛题目有感——图像识别 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -520,8 +467,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -646,6 +602,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#题解"><span class="nav-number">2.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AC代码"><span class="nav-number">3.</span> <span class="nav-text">AC代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

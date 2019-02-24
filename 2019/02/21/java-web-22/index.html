@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原理 JavaCompiler   Java编译器对象，这是核心对象，如果求简单的话，直接使用JavaCompiler.run(Object[] args)方法就可以了   该对象的获取通过ToolProvider.getSystemJavaCompiler();  JavaCompiler.CompilationTask   这个对象相比上面直接使用run方法来的强大，它可以对我们的Java编译">
+<meta name="keywords" content="reactor">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java实现从http中获取java源码进行编译并获取结果">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/02/21/java-web-22/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="原理 JavaCompiler   Java编译器对象，这是核心对象，如果求简单的话，直接使用JavaCompiler.run(Object[] args)方法就可以了   该对象的获取通过ToolProvider.getSystemJavaCompiler();  JavaCompiler.CompilationTask   这个对象相比上面直接使用run方法来的强大，它可以对我们的Java编译">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-02-24T11:39:49.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java实现从http中获取java源码进行编译并获取结果">
+<meta name="twitter:description" content="原理 JavaCompiler   Java编译器对象，这是核心对象，如果求简单的话，直接使用JavaCompiler.run(Object[] args)方法就可以了   该对象的获取通过ToolProvider.getSystemJavaCompiler();  JavaCompiler.CompilationTask   这个对象相比上面直接使用run方法来的强大，它可以对我们的Java编译">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/02/21/java-web-22/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java实现从http中获取java源码进行编译并获取结果 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/02/21/java-web-22/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java实现从http中获取java源码进行编译并获取结果
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-02-21 11:21:08" itemprop="dateCreated datePublished" datetime="2019-02-21T11:21:08+08:00">2019-02-21</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-02-24 19:39:49" itemprop="dateModified" datetime="2019-02-24T19:39:49+08:00">2019-02-24</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><ul>
+<li><p>JavaCompiler</p>
+<p>  Java编译器对象，这是核心对象，如果求简单的话，直接使用JavaCompiler.run(Object[] args)方法就可以了</p>
+<p>  该对象的获取通过<code>ToolProvider.getSystemJavaCompiler();</code></p>
+</li>
+<li><p>JavaCompiler.CompilationTask</p>
+<p>  这个对象相比上面直接使用run方法来的强大，它可以对我们的Java编译过程进行更多的控制操作，比如源文件从哪里来，编译后的文件，编译过程出现的错误以及警告信息；同时该对象继承了<code>Callable&lt;Boolean&gt;</code>接口，因此，该对象在执行时其实是开启了一个线程在后台运行的，当我们调用该对象的<code>call</code>方法时开启，</p>
+<p>  该对象的获取通过<code>compiler.getTask(null, fileManager, diagnostics, options, null, fileObjects);</code>，其中fileManager参数是控制源文件以及编译后的类文件的位置，diagnostics参数是记录编译过程中的信息，options参数是设置一些编译时的参数信息(可以参考javac命令)，fileObjects参数是向task传入待compiler的java文件对象</p>
+</li>
+<li><p>DiagnosticCollector</p>
+<p>  一个监听器，用于监听在编译过程中产生的信息</p>
+</li>
+<li><p>ForwardingJavaFileManager</p>
+<p>  该对象是CompilationTask的一个参数，这个是用于控制源文件和类文件的位置</p>
+</li>
+</ul>
+<h4 id="实现代码"><a href="#实现代码" class="headerlink" title="实现代码"></a>实现代码</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> liaochuntao</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClassFileManager</span> <span class="keyword">extends</span> <span class="title">ForwardingJavaFileManager</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> JavaClassObject classObject;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">ClassFileManager</span><span class="params">(JavaFileManager fileManager)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(fileManager);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> JavaFileObject <span class="title">getJavaFileForOutput</span><span class="params">(Location location, String className, JavaFileObject.Kind kind, FileObject sibling)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (classObject == <span class="keyword">null</span>) &#123;</span><br><span class="line">            classObject = <span class="keyword">new</span> JavaClassObject(className, kind);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> classObject;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> JavaClassObject <span class="title">getJavaClassObject</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> classObject;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> liaochuntao</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JavaClassObject</span> <span class="keyword">extends</span> <span class="title">SimpleJavaFileObject</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> ByteArrayOutputStream bos = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">JavaClassObject</span><span class="params">(String name, Kind kind)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(URI.create(<span class="string">"string:///"</span> + name.replace(<span class="string">'.'</span>, <span class="string">'/'</span>) + kind.extension), kind);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">byte</span>[] getBytes() &#123;</span><br><span class="line">        <span class="keyword">return</span> bos.toByteArray();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> OutputStream <span class="title">openOutputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> bos;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">finalize</span><span class="params">()</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.finalize();</span><br><span class="line">        bos.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> liaochuntao</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JavaSourceObject</span> <span class="keyword">extends</span> <span class="title">SimpleJavaFileObject</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String code;</span><br><span class="line">    <span class="keyword">private</span> ByteArrayOutputStream os;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">JavaSourceObject</span><span class="params">(String name, String code)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(URI.create(<span class="string">"string:///"</span> + name.replace(<span class="string">'.'</span>,<span class="string">'/'</span>) + Kind.SOURCE.extension), Kind.SOURCE);</span><br><span class="line">        <span class="keyword">this</span>.code = code;</span><br><span class="line">        <span class="keyword">this</span>.os = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> CharSequence <span class="title">getCharContent</span><span class="params">(<span class="keyword">boolean</span> ignoreEncodingErrors)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> code;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> OutputStream <span class="title">openOutputStream</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> os;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> liaochuntao</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TensorClassLoader</span> <span class="keyword">extends</span> <span class="title">URLClassLoader</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TensorClassLoader</span><span class="params">(ClassLoader parent)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(<span class="keyword">new</span> URL[<span class="number">0</span>], parent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Class <span class="title">loadClass</span><span class="params">(String name, JavaClassObject jco)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">byte</span>[] classData = jco.getBytes();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.defineClass(name, classData, <span class="number">0</span>, classData.length);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> liaochuntao</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Scope</span>(<span class="string">"singleton"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">CompilerPool</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取机器的可用的CPU核心数</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="keyword">int</span> COMPILER_POOL_SIZE = Runtime.getRuntime().availableProcessors();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> ConcurrentLinkedQueue&lt;TensorJavaCompiler&gt; COMPILER_POOL = <span class="keyword">new</span> ConcurrentLinkedQueue&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> ClassLoader parentClassloader = CompilerPool.class.getClassLoader();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; COMPILER_POOL_SIZE; i ++) &#123;</span><br><span class="line">            COMPILER_POOL.add(<span class="keyword">new</span> TensorJavaCompiler());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> CompilerResult <span class="title">work</span><span class="params">(String javaName, String javaSourceCode)</span> </span>&#123;</span><br><span class="line">        TensorJavaCompiler compiler = COMPILER_POOL.poll();</span><br><span class="line">        <span class="keyword">if</span> (compiler == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> CompilerResult();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> compiler.buildTask(javaName, javaSourceCode).compile(<span class="keyword">new</span> CompilerResult());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">TensorJavaCompiler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> isRunning;</span><br><span class="line">        <span class="keyword">private</span> JavaCompiler compiler;</span><br><span class="line">        <span class="keyword">private</span> DiagnosticCollector&lt;JavaFileObject&gt; diagnostics;</span><br><span class="line">        <span class="keyword">private</span> String javaName;</span><br><span class="line">        <span class="keyword">private</span> JavaCompiler.CompilationTask task;</span><br><span class="line">        <span class="keyword">private</span> TensorClassLoader classLoader;</span><br><span class="line">        <span class="keyword">private</span> String classpath;</span><br><span class="line">        <span class="keyword">private</span> ClassFileManager fileManager;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="title">TensorJavaCompiler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            isRunning = <span class="keyword">false</span>;</span><br><span class="line">            compiler = ToolProvider.getSystemJavaCompiler();</span><br><span class="line">            diagnostics = <span class="keyword">new</span> DiagnosticCollector&lt;&gt;();</span><br><span class="line">            classLoader = <span class="keyword">new</span> TensorClassLoader(parentClassloader);</span><br><span class="line">            fileManager = <span class="keyword">new</span> ClassFileManager(compiler.getStandardFileManager(diagnostics, <span class="keyword">null</span>, <span class="keyword">null</span>));</span><br><span class="line">            buildClassPath();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">buildClassPath</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.classpath = <span class="keyword">null</span>;</span><br><span class="line">            StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">            <span class="keyword">for</span> (URL url : <span class="keyword">this</span>.classLoader.getURLs()) &#123;</span><br><span class="line">                String p = url.getFile();</span><br><span class="line">                sb.append(p).append(File.pathSeparator);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">this</span>.classpath = sb.toString();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function">TensorJavaCompiler <span class="title">buildTask</span><span class="params">(String name, String source)</span> </span>&#123;</span><br><span class="line">            javaName = name;</span><br><span class="line">            List&lt;JavaFileObject&gt; fileObjects = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">            fileObjects.add(<span class="keyword">new</span> JavaSourceObject(javaName, source));</span><br><span class="line">            List&lt;String&gt; options = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">            options.add(<span class="string">"-encoding"</span>);</span><br><span class="line">            options.add(<span class="string">"UTF-8"</span>);</span><br><span class="line">            options.add(<span class="string">"-classpath"</span>);</span><br><span class="line">            options.add(<span class="keyword">this</span>.classpath);</span><br><span class="line">            task = compiler.getTask(<span class="keyword">null</span>, fileManager, diagnostics, options, <span class="keyword">null</span>, fileObjects);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function">CompilerResult <span class="title">compile</span><span class="params">(CompilerResult result)</span> </span>&#123;</span><br><span class="line">            isRunning = <span class="keyword">true</span>;</span><br><span class="line">            String compilerErr = <span class="string">""</span>;</span><br><span class="line">            <span class="keyword">for</span> (Diagnostic diagnostic : diagnostics.getDiagnostics()) &#123;</span><br><span class="line">                compilerErr += compilePrint(diagnostic);</span><br><span class="line">            &#125;</span><br><span class="line">            result.setCompilerErr(compilerErr);</span><br><span class="line">            <span class="keyword">if</span> (task.call()) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                  <span class="comment">// 此处更改System.out流的输出位置，以获取代码中的System.out\err等流的输出信息</span></span><br><span class="line">                    PrintStream old = System.out;</span><br><span class="line">                    ByteArrayOutputStream bos = <span class="keyword">new</span> ByteArrayOutputStream(<span class="number">1024</span>);</span><br><span class="line">                    PrintStream print = <span class="keyword">new</span> PrintStream(bos);</span><br><span class="line">                    System.setOut(print);</span><br><span class="line">                    JavaClassObject classObject = fileManager.getJavaClassObject();</span><br><span class="line">                    Class cls = classLoader.loadClass(javaName, classObject);</span><br><span class="line">                    result.setResult(cls.getDeclaredMethod(<span class="string">"main"</span>, String[].class).invoke(<span class="keyword">null</span>, <span class="keyword">new</span> Object[]&#123;<span class="keyword">null</span>&#125;));</span><br><span class="line">                    <span class="comment">//恢复System流的原输出位置</span></span><br><span class="line">                    System.setOut(old);</span><br><span class="line">                    result.setPrintMsg(bos.toString());</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) &#123;</span><br><span class="line">                    log.error(<span class="string">"compiler exception is "</span>, e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            result.setTimeout(<span class="keyword">false</span>);</span><br><span class="line">            release();</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isRunning</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> isRunning;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">release</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            isRunning = <span class="keyword">false</span>;</span><br><span class="line">            COMPILER_POOL.add(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">private</span> String <span class="title">compilePrint</span><span class="params">(Diagnostic diagnostic)</span> </span>&#123;</span><br><span class="line">            StringBuffer res = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">            res.append(<span class="string">"Code:["</span>).append(diagnostic.getCode()).append(<span class="string">"]\n"</span>);</span><br><span class="line">            res.append(<span class="string">"Kind:["</span>).append(diagnostic.getKind()).append(<span class="string">"]\n"</span>);</span><br><span class="line">            res.append(<span class="string">"Position:["</span>).append(diagnostic.getPosition()).append(<span class="string">"]\n"</span>);</span><br><span class="line">            res.append(<span class="string">"Start Position:["</span>).append(diagnostic.getStartPosition()).append(<span class="string">"]\n"</span>);</span><br><span class="line">            res.append(<span class="string">"End Position:["</span>).append(diagnostic.getEndPosition()).append(<span class="string">"]\n"</span>);</span><br><span class="line">            res.append(<span class="string">"Source:["</span>).append(diagnostic.getSource()).append(<span class="string">"]\n"</span>);</span><br><span class="line">            res.append(<span class="string">"Message:["</span>).append(diagnostic.getMessage(<span class="keyword">null</span>)).append(<span class="string">"]\n"</span>);</span><br><span class="line">            res.append(<span class="string">"LineNumber:["</span>).append(diagnostic.getLineNumber()).append(<span class="string">"]\n"</span>);</span><br><span class="line">            res.append(<span class="string">"ColumnNumber:["</span>).append(diagnostic.getColumnNumber()).append(<span class="string">"]\n"</span>);</span><br><span class="line">            <span class="keyword">return</span> res.toString();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="测试的返回结果"><a href="#测试的返回结果" class="headerlink" title="测试的返回结果"></a>测试的返回结果</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"code"</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="attr">"value"</span>: &#123;</span><br><span class="line">        <span class="attr">"taskId"</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="attr">"sourceName"</span>: <span class="string">"HelloWorld"</span>,</span><br><span class="line">        <span class="attr">"sourceCode"</span>: <span class="string">"public class HelloWorld &#123;\n    public static void main (String[] args) &#123;\n        System.out.println(\"HelloWorld\");\n    &#125;\n&#125;"</span>,</span><br><span class="line">        <span class="attr">"startTime"</span>: <span class="number">1551008298654</span>,</span><br><span class="line">        <span class="attr">"endTime"</span>: <span class="number">1551008298989</span>,</span><br><span class="line">        <span class="attr">"taskOwnerId"</span>: <span class="string">"test-2"</span>,</span><br><span class="line">        <span class="attr">"result"</span>: <span class="string">"&#123;\"timeout\":false,\"compilerErr\":\"\",\"printMsg\":\"HelloWorld\\n\"&#125;"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/reactor/" rel="tag"># reactor</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/18/leetcode-18/" rel="next" title="leetcode回顾——[402] Remove K Digits">
+                <i class="fa fa-chevron-left"></i> leetcode回顾——[402] Remove K Digits
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">70</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">17</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#原理"><span class="nav-number">1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实现代码"><span class="nav-number">2.</span> <span class="nav-text">实现代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#测试的返回结果"><span class="nav-number">3.</span> <span class="nav-text">测试的返回结果</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

@@ -108,24 +108,24 @@
 
 
 
-  <meta name="description" content="题目12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152给定一个二叉树，编写一个函数来获取这个树的最大宽度。树的宽度是所有层中的最大宽度。这个二叉树与满二叉树（full binary tree）结构相同，但一些节点为空。每一层的宽度被定义为两个端点（该层最左和最">
+  <meta name="description" content="题目给出方程式 A / B = k, 其中 A 和 B 均为代表字符串的变量， k 是一个浮点型数字。根据已知方程式求解问题，并返回计算结果。如果结果不存在，则返回 -1.0。 示例 :给定 a / b = 2.0, b / c = 3.0问题: a / c = ?, b / a = ?, a / e = ?, a / a = ?, x / x = ?返回 [6.0, 0.5, -1.0, 1.0">
 <meta property="og:type" content="article">
-<meta property="og:title" content="leetcode回顾——[662] Maximum Width of Binary Tree">
-<meta property="og:url" content="https://www.liaochuntao.cn/2019/02/17/leetcode-17/index.html">
+<meta property="og:title" content="leetcode回顾——[384] Shuffle an Array">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/03/17/leetcode-20/index.html">
 <meta property="og:site_name" content="唉&#39;s Blog">
-<meta property="og:description" content="题目12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152给定一个二叉树，编写一个函数来获取这个树的最大宽度。树的宽度是所有层中的最大宽度。这个二叉树与满二叉树（full binary tree）结构相同，但一些节点为空。每一层的宽度被定义为两个端点（该层最左和最">
+<meta property="og:description" content="题目给出方程式 A / B = k, 其中 A 和 B 均为代表字符串的变量， k 是一个浮点型数字。根据已知方程式求解问题，并返回计算结果。如果结果不存在，则返回 -1.0。 示例 :给定 a / b = 2.0, b / c = 3.0问题: a / c = ?, b / a = ?, a / e = ?, a / a = ?, x / x = ?返回 [6.0, 0.5, -1.0, 1.0">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-17T09:02:44.000Z">
+<meta property="og:updated_time" content="2019-03-17T11:04:03.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="leetcode回顾——[662] Maximum Width of Binary Tree">
-<meta name="twitter:description" content="题目12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152给定一个二叉树，编写一个函数来获取这个树的最大宽度。树的宽度是所有层中的最大宽度。这个二叉树与满二叉树（full binary tree）结构相同，但一些节点为空。每一层的宽度被定义为两个端点（该层最左和最">
+<meta name="twitter:title" content="leetcode回顾——[384] Shuffle an Array">
+<meta name="twitter:description" content="题目给出方程式 A / B = k, 其中 A 和 B 均为代表字符串的变量， k 是一个浮点型数字。根据已知方程式求解问题，并返回计算结果。如果结果不存在，则返回 -1.0。 示例 :给定 a / b = 2.0, b / c = 3.0问题: a / c = ?, b / a = ?, a / e = ?, a / a = ?, x / x = ?返回 [6.0, 0.5, -1.0, 1.0">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.liaochuntao.cn/2019/02/17/leetcode-17/"/>
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/03/17/leetcode-20/"/>
 
 
 
@@ -135,7 +135,7 @@
   };
 </script>
 
-  <title>leetcode回顾——[662] Maximum Width of Binary Tree | 唉's Blog</title>
+  <title>leetcode回顾——[384] Shuffle an Array | 唉's Blog</title>
   
 
 
@@ -305,7 +305,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/02/17/leetcode-17/">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/03/17/leetcode-20/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="liaochuntao">
@@ -322,7 +322,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">leetcode回顾——[662] Maximum Width of Binary Tree
+          <h1 class="post-title" itemprop="name headline">leetcode回顾——[384] Shuffle an Array
               
             
           </h1>
@@ -347,7 +347,7 @@
                 
               
 
-              <time title="Created: 2019-02-17 13:04:33 / Modified: 17:02:44" itemprop="dateCreated datePublished" datetime="2019-02-17T13:04:33+08:00">2019-02-17</time>
+              <time title="Created: 2019-03-17 18:44:15 / Modified: 19:04:03" itemprop="dateCreated datePublished" datetime="2019-03-17T18:44:15+08:00">2019-03-17</time>
             
 
             
@@ -403,9 +403,14 @@
       
 
       
-        <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">给定一个二叉树，编写一个函数来获取这个树的最大宽度。树的宽度是所有层中的最大宽度。这个二叉树与满二叉树（full binary tree）结构相同，但一些节点为空。</span><br><span class="line">每一层的宽度被定义为两个端点（该层最左和最右的非空节点，两端点间的null节点也计入长度）之间的长度。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: </span><br><span class="line"></span><br><span class="line">           1</span><br><span class="line">         /   \</span><br><span class="line">        3     2</span><br><span class="line">       / \     \  </span><br><span class="line">      5   3     9 </span><br><span class="line"></span><br><span class="line">输出: 4</span><br><span class="line">解释: 最大值出现在树的第 3 层，宽度为 4 (5,3,null,9)。</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: </span><br><span class="line"></span><br><span class="line">          1</span><br><span class="line">         /  </span><br><span class="line">        3    </span><br><span class="line">       / \       </span><br><span class="line">      5   3     </span><br><span class="line"></span><br><span class="line">输出: 2</span><br><span class="line">解释: 最大值出现在树的第 3 层，宽度为 2 (5,3)。</span><br><span class="line">示例 3:</span><br><span class="line"></span><br><span class="line">输入: </span><br><span class="line"></span><br><span class="line">          1</span><br><span class="line">         / \</span><br><span class="line">        3   2 </span><br><span class="line">       /        </span><br><span class="line">      5      </span><br><span class="line"></span><br><span class="line">输出: 2</span><br><span class="line">解释: 最大值出现在树的第 2 层，宽度为 2 (3,2)。</span><br><span class="line">示例 4:</span><br><span class="line"></span><br><span class="line">输入: </span><br><span class="line"></span><br><span class="line">          1</span><br><span class="line">         / \</span><br><span class="line">        3   2</span><br><span class="line">       /     \  </span><br><span class="line">      5       9 </span><br><span class="line">     /         \</span><br><span class="line">    6           7</span><br><span class="line">输出: 8</span><br><span class="line">解释: 最大值出现在树的第 4 层，宽度为 8 (6,null,null,null,null,null,null,7)。</span><br></pre></td></tr></table></figure>
-<h4 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h4><p>解题的关键在于题目提到了一个关键信息——满二叉树，满二叉树或着完全二叉树可以利用数组来存储，假设节点所在的数组下标为indx，那么该节点的左子节点所在的数组下标index为 (2 <em> index)，右子节点所在的数组下标index为 (2 </em> index + 1)，因此仅需层次遍历二叉树，利用每层的最右节点的index值与最左节点的index来得出每层的最大宽度即可</p>
-<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">widthOfBinaryTree</span><span class="params">(self, root)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type root: TreeNode</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> root == <span class="keyword">None</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        maxWidth = <span class="number">1</span></span><br><span class="line">        stack = []</span><br><span class="line">        stack.append((root, <span class="number">1</span>))</span><br><span class="line">        l = len(stack)</span><br><span class="line">        tmp = []</span><br><span class="line">        <span class="keyword">while</span> len(stack):</span><br><span class="line">            <span class="keyword">if</span> l == <span class="number">0</span>:</span><br><span class="line">                maxWidth = max(maxWidth, tmp[<span class="number">-1</span>][<span class="number">1</span>] - tmp[<span class="number">0</span>][<span class="number">1</span>] + <span class="number">1</span>)</span><br><span class="line">                tmp = []</span><br><span class="line">                l = len(stack)</span><br><span class="line">            p = stack.pop(<span class="number">0</span>)</span><br><span class="line">            l -= <span class="number">1</span></span><br><span class="line">            tmp.append(p)</span><br><span class="line">            <span class="keyword">if</span> p[<span class="number">0</span>].left:</span><br><span class="line">                stack.append((p[<span class="number">0</span>].left, <span class="number">2</span> * p[<span class="number">1</span>]))</span><br><span class="line">            <span class="keyword">if</span> p[<span class="number">0</span>].right:</span><br><span class="line">                stack.append((p[<span class="number">0</span>].right, <span class="number">2</span> * p[<span class="number">1</span>] + <span class="number">1</span>))</span><br><span class="line">        <span class="keyword">if</span> len(tmp):</span><br><span class="line">            maxWidth = max(maxWidth, tmp[<span class="number">-1</span>][<span class="number">1</span>] - tmp[<span class="number">0</span>][<span class="number">1</span>] + <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> maxWidth</span><br></pre></td></tr></table></figure>
+        <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><p>给出方程式 A / B = k, 其中 A 和 B 均为代表字符串的变量， k 是一个浮点型数字。根据已知方程式求解问题，并返回计算结果。如果结果不存在，则返回 -1.0。</p>
+<p>示例 :<br>给定 a / b = 2.0, b / c = 3.0<br>问题: a / c = ?, b / a = ?, a / e = ?, a / a = ?, x / x = ?<br>返回 [6.0, 0.5, -1.0, 1.0, -1.0 ]</p>
+<p>输入为: vector&lt;pair&lt;string, string&gt;&gt; equations, vector<double>&amp; values, vector&lt;pair&lt;string, string&gt;&gt; queries(方程式，方程式结果，问题方程式)， 其中 equations.size() == values.size()，即方程式的长度与方程式结果长度相等（程式与结果一一对应），并且结果值均为正数。以上为方程式的描述。 返回vector<double>类型。</double></double></p>
+<p>基于上述例子，输入如下：</p>
+<p>equations(方程式) = [ [“a”, “b”], [“b”, “c”] ],<br>values(方程式结果) = [2.0, 3.0],<br>queries(问题方程式) = [ [“a”, “c”], [“b”, “a”], [“a”, “e”], [“a”, “a”], [“x”, “x”] ].<br>输入总是有效的。你可以假设除法运算中不会出现除数为0的情况，且不存在任何矛盾的结果。</p>
+<h4 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h4><p>将题目给的数据转为有向带权图，假设<code>a</code>与<code>b</code>有一关系<code>a / b = 2.0</code>，那么该图有<code>a</code>、<code>b</code>两个点，方向为<code>a -&gt; b</code>，这条边的权值为<code>a / b</code>的值，同理，既然有<code>a / b</code>，那么也有<code>b / a</code>，这样图又多了一条边</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">-----      2.0     -----      3.0      -----</span><br><span class="line">|   |-------------&gt;|   |--------------&gt;|   |</span><br><span class="line">| A |              | B |               | C |</span><br><span class="line">|   |&lt;-------------|   |&lt;--------------|   |</span><br><span class="line">-----      0.5     -----    0.33...    -----</span><br></pre></td></tr></table></figure>
+<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">calcEquation</span><span class="params">(self, equations, values, queries)</span>:</span></span><br><span class="line">        <span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line">        self.graph = defaultdict(set)</span><br><span class="line">        self.weight = defaultdict()</span><br><span class="line">        <span class="keyword">for</span> idx, equ <span class="keyword">in</span> enumerate(equations):</span><br><span class="line">            self.graph[equ[<span class="number">0</span>]].add(equ[<span class="number">1</span>])</span><br><span class="line">            self.graph[equ[<span class="number">1</span>]].add(equ[<span class="number">0</span>])</span><br><span class="line">            self.weight[tuple(equ)] = values[idx]</span><br><span class="line">            self.weight[(equ[<span class="number">1</span>], equ[<span class="number">0</span>])] = <span class="number">1</span> / values[idx]</span><br><span class="line">        res = []</span><br><span class="line">        <span class="keyword">for</span> que <span class="keyword">in</span> queries:</span><br><span class="line">            t = self.dfs(start=que[<span class="number">0</span>], end=que[<span class="number">1</span>], visited=set())</span><br><span class="line">            <span class="keyword">if</span> t == <span class="number">0</span>:</span><br><span class="line">                t = <span class="number">-1.0</span></span><br><span class="line">            res.append(t)</span><br><span class="line">        <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">dfs</span><span class="params">(self, start, end, visited)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> (start, end) <span class="keyword">in</span> self.weight:</span><br><span class="line">            <span class="keyword">return</span> self.weight[(start, end)]</span><br><span class="line">        <span class="keyword">if</span> start <span class="keyword">not</span> <span class="keyword">in</span> self.graph <span class="keyword">or</span> end <span class="keyword">not</span> <span class="keyword">in</span> self.graph:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        <span class="keyword">if</span> start <span class="keyword">in</span> visited:</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span></span><br><span class="line">        visited.add(start)</span><br><span class="line">        res = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> tmp <span class="keyword">in</span> self.graph[start]:</span><br><span class="line">            res = (self.dfs(tmp, end, visited) * self.weight[(start, tmp)])</span><br><span class="line">            <span class="keyword">if</span> res != <span class="number">0</span>:</span><br><span class="line">                self.weight[(start, end)] = res</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        visited.remove(start)</span><br><span class="line">        <span class="keyword">return</span> res</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    s = Solution()</span><br><span class="line">    equations = [[<span class="string">"a"</span>,<span class="string">"e"</span>],[<span class="string">"b"</span>,<span class="string">"e"</span>]]</span><br><span class="line">    values = [<span class="number">4.0</span>,<span class="number">3.0</span>]</span><br><span class="line">    queries = [[<span class="string">"a"</span>,<span class="string">"b"</span>],[<span class="string">"e"</span>,<span class="string">"e"</span>],[<span class="string">"x"</span>,<span class="string">"x"</span>]]</span><br><span class="line">    print(s.calcEquation(equations=equations, values=values, queries=queries))</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -432,8 +437,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/02/16/leetcode-16/" rel="next" title="leetcode回顾——[164] Maximum Gap">
-                <i class="fa fa-chevron-left"></i> leetcode回顾——[164] Maximum Gap
+              <a href="/2019/03/03/java-web-26/" rel="next" title="MyBatis延迟加载的简易实现">
+                <i class="fa fa-chevron-left"></i> MyBatis延迟加载的简易实现
               </a>
             
           </div>
@@ -441,10 +446,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/02/18/leetcode-18/" rel="prev" title="leetcode回顾——[402] Remove K Digits">
-                leetcode回顾——[402] Remove K Digits <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>

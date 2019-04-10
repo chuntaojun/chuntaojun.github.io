@@ -108,34 +108,29 @@
 
 
 
-  <meta name="description" content="什么是solr引用于维基百科开发者    Apache软件基金会稳定版本6.6.0 （2017年6月6日，​11个月前 ）开发状态    活跃编程语言    Java操作系统    跨平台类型    企业搜索服务器软件许可协议    Apache许可证 2.0网站    lucene.apache.org/solr/源代码库    git.apache.org/lucene-solr.gitSol">
-<meta name="keywords" content="solr">
+  <meta name="description" content="题目编写一个程序，找到两个单链表相交的起始节点。 如下面的两个链表：  在节点 c1 开始相交。 示例 1：  输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3输出：Reference of the node with value = 8输入解释：相交节点的值为 8 （注意，如">
 <meta property="og:type" content="article">
-<meta property="og:title" content="solr快速搭建">
-<meta property="og:url" content="https://www.liaochuntao.cn/2018/05/26/java-web-10/index.html">
+<meta property="og:title" content="leetcode回顾-[160] Intersection of Two Linked Lists">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/04/10/leetcode-22/index.html">
 <meta property="og:site_name" content="唉&#39;s Blog">
-<meta property="og:description" content="什么是solr引用于维基百科开发者    Apache软件基金会稳定版本6.6.0 （2017年6月6日，​11个月前 ）开发状态    活跃编程语言    Java操作系统    跨平台类型    企业搜索服务器软件许可协议    Apache许可证 2.0网站    lucene.apache.org/solr/源代码库    git.apache.org/lucene-solr.gitSol">
+<meta property="og:description" content="题目编写一个程序，找到两个单链表相交的起始节点。 如下面的两个链表：  在节点 c1 开始相交。 示例 1：  输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3输出：Reference of the node with value = 8输入解释：相交节点的值为 8 （注意，如">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-1.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-2.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-3.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-4.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-5.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-6.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-7.png">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-8.png">
-<meta property="og:updated_time" content="2018-06-07T13:51:20.000Z">
+<meta property="og:image" content="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_statement.png">
+<meta property="og:image" content="https://assets.leetcode.com/uploads/2018/12/13/160_example_1.png">
+<meta property="og:image" content="https://assets.leetcode.com/uploads/2018/12/13/160_example_2.png">
+<meta property="og:image" content="https://assets.leetcode.com/uploads/2018/12/13/160_example_3.png">
+<meta property="og:updated_time" content="2019-04-10T03:04:12.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="solr快速搭建">
-<meta name="twitter:description" content="什么是solr引用于维基百科开发者    Apache软件基金会稳定版本6.6.0 （2017年6月6日，​11个月前 ）开发状态    活跃编程语言    Java操作系统    跨平台类型    企业搜索服务器软件许可协议    Apache许可证 2.0网站    lucene.apache.org/solr/源代码库    git.apache.org/lucene-solr.gitSol">
-<meta name="twitter:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-10-1.png">
+<meta name="twitter:title" content="leetcode回顾-[160] Intersection of Two Linked Lists">
+<meta name="twitter:description" content="题目编写一个程序，找到两个单链表相交的起始节点。 如下面的两个链表：  在节点 c1 开始相交。 示例 1：  输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3输出：Reference of the node with value = 8输入解释：相交节点的值为 8 （注意，如">
+<meta name="twitter:image" content="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_statement.png">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.liaochuntao.cn/2018/05/26/java-web-10/"/>
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/04/10/leetcode-22/"/>
 
 
 
@@ -145,7 +140,7 @@
   };
 </script>
 
-  <title>solr快速搭建 | 唉's Blog</title>
+  <title>leetcode回顾-[160] Intersection of Two Linked Lists | 唉's Blog</title>
   
 
 
@@ -315,7 +310,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/05/26/java-web-10/">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/04/10/leetcode-22/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="liaochuntao">
@@ -332,7 +327,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">solr快速搭建
+          <h1 class="post-title" itemprop="name headline">leetcode回顾-[160] Intersection of Two Linked Lists
               
             
           </h1>
@@ -357,24 +352,12 @@
                 
               
 
-              <time title="Created: 2018-05-26 17:30:02" itemprop="dateCreated datePublished" datetime="2018-05-26T17:30:02+08:00">2018-05-26</time>
+              <time title="Created: 2019-04-10 10:42:13 / Modified: 11:04:12" itemprop="dateCreated datePublished" datetime="2019-04-10T10:42:13+08:00">2019-04-10</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2018-06-07 21:51:20" itemprop="dateModified" datetime="2018-06-07T21:51:20+08:00">2018-06-07</time>
               
             
           </span>
@@ -391,7 +374,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a></span>
 
                 
                 
@@ -425,55 +408,52 @@
       
 
       
-        <h4 id="什么是solr"><a href="#什么是solr" class="headerlink" title="什么是solr"></a>什么是solr</h4><h3 id="引用于维基百科"><a href="#引用于维基百科" class="headerlink" title="引用于维基百科"></a>引用于维基百科</h3><p>开发者    Apache软件基金会<br>稳定版本<br>6.6.0 （2017年6月6日，​11个月前 ）<br>开发状态    活跃<br>编程语言    Java<br>操作系统    跨平台<br>类型    企业搜索服务器软件<br>许可协议    Apache许可证 2.0<br>网站    lucene.apache.org/solr/<br>源代码库    git.apache.org/lucene-solr.git<br>Solr（读作“solar”）是Apache Lucene项目的开源企业搜索平台。其主要功能包括全文检索、命中标示[1]、分面搜索、动态聚类、数据库集成，以及富文本（如Word、PDF）的处理。Solr是高度可扩展的，并提供了分布式搜索和索引复制。Solr是最流行的企业级搜索引擎，[2]Solr 4还增加了NoSQL支持。[3]<br>Solr是用Java编写、运行在Servlet容器（如Apache Tomcat或Jetty）的一个独立的全文搜索服务器。 Solr采用了Lucene Java搜索库为核心的全文索引和搜索，并具有类似REST的HTTP/XML和JSON的API。 Solr强大的外部配置功能使得无需进行Java编码，便可对其进行调整以适应多种类型的应用程序。Solr有一个插件架构，以支持更多的高级定制。<br>因为2010年Apache Lucene和Apache Solr项目合并，两个项目是由同一个Apache软件基金会开发团队制作实现的。提到技术或产品时，Lucene/Solr或Solr/Lucene是一样的。</p>
-<h4 id="搭建solr"><a href="#搭建solr" class="headerlink" title="搭建solr"></a>搭建solr</h4><ol>
-<li><p>进入Apache官网，找到solr下载，下载后的文件名为：solr-7.3.0.tgz（我的是7.3.0版本的solr）</p>
-</li>
-<li><p>解压文件<code>solr-7.3.0.tgz</code>，文件目录为</p>
-</li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-1.png" alt="解压后的目录"></p>
-<ol start="3">
-<li>进入目录<code>/solr-7.3.0/bin</code>，使用执行<code>solr start</code>，然后打开 localhost:{执行命令后显示的端口}</li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-2.png" alt="执行成功后的返回"></p>
-<blockquote>
-<p>创建collection</p>
+        <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><p>编写一个程序，找到两个单链表相交的起始节点。</p>
+<p>如下面的两个链表：</p>
+<p><img src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/12/14/160_statement.png" alt="解释"></p>
+<p>在节点 c1 开始相交。</p>
+<p>示例 1：</p>
+<p><img src="https://assets.leetcode.com/uploads/2018/12/13/160_example_1.png" alt="示例1"></p>
+<p>输入：intersectVal = 8, listA = [4,1,8,4,5], listB = [5,0,1,8,4,5], skipA = 2, skipB = 3<br>输出：Reference of the node with value = 8<br>输入解释：相交节点的值为 8 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [4,1,8,4,5]，链表 B 为 [5,0,1,8,4,5]。在 A 中，相交节点前有 2 个节点；在 B 中，相交节点前有 3 个节点。</p>
+<p>示例 2：</p>
+<p><img src="https://assets.leetcode.com/uploads/2018/12/13/160_example_2.png" alt="示例2"></p>
+<p>输入：intersectVal = 2, listA = [0,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1<br>输出：Reference of the node with value = 2<br>输入解释：相交节点的值为 2 （注意，如果两个列表相交则不能为 0）。从各自的表头开始算起，链表 A 为 [0,9,1,2,4]，链表 B 为 [3,2,4]。在 A 中，相交节点前有 3 个节点；在 B 中，相交节点前有 1 个节点。</p>
+<p>示例 3：</p>
+<p><img src="https://assets.leetcode.com/uploads/2018/12/13/160_example_3.png" alt="示例3"></p>
+<p>输入：intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2<br>输出：null<br>输入解释：从各自的表头开始算起，链表 A 为 [2,6,4]，链表 B 为 [1,5]。由于这两个链表不相交，所以 intersectVal 必须为 0，而 skipA 和 skipB 可以是任意值。<br>解释：这两个链表不相交，因此返回 null。</p>
+<h4 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h4><blockquote>
+<p>链表 A</p>
 </blockquote>
-<ol>
-<li><p>执行命令<code>solr create -c {collection_name}</code>(我的collection名称为listing_new)</p>
-</li>
-<li><p>然后我们进入<code>/solr-7.3.0/srever/solr</code>中，会找到我们刚刚创建的collection</p>
-</li>
-</ol>
+<p>[4] -&gt; [1] -&gt; {8} -&gt; {4} -&gt; {5}</p>
 <blockquote>
-<p>collection设置</p>
+<p>链表 B</p>
 </blockquote>
-<ol>
-<li>进入该collection目录里面的conf目录，会看到<code>managed-schema</code>文件，这个文件是用来定义导入solr的数据，数据定义部分如图所示</li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-3.png" alt="managed-schema文件内容"></p>
-<ol start="2">
-<li>然后我们会退到{collection_name}目录下，创建<code>solr-data-config.xmnl</code>用于定义导入数据的一些操作</li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-4.png" alt="solr-data-config.xml"></p>
-<ol start="3">
-<li>接着，我们进入{collection_name}/conf目录下，找到solrconfig.xml文件，打开并编辑，将我们刚刚创建的<code>solr-data-config.xml</code>文件导入到配置文件中去</li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-5.png" alt="solrconfig.xml"></p>
-<h4 id="数据导入"><a href="#数据导入" class="headerlink" title="数据导入"></a>数据导入</h4><ol>
-<li>数据导入方面我用的是传统关系型数据库MySQL，然后创建数据库-表，然后自己导入一些数据，等等这些数据将要被导入到solr中{如果是中文的话需要提前进行中文分词}。然后打开网页<code>http://127.0.0.1:8983</code>，然后在<code>core</code>的选项框中选中<code>listing_new</code></li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-6.png" alt="core-listing_new"></p>
-<ol start="2">
-<li>选中该collection之后，我们会看到DataImport这个选项，点击这个选项，会看到这个页面</li>
-</ol>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-7.png" alt="DataImport"></p>
-<p>然后执行execute，等待最后数据导入成功</p>
-<h4 id="查看"><a href="#查看" class="headerlink" title="查看"></a>查看</h4><p>在DataImport的同级目录下找到<code>Query</code>这个功能，接着你就可以在这里体验下你的搜索引擎了</p>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-10-8.png" alt="Query"></p>
-<h4 id="哔哩哔哩视频演示"><a href="#哔哩哔哩视频演示" class="headerlink" title="哔哩哔哩视频演示"></a>哔哩哔哩视频演示</h4><p><a href="https://www.bilibili.com/video/av24486975/" target="_blank" rel="noopener">solr搜索引擎初识</a></p>
-
+<p>[5] -&gt; [0] -&gt; [1] -&gt; {8} -&gt; {4} -&gt; {5}</p>
+<p>可以看出，链表A与链表B的第一个交点是<code>{8}</code>这个Node，因此，我们可以假设在链表A中，<code>{8}</code>节点之前的长度为<code>x</code>，<code>{8}</code>节点以及之后的节点长度为<code>y</code>；而链表B中，<code>{8}</code>节点之前的长度为<code>z</code>，<code>{8}</code>节点以及之后的节点长度为<code>y</code>（公共）。</p>
+<p>然后我们对链表A和链表B做一些操作（链表B拼接在链表A结尾，链表A拼接在链表B结尾）</p>
+<blockquote>
+<p>new 链表 A</p>
+</blockquote>
+<p>[4] -&gt; [1] -&gt; {8} -&gt; {4} -&gt; {5} -&gt; [5] -&gt; [0] -&gt; [1] -&gt; {8} -&gt; {4} -&gt; {5}</p>
+<p>|&lt;——–链表A———-&gt;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&lt;————链表B————&gt;|</p>
+<p>|<--x-->|&nbsp;&nbsp;&nbsp;&nbsp;|<------y----->|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<-----z----->|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<------y----->|</------y-----></-----z-----></------y-----></--x--></p>
+<blockquote>
+<p>new 链表 B</p>
+</blockquote>
+<p>[5] -&gt; [0] -&gt; [1] -&gt; {8} -&gt; {4} -&gt; {5} -&gt; [4] -&gt; [1] -&gt; {8} -&gt; {4} -&gt; {5}</p>
+<p>|&lt;————链表B————&gt;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&lt;——–链表A———-&gt;|</p>
+<p>|<-----z----->|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<-----y------>|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<--x-->|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<------y----->|</------y-----></--x--></-----y------></-----z-----></p>
+<p>可以发现，我们找到了第一个交点<code>{8}</code>，这个时候就用到了我们上面假设的长度</p>
+<blockquote>
+<p>对于链表A</p>
+</blockquote>
+<p>x + y + z + y</p>
+<blockquote>
+<p>对于链表B</p>
+</blockquote>
+<p>z + y + x + y</p>
+<p>可以看出，通过拼接后，我们实现了将公共部分的链表放在了最后，并且在两个链表中的起始位置都相同，都在<code>(x + y + z)</code>长度后出现</p>
+<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ListNode</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> val;</span><br><span class="line">    ListNode next = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    ListNode(<span class="keyword">int</span> val) &#123;</span><br><span class="line">        <span class="keyword">this</span>.val = val;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ListNode <span class="title">FindFirstCommonNode</span><span class="params">(ListNode pHead1, ListNode pHead2)</span> </span>&#123;</span><br><span class="line">        ListNode pA = pHead1;</span><br><span class="line">        ListNode pB = pHead2;</span><br><span class="line">        <span class="keyword">if</span> (pA == <span class="keyword">null</span> &amp;&amp; pB == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (pA != <span class="keyword">null</span> &amp;&amp; pB != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((pA.val == pB.val &amp;&amp; !pA.equals(pB)) || pA.val != pB.val) &#123;</span><br><span class="line">                <span class="keyword">if</span> (pA.next != <span class="keyword">null</span> &amp;&amp; pB.next != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    pA = pA.next;</span><br><span class="line">                    pB = pB.next;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (pA.next == <span class="keyword">null</span> &amp;&amp; pB.next != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    pA = pHead2;</span><br><span class="line">                    pB = pB.next;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (pA.next != <span class="keyword">null</span> &amp;&amp; pB.next == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    pA = pA.next;</span><br><span class="line">                    pB = pHead1;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">return</span> pA;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> pA;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -491,12 +471,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/solr/" rel="tag"># solr</a>
-          
-        </div>
-      
 
       
       
@@ -506,8 +480,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/05/04/java-web-8/" rel="next" title="SpringBoot集成SpringSecurity Oauth2">
-                <i class="fa fa-chevron-left"></i> SpringBoot集成SpringSecurity Oauth2
+              <a href="/2019/04/06/leetcode-21/" rel="next" title="leetcode回顾——[946] 验证栈序列">
+                <i class="fa fa-chevron-left"></i> leetcode回顾——[946] 验证栈序列
               </a>
             
           </div>
@@ -515,10 +489,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/06/15/java-web-11/" rel="prev" title="手动实现spring中的@RequestMapping注解">
-                手动实现spring中的@RequestMapping注解 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -712,7 +682,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#什么是solr"><span class="nav-number">1.</span> <span class="nav-text">什么是solr</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#引用于维基百科"><span class="nav-number"></span> <span class="nav-text">引用于维基百科</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#搭建solr"><span class="nav-number">1.</span> <span class="nav-text">搭建solr</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数据导入"><span class="nav-number">2.</span> <span class="nav-text">数据导入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看"><span class="nav-number">3.</span> <span class="nav-text">查看</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#哔哩哔哩视频演示"><span class="nav-number">4.</span> <span class="nav-text">哔哩哔哩视频演示</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#题解"><span class="nav-number">2.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AC代码"><span class="nav-number">3.</span> <span class="nav-text">AC代码</span></a></li></ol></div>
             
 
           </div>

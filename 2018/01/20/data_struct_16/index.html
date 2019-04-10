@@ -115,12 +115,12 @@
 <meta property="og:site_name" content="唉&#39;s Blog">
 <meta property="og:description" content="这两天看了下爬虫的技术，其中，爬虫有一项很重要的注意事项——过滤掉已经爬取过的URL地址。那么，这个过滤要怎么实现呢？参照之前的文章，或许我们可以维护两个队列，一个队列为保存已经访问过的URL地址，另一个队列为保存尚待爬取的URL地址，这样我们只需要把将要爬取URL地址去一访问的URL地址队列中查找，如果存在，那么就将这个URL地址入队到待爬取URL地址的队列中去。这样感觉很完美，但是，这样的时间">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="http://120.24.90.180/blog/image/data_struct/data_struct_16.png">
-<meta property="og:updated_time" content="2018-01-21T05:28:12.000Z">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/data_struct/data_struct_16.png">
+<meta property="og:updated_time" content="2019-04-10T02:47:21.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Bloom Filter">
 <meta name="twitter:description" content="这两天看了下爬虫的技术，其中，爬虫有一项很重要的注意事项——过滤掉已经爬取过的URL地址。那么，这个过滤要怎么实现呢？参照之前的文章，或许我们可以维护两个队列，一个队列为保存已经访问过的URL地址，另一个队列为保存尚待爬取的URL地址，这样我们只需要把将要爬取URL地址去一访问的URL地址队列中查找，如果存在，那么就将这个URL地址入队到待爬取URL地址的队列中去。这样感觉很完美，但是，这样的时间">
-<meta name="twitter:image" content="http://120.24.90.180/blog/image/data_struct/data_struct_16.png">
+<meta name="twitter:image" content="http://120.24.90.180:8080/blog/image/data_struct/data_struct_16.png">
 
 
 
@@ -366,7 +366,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2018-01-21 13:28:12" itemprop="dateModified" datetime="2018-01-21T13:28:12+08:00">2018-01-21</time>
+                <time title="Modified: 2019-04-10 10:47:21" itemprop="dateModified" datetime="2019-04-10T10:47:21+08:00">2019-04-10</time>
               
             
           </span>
@@ -418,7 +418,7 @@
 
       
         <p>这两天看了下爬虫的技术，其中，爬虫有一项很重要的注意事项——过滤掉已经爬取过的URL地址。那么，这个过滤要怎么实现呢？参照之前的文章，或许我们可以维护两个队列，一个队列为保存已经访问过的URL地址，另一个队列为保存尚待爬取的URL地址，这样我们只需要把将要爬取URL地址去一访问的URL地址队列中查找，如果存在，那么就将这个URL地址入队到待爬取URL地址的队列中去。这样感觉很完美，但是，这样的时间开销对于大型爬虫程序是难以承受的，队列的查找再怎么快都需要 O(log2N)[ 折半查找、插值查找、斐波那契查找 ]；这个时候Hash表查找或许会是一个不错的方案，我们用一个数组来存储URL地址信息，如果这个URL爬取了，那么我们将这个URL地址利用Hash表存储，届时如果我们需要查找某一个URL地址是否被访问过，只要需要利用Hash查找，几乎可以在 O(1) 的时间开销内查找到结果，但是呢，这还是不够，就有了今天说要讲的数据结构—— <a href="https://zh.wikipedia.org/wiki/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8" target="_blank" rel="noopener"><code>Bloom Filter</code></a></p>
-<p><img src="http://120.24.90.180/blog/image/data_struct/data_struct_16.png" alt="data_struct_16"></p>
+<p><img src="http://120.24.90.180:8080/blog/image/data_struct/data_struct_16.png" alt="data_struct_16"></p>
 <p><code>Bloom Filter</code>其实原理其实就是Hash散列表，只不过由一个Hash函数转为多个Hash函数，并且不需要存储实际URL地址数据。那么<code>Bloom Filter</code>是如何实现的呢？<code>Bloom Filter</code>是利用K个互不相关的Hash函数以及一个长度为m，默认值为0的位数组，通过将长度为l的数组s中的每一个元素映射到位数组中去，只要被映射到，那么位数组对应的数据就变为1，这就是<code>Bloom Filter</code>的实现，查找的时候，通过计算并查看对应位数组中的值是1还是0，如果都是1就代表元素存在，否则只要有一个0，就否定了该元素的存在性。</p>
 <blockquote>
 <p>Bloom Filter 代码实现</p>
@@ -527,7 +527,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">76</span>
+                    <span class="site-state-item-count">77</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>

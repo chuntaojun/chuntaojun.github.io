@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前提在使用数据库ORM框架的时候，通过一些配置，使得ORM能够将查出来的数据转为我们想要的Java对象，虽然大致原理是通过Java本身的反射机制获取相应的方法，生成对象、注入值到对象相应的field，其原理就类似java注解原生模仿@ModelAttribute功能 分析Mybatis如何将数据库查出的数据转为Java对象在xml中定一个了ResultMap用于映射Java对象与数据库表字段的关">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MyBatis源码解析—————序列化实体的原理">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/04/05/java-web-27/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="前提在使用数据库ORM框架的时候，通过一些配置，使得ORM能够将查出来的数据转为我们想要的Java对象，虽然大致原理是通过Java本身的反射机制获取相应的方法，生成对象、注入值到对象相应的field，其原理就类似java注解原生模仿@ModelAttribute功能 分析Mybatis如何将数据库查出的数据转为Java对象在xml中定一个了ResultMap用于映射Java对象与数据库表字段的关">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-04-15T06:30:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MyBatis源码解析—————序列化实体的原理">
+<meta name="twitter:description" content="前提在使用数据库ORM框架的时候，通过一些配置，使得ORM能够将查出来的数据转为我们想要的Java对象，虽然大致原理是通过Java本身的反射机制获取相应的方法，生成对象、注入值到对象相应的field，其原理就类似java注解原生模仿@ModelAttribute功能 分析Mybatis如何将数据库查出的数据转为Java对象在xml中定一个了ResultMap用于映射Java对象与数据库表字段的关">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/04/05/java-web-27/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MyBatis源码解析—————序列化实体的原理 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/04/05/java-web-27/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MyBatis源码解析—————序列化实体的原理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-04-05 19:06:34" itemprop="dateCreated datePublished" datetime="2019-04-05T19:06:34+08:00">2019-04-05</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-15 14:30:36" itemprop="dateModified" datetime="2019-04-15T14:30:36+08:00">2019-04-15</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="前提"><a href="#前提" class="headerlink" title="前提"></a>前提</h4><p>在使用数据库<code>ORM</code>框架的时候，通过一些配置，使得<code>ORM</code>能够将查出来的数据转为我们想要的Java对象，虽然大致原理是通过Java本身的反射机制获取相应的方法，生成对象、注入值到对象相应的<code>field</code>，其原理就类似<a href="https://www.liaochuntao.cn/2017/12/20/java_web_5/">java注解原生模仿@ModelAttribute功能</a></p>
+<h4 id="分析Mybatis如何将数据库查出的数据转为Java对象"><a href="#分析Mybatis如何将数据库查出的数据转为Java对象" class="headerlink" title="分析Mybatis如何将数据库查出的数据转为Java对象"></a>分析Mybatis如何将数据库查出的数据转为Java对象</h4><p>在xml中定一个了ResultMap用于映射Java对象与数据库表字段的关系，因此在MyBatis中用ResultMap对象去保存xml中写的resultmap，而<code>Class&lt;?&gt; type</code>这个属性就是代表查出的数据库数据要转为哪个Java对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ResultMap</span> </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">// 重要的属性，表明要转为查出的数据库数据要转为哪个Java对象</span></span><br><span class="line">  <span class="keyword">private</span> Class&lt;?&gt; type;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong><em>第一步</em></strong></p>
+<p>这是将数据库数据转为Java对象最终的方法！该方法通过<code>ResultSetWrapper</code>、<code>ResultMap</code>创建一个成员属性都为默认值的Java对象，在进行映射时，有两次机会，第一次是判断是否可以自动映射将查出来的数据自动注入到实体中，如果可以，则将数据注入到<code>metaObject</code>中；第二次是如果没法通过自动映射解决，则通过<code>xml</code>文件中配置的<code>resultMap</code>进行数据映射</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">getRowValue</span><span class="params">(ResultSetWrapper rsw, ResultMap resultMap)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  <span class="keyword">final</span> ResultLoaderMap lazyLoader = <span class="keyword">new</span> ResultLoaderMap();</span><br><span class="line">  Object rowValue = createResultObject(rsw, resultMap, lazyLoader, <span class="keyword">null</span>);</span><br><span class="line">  <span class="keyword">if</span> (rowValue != <span class="keyword">null</span> &amp;&amp; !hasTypeHandlerForResultObject(rsw, resultMap.getType())) &#123;</span><br><span class="line">    <span class="keyword">final</span> MetaObject metaObject = configuration.newMetaObject(rowValue);</span><br><span class="line">    <span class="keyword">boolean</span> foundValues = <span class="keyword">this</span>.useConstructorMappings;</span><br><span class="line">    <span class="keyword">if</span> (shouldApplyAutomaticMappings(resultMap, <span class="keyword">false</span>)) &#123;</span><br><span class="line">      foundValues = applyAutomaticMappings(rsw, resultMap, metaObject, <span class="keyword">null</span>) || foundValues;</span><br><span class="line">    &#125;</span><br><span class="line">    foundValues = applyPropertyMappings(rsw, resultMap, metaObject, lazyLoader, <span class="keyword">null</span>) || foundValues;</span><br><span class="line">    foundValues = lazyLoader.size() &gt; <span class="number">0</span> || foundValues;</span><br><span class="line">    rowValue = foundValues || configuration.isReturnInstanceForEmptyRow() ? rowValue : <span class="keyword">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> rowValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong><em>第二步</em></strong></p>
+<p>创建出一个对应的Java对象，同时根据懒加载策略进行相应的对象代理；如果存在懒加载策略，则返回的是一个代理对象，用于拦截方法（一般是属性的<code>get</code>方法），通过方法拦截实现懒加载，具体懒加载的实现可以看这篇：<a href="https://www.liaochuntao.cn/2019/03/03/java-web-26/">MyBatis延迟加载的简易实现</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">createResultObject</span><span class="params">(ResultSetWrapper rsw, ResultMap resultMap, ResultLoaderMap lazyLoader, String columnPrefix)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.useConstructorMappings = <span class="keyword">false</span>; <span class="comment">// reset previous mapping result</span></span><br><span class="line">  <span class="keyword">final</span> List&lt;Class&lt;?&gt;&gt; constructorArgTypes = <span class="keyword">new</span> ArrayList&lt;Class&lt;?&gt;&gt;();</span><br><span class="line">  <span class="keyword">final</span> List&lt;Object&gt; constructorArgs = <span class="keyword">new</span> ArrayList&lt;Object&gt;();</span><br><span class="line">  Object resultObject = createResultObject(rsw, resultMap, constructorArgTypes, constructorArgs, columnPrefix);</span><br><span class="line">  <span class="keyword">if</span> (resultObject != <span class="keyword">null</span> &amp;&amp; !hasTypeHandlerForResultObject(rsw, resultMap.getType())) &#123;</span><br><span class="line">    <span class="keyword">final</span> List&lt;ResultMapping&gt; propertyMappings = resultMap.getPropertyResultMappings();</span><br><span class="line">    <span class="keyword">for</span> (ResultMapping propertyMapping : propertyMappings) &#123;</span><br><span class="line">      <span class="comment">// issue gcode #109 &amp;&amp; issue #149</span></span><br><span class="line">      <span class="keyword">if</span> (propertyMapping.getNestedQueryId() != <span class="keyword">null</span> &amp;&amp; propertyMapping.isLazy()) &#123;</span><br><span class="line">        resultObject = configuration.getProxyFactory().createProxy(resultObject, lazyLoader, configuration, objectFactory, constructorArgTypes, constructorArgs);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">this</span>.useConstructorMappings = resultObject != <span class="keyword">null</span> &amp;&amp; !constructorArgTypes.isEmpty(); <span class="comment">// set current mapping result</span></span><br><span class="line">  <span class="keyword">return</span> resultObject;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong><em>第三步</em></strong></p>
+<p>其核心实现是通过反射实现，而从传参可知，MyBatis支持在没有无参构造函数的情况下能够通过有参的构造函数去反射实例化一个对象出来，因为Java语言里，一切都是对象，因此类的构造函数也是一个对象——<code>Constructor</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Object <span class="title">createResultObject</span><span class="params">(ResultSetWrapper rsw, ResultMap resultMap, List&lt;Class&lt;?&gt;&gt; constructorArgTypes, List&lt;Object&gt; constructorArgs, String columnPrefix)</span></span></span><br><span class="line"><span class="function">      <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  <span class="keyword">final</span> Class&lt;?&gt; resultType = resultMap.getType();</span><br><span class="line">  <span class="keyword">final</span> MetaClass metaType = MetaClass.forClass(resultType, reflectorFactory);</span><br><span class="line">  <span class="keyword">final</span> List&lt;ResultMapping&gt; constructorMappings = resultMap.getConstructorResultMappings();</span><br><span class="line">  <span class="keyword">if</span> (hasTypeHandlerForResultObject(rsw, resultType)) &#123;</span><br><span class="line">    <span class="keyword">return</span> createPrimitiveResultObject(rsw, resultMap, columnPrefix);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!constructorMappings.isEmpty()) &#123;</span><br><span class="line">    <span class="keyword">return</span> createParameterizedResultObject(rsw, resultType, constructorMappings, constructorArgTypes, constructorArgs, columnPrefix);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (resultType.isInterface() || metaType.hasDefaultConstructor()) &#123;</span><br><span class="line">    <span class="comment">// 默认构造函数，也就是无参构造函数</span></span><br><span class="line">    <span class="keyword">return</span> objectFactory.create(resultType);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (shouldApplyAutomaticMappings(resultMap, <span class="keyword">false</span>)) &#123;</span><br><span class="line">    <span class="keyword">return</span> createByConstructorSignature(rsw, resultType, constructorArgTypes, constructorArgs, columnPrefix);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">throw</span> <span class="keyword">new</span> ExecutorException(<span class="string">"Do not know how to create an instance of "</span> + resultType);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong><em>第四步</em></strong></p>
+<p>通过前面的几个步骤获得了一个初始化的对象，然后需要把数据库查出来的数据注入到对象中去</p>
+<blockquote>
+<p>applyAutomaticMappings</p>
+</blockquote>
+<p><code>applyAutomaticMappings</code>函数是将查出来的数据注入到Java对象中的<code>field</code>中的一种方法，它的策略是Java对象的属性名能够与数据库字段名称自动化映射过去。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">applyAutomaticMappings</span><span class="params">(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, String columnPrefix)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  List&lt;UnMappedColumnAutoMapping&gt; autoMapping = createAutomaticMappings(rsw, resultMap, metaObject, columnPrefix);</span><br><span class="line">  <span class="keyword">boolean</span> foundValues = <span class="keyword">false</span>;</span><br><span class="line">  <span class="comment">// 是否存在自动映射，如果存在就根据自动映射将数据注入对应的类Field中</span></span><br><span class="line">  <span class="keyword">if</span> (!autoMapping.isEmpty()) &#123;</span><br><span class="line">    <span class="keyword">for</span> (UnMappedColumnAutoMapping mapping : autoMapping) &#123;</span><br><span class="line">      <span class="keyword">final</span> Object value = mapping.typeHandler.getResult(rsw.getResultSet(), mapping.column);</span><br><span class="line">      <span class="keyword">if</span> (value != <span class="keyword">null</span>) &#123;</span><br><span class="line">        foundValues = <span class="keyword">true</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (value != <span class="keyword">null</span> || (configuration.isCallSettersOnNulls() &amp;&amp; !mapping.primitive)) &#123;</span><br><span class="line">        <span class="comment">// gcode issue #377, call setter on nulls (value is not 'found')</span></span><br><span class="line">        metaObject.setValue(mapping.property, value);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> foundValues;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>applyPropertyMappings</p>
+</blockquote>
+<p>mybatis最重要的特性就是通过xml配置Java对象与数据库表实现字段映射的关系，并且无论自动映射成功与否，<code>applyPropertyMappings</code>都会执行，通过xml中定义的映射关系将查处的数据注入到Java对象中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">applyPropertyMappings</span><span class="params">(ResultSetWrapper rsw, ResultMap resultMap, MetaObject metaObject, ResultLoaderMap lazyLoader, String columnPrefix)</span></span></span><br><span class="line"><span class="function">      <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">  <span class="keyword">final</span> List&lt;String&gt; mappedColumnNames = rsw.getMappedColumnNames(resultMap, columnPrefix);</span><br><span class="line">  <span class="keyword">boolean</span> foundValues = <span class="keyword">false</span>;</span><br><span class="line">  <span class="keyword">final</span> List&lt;ResultMapping&gt; propertyMappings = resultMap.getPropertyResultMappings();</span><br><span class="line">  <span class="keyword">for</span> (ResultMapping propertyMapping : propertyMappings) &#123;</span><br><span class="line">    String column = prependPrefix(propertyMapping.getColumn(), columnPrefix);</span><br><span class="line">    <span class="keyword">if</span> (propertyMapping.getNestedResultMapId() != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="comment">// the user added a column attribute to a nested result map, ignore it</span></span><br><span class="line">      column = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (propertyMapping.isCompositeResult()</span><br><span class="line">          || (column != <span class="keyword">null</span> &amp;&amp; mappedColumnNames.contains(column.toUpperCase(Locale.ENGLISH)))</span><br><span class="line">          || propertyMapping.getResultSet() != <span class="keyword">null</span>) &#123;</span><br><span class="line">      Object value = getPropertyMappingValue(rsw.getResultSet(), metaObject, propertyMapping, lazyLoader, columnPrefix);</span><br><span class="line">      <span class="comment">// issue #541 make property optional</span></span><br><span class="line">      <span class="keyword">final</span> String property = propertyMapping.getProperty();</span><br><span class="line">      <span class="keyword">if</span> (property == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (value == DEFERRED) &#123;</span><br><span class="line">        foundValues = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (value != <span class="keyword">null</span>) &#123;</span><br><span class="line">        foundValues = <span class="keyword">true</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (value != <span class="keyword">null</span> || (configuration.isCallSettersOnNulls() &amp;&amp; !metaObject.getSetterType(property).isPrimitive())) &#123;</span><br><span class="line">        <span class="comment">// gcode issue #377, call setter on nulls (value is not 'found')</span></span><br><span class="line">        metaObject.setValue(property, value);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> foundValues;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/17/leetcode-20/" rel="next" title="leetcode回顾——[384] Shuffle an Array">
+                <i class="fa fa-chevron-left"></i> leetcode回顾——[384] Shuffle an Array
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/06/leetcode-21/" rel="prev" title="leetcode回顾——[946] 验证栈序列">
+                leetcode回顾——[946] 验证栈序列 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">78</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前提"><span class="nav-number">1.</span> <span class="nav-text">前提</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分析Mybatis如何将数据库查出的数据转为Java对象"><span class="nav-number">2.</span> <span class="nav-text">分析Mybatis如何将数据库查出的数据转为Java对象</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

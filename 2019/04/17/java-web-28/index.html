@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="扔上我的项目地址go-fork-join 简易原理 什么是ForkJoin   接触到ForkJoin框架是因为学习Java中的Stream中的并行流，并行流的底层就是借助ForkJoin框架   ForkJoin框架更适合现在CPU多核的机器，一般用于处理可以将一个大任务分解成数个互相没有依赖性的小任务，利用分治的策略，将任务不断变小，将这些小任务分发到CPU的核中，将子任务并行运行，大大加快任">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何用Golang实现一个简单的ForkJoin框架">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/04/17/java-web-28/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="扔上我的项目地址go-fork-join 简易原理 什么是ForkJoin   接触到ForkJoin框架是因为学习Java中的Stream中的并行流，并行流的底层就是借助ForkJoin框架   ForkJoin框架更适合现在CPU多核的机器，一般用于处理可以将一个大任务分解成数个互相没有依赖性的小任务，利用分治的策略，将任务不断变小，将这些小任务分发到CPU的核中，将子任务并行运行，大大加快任">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-28-1.png">
+<meta property="og:updated_time" content="2019-04-21T06:21:48.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="如何用Golang实现一个简单的ForkJoin框架">
+<meta name="twitter:description" content="扔上我的项目地址go-fork-join 简易原理 什么是ForkJoin   接触到ForkJoin框架是因为学习Java中的Stream中的并行流，并行流的底层就是借助ForkJoin框架   ForkJoin框架更适合现在CPU多核的机器，一般用于处理可以将一个大任务分解成数个互相没有依赖性的小任务，利用分治的策略，将任务不断变小，将这些小任务分发到CPU的核中，将子任务并行运行，大大加快任">
+<meta name="twitter:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-28-1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/04/17/java-web-28/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>如何用Golang实现一个简单的ForkJoin框架 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/04/17/java-web-28/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">如何用Golang实现一个简单的ForkJoin框架
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-04-17 17:49:04" itemprop="dateCreated datePublished" datetime="2019-04-17T17:49:04+08:00">2019-04-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-04-21 14:21:48" itemprop="dateModified" datetime="2019-04-21T14:21:48+08:00">2019-04-21</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="扔上我的项目地址"><a href="#扔上我的项目地址" class="headerlink" title="扔上我的项目地址"></a>扔上我的项目地址</h4><p><a href="https://github.com/chuntaojun/go-fork-join" target="_blank" rel="noopener">go-fork-join</a></p>
+<h4 id="简易原理"><a href="#简易原理" class="headerlink" title="简易原理"></a>简易原理</h4><ul>
+<li><p>什么是ForkJoin</p>
+<p>  接触到<code>ForkJoin</code>框架是因为学习<code>Java</code>中的<code>Stream</code>中的并行流，并行流的底层就是借助<code>ForkJoin</code>框架</p>
+<p>  <code>ForkJoin</code>框架更适合现在CPU多核的机器，一般用于处理可以将一个大任务分解成数个互相没有依赖性的小任务，利用分治的策略，将任务不断变小，将这些小任务分发到CPU的核中，将子任务并行运行，大大加快任务处理速度</p>
+<p>  具体的很多博客上说的都很不错，这里也不细说了，给几个我当时学习的博客地址吧</p>
+<ul>
+<li><a href="https://juejin.im/post/5b5848fbf265da0fad0d0aa4" target="_blank" rel="noopener">https://juejin.im/post/5b5848fbf265da0fad0d0aa4</a></li>
+<li></li>
+</ul>
+</li>
+<li><p>任务偷窃</p>
+<p>  任务偷窃算法其实就是<code>Worker</code>可以从自己对应的工作队列头部或者其他<code>Worker</code>的工作队列尾部获取元素。</p>
+<p>  每次在轮询任务队列时，先从每个<code>Worker</code>对应的任务队列中去获取任务，如果发现任务队列此时没有待处理的任务，那么这个时候就会采用随机选取策略，随机选择一个<code>Worker</code>对应的工作队列，去窃取它的任务</p>
+</li>
+<li><p>Join子任务结果</p>
+<p>  在Java中需要去不断的获取任务的执行情况，如果任务执行完就返回任务处理的结果；而在Golang中，由于chan的存在，使得Java的Future模式非常容易实现，只需要任务Join的时候去读取通道就可以，因为当我们把chan的cap设置为1时，如果通道中没有数据，读取一方是会被阻塞等待的</p>
+</li>
+</ul>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(f *ForkJoinTask)</span> <span class="title">Join</span><span class="params">()</span> <span class="params">(<span class="keyword">bool</span>, <span class="keyword">interface</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="keyword">select</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> data, ok := &lt;-f.result:</span><br><span class="line">			<span class="keyword">if</span> ok &#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="literal">true</span>, data</span><br><span class="line">			&#125;</span><br><span class="line">		<span class="keyword">case</span> &lt;-f.ctx.Done():</span><br><span class="line">			<span class="built_in">panic</span>(f.taskPool.err)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="核心代码"><a href="#核心代码" class="headerlink" title="核心代码"></a>核心代码</h4><blockquote>
+<p>任务队列</p>
+</blockquote>
+<p>对任务队列进行遍历操作。任务队列不止一个，而是存在多个任务队列，每次都会从这些任务队列中获取一个任务出来，如果任务存在则将任务包装成一个结构体；在获取到任务后，就是获取一个任务的执行者<code>worker</code>了，随后将包装好的任务送入<code>Worker</code>的chan通道中异步发送任务</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(fp *ForkJoinPool)</span> <span class="title">run</span><span class="params">(ctx context.Context)</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		wId := <span class="keyword">int32</span>(<span class="number">0</span>)</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			<span class="keyword">select</span> &#123;</span><br><span class="line">			<span class="keyword">case</span> &lt;-ctx.Done():</span><br><span class="line">				fmt.Printf(<span class="string">"here is err"</span>)</span><br><span class="line">				fp.err = fp.wp.err</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">			<span class="keyword">default</span>:</span><br><span class="line">				hasTask, job, ft := fp.taskQueue.dequeueByTali(wId)</span><br><span class="line">				<span class="keyword">if</span> hasTask &#123;</span><br><span class="line">					fp.wp.Submit(ctx, &amp;<span class="keyword">struct</span> &#123;</span><br><span class="line">						T Task</span><br><span class="line">						F *ForkJoinTask</span><br><span class="line">						C context.Context</span><br><span class="line">					&#125;&#123;T: job, F: ft, C: ctx&#125;)</span><br><span class="line">				&#125;</span><br><span class="line">				wId = (wId + <span class="number">1</span>) % fp.<span class="built_in">cap</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>获取一个Worker</p>
+</blockquote>
+<p>在<code>ForkJoin</code>初始化的时候，根据CPU核数对<code>Worker</code>池进行初始化操作</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">newPool</span><span class="params">(ctx context.Context, cancel context.CancelFunc)</span> *<span class="title">Pool</span></span> &#123;</span><br><span class="line">	...</span><br><span class="line">	wCnt := runtime.NumCPU()</span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; wCnt; i ++ &#123;</span><br><span class="line">		w := newWorker(p)</span><br><span class="line">		w.run(ctx)</span><br><span class="line">		p.workers = <span class="built_in">append</span>(p.workers, w)</span><br><span class="line">	&#125;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>随后，处理任务肯定需要一个对应的worker去执行的，因此每次在获取<code>worker</code>时，会先去<code>worker</code>池中判断是否还存在空闲的<code>worker</code>，如果存在就直接获取一个<code>worker</code>，否则直接创建一个<code>worker</code>进行接受任务</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *Pool)</span> <span class="title">retrieveWorker</span><span class="params">(ctx context.Context)</span> *<span class="title">Worker</span></span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> w *Worker</span><br><span class="line"></span><br><span class="line">	idleWorker := p.workers</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(idleWorker) &gt;= <span class="number">1</span> &#123;</span><br><span class="line">		p.lock.Lock()</span><br><span class="line">		n := <span class="built_in">len</span>(idleWorker) - <span class="number">1</span></span><br><span class="line">		w = idleWorker[n]</span><br><span class="line">		p.workers = idleWorker[:n]</span><br><span class="line">		p.lock.Unlock()</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> cacheWorker := p.workerCache.Get(); cacheWorker != <span class="literal">nil</span> &#123;</span><br><span class="line">			w = cacheWorker.(*Worker)</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			w = &amp;Worker&#123;</span><br><span class="line">				pool: p,</span><br><span class="line">				job: <span class="built_in">make</span>(<span class="keyword">chan</span> *<span class="keyword">struct</span> &#123;</span><br><span class="line">					T Task</span><br><span class="line">					F *ForkJoinTask</span><br><span class="line">					C context.Context</span><br><span class="line">				&#125;, <span class="number">1</span>),</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		w.run(ctx)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> w</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Worker</p>
+</blockquote>
+<p>真正执行任务的对象，每个<code>worker</code>绑定一个<code>goruntine</code>，并且有一个<code>chan</code>通道，用于异步接收任务以及在<code>goruntine</code>中异步将任务取出并执行；当任务执行完后，将<code>worker</code>返回到<code>worker</code>池中</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(w *Worker)</span> <span class="title">run</span><span class="params">(ctx context.Context)</span></span> &#123;</span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">var</span> tmpTask *ForkJoinTask</span><br><span class="line"></span><br><span class="line">		<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="keyword">if</span> p := <span class="built_in">recover</span>(); p != <span class="literal">nil</span> &#123;</span><br><span class="line">				w.pool.panicHandler(p)</span><br><span class="line">				<span class="keyword">if</span> tmpTask != <span class="literal">nil</span> &#123;</span><br><span class="line">					w.pool.err = p</span><br><span class="line">					<span class="built_in">close</span>(tmpTask.result)</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			<span class="keyword">select</span> &#123;</span><br><span class="line">			<span class="keyword">case</span> &lt;-ctx.Done():</span><br><span class="line">				fmt.Println(<span class="string">"An exception occurred and the task has stopped"</span>)</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">			<span class="keyword">default</span>:</span><br><span class="line">				<span class="keyword">for</span> job := <span class="keyword">range</span> w.job &#123;</span><br><span class="line">					<span class="keyword">if</span> job == <span class="literal">nil</span> &#123;</span><br><span class="line">						w.pool.workerCache.Put(w)</span><br><span class="line">						<span class="keyword">return</span></span><br><span class="line">					&#125;</span><br><span class="line">					tmpTask = job.F</span><br><span class="line">					job.F.result &lt;- job.T.Compute()</span><br><span class="line">					w.pool.releaseWorker(w)</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="成果"><a href="#成果" class="headerlink" title="成果"></a>成果</h4><p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-28-1.png" alt="benchtest"></p>
+<h4 id="正在改进的地方"><a href="#正在改进的地方" class="headerlink" title="正在改进的地方"></a>正在改进的地方</h4><ul>
+<li><p>任务偷窃算法</p>
+<p>  目前v0.1的任务偷窃算法并不能说像Java的ForkJoin那样，支持两个worker同时从一个队列中获取任务，而是在获取任务的时候锁住整个队列，因此并发性能不太好，目前正在采用CAS去替换悲观锁，实现两个Worker可同时读取一个队列中的数据，如果两<code>Worker</code>同时向一个长度只有1的任务队列获取元素，则乐观锁上升为悲观锁进行控制</p>
+</li>
+</ul>
+<ul>
+<li><p>Worker数量控制</p>
+<p>  目前的Worker数量会随着任务的不断分解而不断创建，如果任务分解过深可能会导致创建大量的<code>Worker</code>，因此还需要继续理解<code>ForkJoin</code>的关于线程资源的调度</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/10/leetcode-22/" rel="next" title="leetcode回顾-[160] Intersection of Two Linked Lists">
+                <i class="fa fa-chevron-left"></i> leetcode回顾-[160] Intersection of Two Linked Lists
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">79</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#扔上我的项目地址"><span class="nav-number">1.</span> <span class="nav-text">扔上我的项目地址</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#简易原理"><span class="nav-number">2.</span> <span class="nav-text">简易原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#核心代码"><span class="nav-number">3.</span> <span class="nav-text">核心代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#成果"><span class="nav-number">4.</span> <span class="nav-text">成果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#正在改进的地方"><span class="nav-number">5.</span> <span class="nav-text">正在改进的地方</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

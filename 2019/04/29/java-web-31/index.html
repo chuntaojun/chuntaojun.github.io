@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Client端实例注册简单分析Nacos是如何进行服务发现以及服务注册的 Nacos Server端是如何注册一个Instance的Nacos Server端负责处理Service、Instance的创建、删除、更改的请求处理器在com.alibaba.nacos.naming.controllers包下的ServiceController以及InstanceController；这次先来解析一个">
+<meta name="keywords" content="nacos">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nacos Server端注册一个服务实例流程">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/04/29/java-web-31/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="Client端实例注册简单分析Nacos是如何进行服务发现以及服务注册的 Nacos Server端是如何注册一个Instance的Nacos Server端负责处理Service、Instance的创建、删除、更改的请求处理器在com.alibaba.nacos.naming.controllers包下的ServiceController以及InstanceController；这次先来解析一个">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-31-1.jpg">
+<meta property="og:updated_time" content="2019-05-03T08:01:26.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nacos Server端注册一个服务实例流程">
+<meta name="twitter:description" content="Client端实例注册简单分析Nacos是如何进行服务发现以及服务注册的 Nacos Server端是如何注册一个Instance的Nacos Server端负责处理Service、Instance的创建、删除、更改的请求处理器在com.alibaba.nacos.naming.controllers包下的ServiceController以及InstanceController；这次先来解析一个">
+<meta name="twitter:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-31-1.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/04/29/java-web-31/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Nacos Server端注册一个服务实例流程 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/04/29/java-web-31/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 commiter">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Nacos Server端注册一个服务实例流程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-04-29 18:10:42" itemprop="dateCreated datePublished" datetime="2019-04-29T18:10:42+08:00">2019-04-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-05-03 16:01:26" itemprop="dateModified" datetime="2019-05-03T16:01:26+08:00">2019-05-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/04/29/java-web-31/" class="leancloud_visitors" data-flag-title="Nacos Server端注册一个服务实例流程">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="Client端实例注册"><a href="#Client端实例注册" class="headerlink" title="Client端实例注册"></a>Client端实例注册</h4><p><a href="https://www.liaochuntao.cn/2019/04/25/java-web-29/">简单分析Nacos是如何进行服务发现以及服务注册的</a></p>
+<h4 id="Nacos-Server端是如何注册一个Instance的"><a href="#Nacos-Server端是如何注册一个Instance的" class="headerlink" title="Nacos Server端是如何注册一个Instance的"></a>Nacos Server端是如何注册一个Instance的</h4><p>Nacos Server端负责处理<code>Service</code>、<code>Instance</code>的创建、删除、更改的请求处理器在<code>com.alibaba.nacos.naming.controllers</code>包下的<code>ServiceController</code>以及<code>InstanceController</code>；这次先来解析一个<code>Instance</code>实例的注册请求在<code>Nacos Server</code>端是怎么被处理的。</p>
+<h4 id="处理Nacos-Client端的instance注册请求"><a href="#处理Nacos-Client端的instance注册请求" class="headerlink" title="处理Nacos Client端的instance注册请求"></a>处理<code>Nacos Client</code>端的<code>instance</code>注册请求</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@CanDistro</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">""</span>, method = RequestMethod.POST)</span><br><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">register</span><span class="params">(HttpServletRequest request)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">    String serviceName = WebUtils.required(request, CommonParams.SERVICE_NAME);</span><br><span class="line">    String namespaceId = WebUtils.optional(request, CommonParams.NAMESPACE_ID, Constants.DEFAULT_NAMESPACE_ID);</span><br><span class="line"></span><br><span class="line">    serviceManager.registerInstance(namespaceId, serviceName, parseInstance(request));</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"ok"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>请求处理器接收到注册<code>Instance</code>的请求后，先获取<code>serviceName</code>以及<code>namespaceId</code>信息，然后调用<code>ServiceManager</code>的<code>registerInstance</code>进行注册，在注册之前，需要先根据请求将<code>Instance</code>进行创建，注意，这里创建出来的<code>Instance</code>可不是之前介绍的在<code>com.alibaba.nacos.api.naming.pojo</code>下的<code>Instance</code>，这里创建的<code>Instance</code>是它的之类，多了很多在<code>Server</code>端需要用到的信息字段</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Instance <span class="title">parseInstance</span><span class="params">(HttpServletRequest request)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">    String serviceName = WebUtils.required(request, CommonParams.SERVICE_NAME);</span><br><span class="line">    String app = WebUtils.optional(request, <span class="string">"app"</span>, <span class="string">"DEFAULT"</span>);</span><br><span class="line">    String metadata = WebUtils.optional(request, <span class="string">"metadata"</span>, StringUtils.EMPTY);</span><br><span class="line"></span><br><span class="line">    Instance instance = getIPAddress(request);</span><br><span class="line">    instance.setApp(app);</span><br><span class="line">    instance.setServiceName(serviceName);</span><br><span class="line">    instance.setInstanceId(instance.generateInstanceId());</span><br><span class="line">    instance.setLastBeat(System.currentTimeMillis());</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isNotEmpty(metadata)) &#123;</span><br><span class="line">        instance.setMetadata(UtilsAndCommons.parseMetadata(metadata));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!instance.validate()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NacosException(NacosException.INVALID_PARAM, <span class="string">"instance format invalid:"</span> + instance);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> instance;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>随后在跟进<code>serviceManager.registerInstance</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">registerInstance</span><span class="params">(String namespaceId, String serviceName, Instance instance)</span> <span class="keyword">throws</span> NacosException </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// SDK端提供service的curd操作——可能是指这个，根据 instance 是否是临时的属性决定是否放入 serviceMap 中</span></span><br><span class="line">    createEmptyService(namespaceId, serviceName, instance.isEphemeral());</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 根据 namespaceId 以及对应的 serviceName 获取所属的 service 对象信息</span></span><br><span class="line">    Service service = getService(namespaceId, serviceName);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (service == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NacosException(NacosException.INVALID_PARAM,</span><br><span class="line">                <span class="string">"service not found, namespace: "</span> + namespaceId + <span class="string">", service: "</span> + serviceName);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    addInstance(namespaceId, serviceName, instance.isEphemeral(), instance);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里看到有一个<code>createEmptyService</code>方法，这是由于<code>Nacos</code>的<code>Model</code>设计——<code>service --&gt; cluster --&gt; instance</code>，所有<code>instance</code>是需要挂在<code>service</code>下面的，因此如果没有<code>service</code>的话，<code>instance</code>就无法注册，而<code>server</code>端不知道<code>instance</code>所挂的<code>service</code>是否存在，因此需要先执行这个<code>createEmptyService</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createEmptyService</span><span class="params">(String namespaceId, String serviceName, <span class="keyword">boolean</span> local)</span> <span class="keyword">throws</span> NacosException </span>&#123;</span><br><span class="line">    Service service = getService(namespaceId, serviceName);</span><br><span class="line">    <span class="comment">// 如果服务不存在，则创建一个新的服务——Service</span></span><br><span class="line">    <span class="keyword">if</span> (service == <span class="keyword">null</span>) &#123;</span><br><span class="line"></span><br><span class="line">        Loggers.SRV_LOG.info(<span class="string">"creating empty service &#123;&#125;:&#123;&#125;"</span>, namespaceId, serviceName);</span><br><span class="line">        service = <span class="keyword">new</span> Service();</span><br><span class="line">        service.setName(serviceName);</span><br><span class="line">        service.setNamespaceId(namespaceId);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置服务所在的分组信息</span></span><br><span class="line">        service.setGroupName(Constants.DEFAULT_GROUP);</span><br><span class="line">        <span class="comment">// now validate the service. if failed, exception will be thrown</span></span><br><span class="line">        service.setLastModifiedMillis(System.currentTimeMillis());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 重新计算 service 的签名信息</span></span><br><span class="line">        service.recalculateChecksum();</span><br><span class="line">        <span class="comment">// 对 cluster 进行校验</span></span><br><span class="line">        service.validate();</span><br><span class="line">        <span class="keyword">if</span> (local) &#123;</span><br><span class="line">            <span class="comment">//将 service 放入容器中</span></span><br><span class="line">            putService(service);</span><br><span class="line">            service.init();</span><br><span class="line">                consistencyService.listen(KeyBuilder.buildInstanceListKey(service.getNamespaceId(), service.getName(), <span class="keyword">true</span>), service);</span><br><span class="line">                consistencyService.listen(KeyBuilder.buildInstanceListKey(service.getNamespaceId(), service.getName(), <span class="keyword">false</span>), service);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            addOrReplaceService(service);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在<code>createEmptyService</code>方法的末尾，有一个<code>consistencyService.listen</code>方法以及<code>addOrReplaceService</code>方法，这两个方法的作用是什么？现在来分析一下。</p>
+<p>这两个方法都会调用<code>ConsistencyService consistencyService</code>进行一致性策略的选择，主要有两个一致性策略，如下面代码所示</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> PersistentConsistencyService persistentConsistencyService;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> EphemeralConsistencyService ephemeralConsistencyService;</span><br></pre></td></tr></table></figure>
+<p>这两个一致性策略的实现分别是<code>PersistentConsistencyService</code>对应<code>RaftConsistencyServiceImpl</code>；<code>EphemeralConsistencyService</code>对应的是<code>DistroConsistencyServiceImpl</code>，这里引用阿里<code>Nacos</code>团队发表的文章中的一段话来大概描述下<code>Nacos</code>的一致性策略</p>
+<blockquote>
+<p>目前的一致性协议实现，一个是基于简化的Raft的CP一致性，一个是基于自研协议Distro的AP一致性。Raft协议不必多言，基于Leader进行写入，其CP也并不是严格的，只是能保证一半所见一致，以及数据的丢失概率较小。Distro协议则是参考了内部ConfigServer和开源Eureka，在不借助第三方存储的情况下，实现基本大同小异。Distro重点是做了一些逻辑的优化和性能的调优</p>
+</blockquote>
+<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-31-1.jpg" alt="Nacos一致性协议"></p>
+<p>接下来就是简要分析下这两个一致性策略的实现了</p>
+<blockquote>
+<p>RaftConsistencyServiceImpl</p>
+</blockquote>
+<p>这里先放上一个<code>Raft</code>协议原理的动画演示 <a href="http://thesecretlivesofdata.com/raft/" target="_blank" rel="noopener">http://thesecretlivesofdata.com/raft/</a></p>
+<p>对于注册形式为持久化的<code>Instance</code>来说，<code>Nacos</code>的一致性策略是采用了简化版的<code>Raft</code>协议</p>
+<blockquote>
+<p>DistroConsistencyServiceImpl</p>
+</blockquote>
+<p><code>DistroConsistency</code>是针对注册形式为临时实例的<code>Instance</code>，该一致性策略其实是阿里<code>Nacos</code>团队根据他们内部的<code>ConfigServer</code>以及<code>Eureka</code>的一致性策略来实现的，<code>Distro</code>一致性策略的实现，在构造函数执行完后，会执行一个<code>init</code>函数，<code>init</code>函数内部提交了一个任务，任务里面执行了一个<code>load</code>函数以及提交了一个<code>Notifier</code>的<code>Runnable</code>；而这个<code>load</code>函数，会先判断<code>Nacos</code>的启动是单机模式还是集群模式，如果是集群模式那就很简单了；但是如果是集群模式下的话，就比较多了，首先会判断当前<code>Nacos</code>集群中的<code>server</code>数量是否为1，如果为1的话，表示当前集群中只有一个<code>server</code>实例，因此会让线程休眠一下，等待其他的<code>server</code>加入然后根据远程的<code>server</code>进行数据的远程同步</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PostConstruct</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    GlobalExecutor.submit(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                load();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                Loggers.EPHEMERAL.error(<span class="string">"load data failed."</span>, e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    executor.submit(notifier);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">load</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (SystemUtils.STANDALONE_MODE) &#123;</span><br><span class="line">        initialized = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// size = 1 means only myself in the list, we need at least one another server alive:</span></span><br><span class="line">    <span class="keyword">while</span> (serverListManager.getHealthyServers().size() &lt;= <span class="number">1</span>) &#123;</span><br><span class="line">        Thread.sleep(<span class="number">1000L</span>);</span><br><span class="line">        Loggers.EPHEMERAL.info(<span class="string">"waiting server list init..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (Server server : serverListManager.getHealthyServers()) &#123;</span><br><span class="line">        <span class="keyword">if</span> (NetUtils.localServer().equals(server.getKey())) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (Loggers.EPHEMERAL.isDebugEnabled()) &#123;</span><br><span class="line">            Loggers.EPHEMERAL.debug(<span class="string">"sync from "</span> + server);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// try sync data from remote server:</span></span><br><span class="line">        <span class="keyword">if</span> (syncAllDataFromRemote(server)) &#123;</span><br><span class="line">            initialized = <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>现在来看看<code>syncAllDataFromRemote</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">syncAllDataFromRemote</span><span class="params">(Server server)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">byte</span>[] data = NamingProxy.getAllData(server.getKey());</span><br><span class="line">        processData(data);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        Loggers.EPHEMERAL.error(<span class="string">"sync full data from "</span> + server + <span class="string">" failed!"</span>, e);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">byte</span>[] getAllData(String server) <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">    Map&lt;String, String&gt; params = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">8</span>);</span><br><span class="line">    HttpClient.HttpResult result = HttpClient.httpGet(<span class="string">"http://"</span> + server + RunningConfig.getContextPath()</span><br><span class="line">            + UtilsAndCommons.NACOS_NAMING_CONTEXT + ALL_DATA_GET_URL, <span class="keyword">new</span> ArrayList&lt;&gt;(), params);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (HttpURLConnection.HTTP_OK == result.code) &#123;</span><br><span class="line">        <span class="keyword">return</span> result.content.getBytes();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IOException(<span class="string">"failed to req API: "</span> + <span class="string">"http://"</span> + server</span><br><span class="line">            + RunningConfig.getContextPath()</span><br><span class="line">            + UtilsAndCommons.NACOS_NAMING_CONTEXT + DATA_GET_URL + <span class="string">". code: "</span></span><br><span class="line">            + result.code + <span class="string">" msg: "</span> + result.content);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">processData</span><span class="params">(<span class="keyword">byte</span>[] data)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (data.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        Map&lt;String, Datum&lt;Instances&gt;&gt; datumMap =</span><br><span class="line">                serializer.deserializeMap(data, Instances.class);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (Map.Entry&lt;String, Datum&lt;Instances&gt;&gt; entry : datumMap.entrySet()) &#123;</span><br><span class="line">            dataStore.put(entry.getKey(), entry.getValue());</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!listeners.containsKey(entry.getKey())) &#123;</span><br><span class="line">                <span class="comment">// pretty sure the service not exist:</span></span><br><span class="line">                <span class="keyword">if</span> (switchDomain.isDefaultInstanceEphemeral()) &#123;</span><br><span class="line">                    <span class="comment">// create empty service</span></span><br><span class="line">                    Loggers.EPHEMERAL.info(<span class="string">"creating service &#123;&#125;"</span>, entry.getKey());</span><br><span class="line">                    Service service = <span class="keyword">new</span> Service();</span><br><span class="line">                    String serviceName = KeyBuilder.getServiceName(entry.getKey());</span><br><span class="line">                    String namespaceId = KeyBuilder.getNamespace(entry.getKey());</span><br><span class="line">                    service.setName(serviceName);</span><br><span class="line">                    service.setNamespaceId(namespaceId);</span><br><span class="line">                    service.setGroupName(Constants.DEFAULT_GROUP);</span><br><span class="line">                    <span class="comment">// now validate the service. if failed, exception will be thrown</span></span><br><span class="line">                    service.setLastModifiedMillis(System.currentTimeMillis());</span><br><span class="line">                    service.recalculateChecksum();</span><br><span class="line">                    listeners.get(KeyBuilder.SERVICE_META_KEY_PREFIX).get(<span class="number">0</span>)</span><br><span class="line">                            .onChange(KeyBuilder.buildServiceMetaKey(namespaceId, serviceName), service);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (Map.Entry&lt;String, Datum&lt;Instances&gt;&gt; entry : datumMap.entrySet()) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!listeners.containsKey(entry.getKey())) &#123;</span><br><span class="line">                <span class="comment">// Should not happen:</span></span><br><span class="line">                Loggers.EPHEMERAL.warn(<span class="string">"listener of &#123;&#125; not found."</span>, entry.getKey());</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">for</span> (RecordListener listener : listeners.get(entry.getKey())) &#123;</span><br><span class="line">                    listener.onChange(entry.getKey(), entry.getValue().value);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                Loggers.EPHEMERAL.error(<span class="string">"[NACOS-DISTRO] error while execute listener of key: &#123;&#125;"</span>, entry.getKey(), e);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Update data store if listener executed successfully:</span></span><br><span class="line">            dataStore.put(entry.getKey(), entry.getValue());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先是执行远程获取数据的方法<code>getAllData</code>，获取到数据后，进行数据的反序列化操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Map&lt;String, Datum&lt;Instances&gt;&gt; datumMap = serializer.deserializeMap(data, Instances.class)</span><br></pre></td></tr></table></figure>
+<p>然后进行遍历操作，通过两次<code>if</code>语句的筛选，确定了不存在<code>service</code>对象后，会对<code>service</code>进行初始化操作，然后相应的<code>listener</code>发起相应的<code>onChange</code>事件，而这里的<code>listener</code>则是<code>com.alibaba.nacos.naming.core.ServiceManager</code>对象，为什么会是<code>ServiceManager</code>呢，先看看<code>listener</code>总共有几个实现</p>
+<p><code>Service</code>、<code>ServiceManager</code>、<code>SwitchManager</code>，他们各自监听的对象分别为<code>Instances</code>、<code>Service</code>以及<code>SwitchDomain</code>，所以得出这个<code>listener</code>的实现为<code>ServiceManager</code></p>
+<p>；因此这个时候在跟进看看<code>ServiceManager</code>的<code>onChange</code>事件发生时候做了什么</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onChange</span><span class="params">(String key, Service service)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (service == <span class="keyword">null</span>) &#123;</span><br><span class="line">            Loggers.SRV_LOG.warn(<span class="string">"received empty push from raft, key: &#123;&#125;"</span>, key);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isBlank(service.getNamespaceId())) &#123;</span><br><span class="line">            service.setNamespaceId(Constants.DEFAULT_NAMESPACE_ID);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Loggers.RAFT.info(<span class="string">"[RAFT-NOTIFIER] datum is changed, key: &#123;&#125;, value: &#123;&#125;"</span>, key, service);</span><br><span class="line"></span><br><span class="line">        Service oldDom = getService(service.getNamespaceId(), service.getName());</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (oldDom != <span class="keyword">null</span>) &#123;</span><br><span class="line">            oldDom.update(service);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            putService(service);</span><br><span class="line">            service.init();</span><br><span class="line">                consistencyService.listen(KeyBuilder.buildInstanceListKey(service.getNamespaceId(), service.getName(), <span class="keyword">true</span>), service);</span><br><span class="line">                consistencyService.listen(KeyBuilder.buildInstanceListKey(service.getNamespaceId(), service.getName(), <span class="keyword">false</span>), service);</span><br><span class="line">            Loggers.SRV_LOG.info(<span class="string">"[NEW-SERVICE] &#123;&#125;"</span>, service.toJSON());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">        Loggers.SRV_LOG.error(<span class="string">"[NACOS-SERVICE] error while processing service update"</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>实际上就是根据传入的<code>service</code>对象，然后查找是否存在一个旧的<code>service</code>，如果存在则执行更新操作，否则就执行类似于<code>createEmptyServer</code>的方法。</p>
+<p>而接着的下一个循环内部呢，还有一个<code>listener.onChange</code>事件，而这个时候的<code>listener</code>，就是<code>com.alibaba.nacos.naming.core.Service</code>这个对象了，来看看它的<code>onChange</code>事件做了什么吧</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onChange</span><span class="params">(String key, Instances value)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">    Loggers.SRV_LOG.info(<span class="string">"[NACOS-RAFT] datum is changed, key: &#123;&#125;, value: &#123;&#125;"</span>, key, value);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (Instance instance : value.getInstanceList()) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// Reject this abnormal instance list:</span></span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"got null instance "</span> + key);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (instance.getWeight() &gt; <span class="number">10000.0</span>D) &#123;</span><br><span class="line">            instance.setWeight(<span class="number">10000.0</span>D);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (instance.getWeight() &lt; <span class="number">0.01</span>D &amp;&amp; instance.getWeight() &gt; <span class="number">0.0</span>D) &#123;</span><br><span class="line">            instance.setWeight(<span class="number">0.01</span>D);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    updateIPs(value.getInstanceList(), KeyBuilder.matchEphemeralInstanceListKey(key));</span><br><span class="line">    recalculateChecksum();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>Service</code>中的<code>onChange</code>事件，首先是对<code>Instance</code>的<code>weight</code>信息根据当前<code>weight</code>的值进行相应的重置操作，随后执行<code>updateIPs</code>操作，而这个<code>updateIPs</code>涉及了<code>Service</code>的<code>updateIPs</code>以及<code>Cluster</code>的<code>updateIPs</code>操作，其实就是根据远程<code>Server</code>的数据去对自己<code>Service</code>-&gt;<code>Cluster</code>-&gt;<code>Instance</code>这个模型的所有数据进行更新操作，以保证数据的一致性，其原理就类似于<code>Eureka</code>的一致性策略</p>
+<blockquote>
+<p>在Eureka平台中，如果某台服务器宕机，Eureka不会有类似于ZooKeeper的选举leader的过程；客户端请求会自动切换到新的Eureka节点；当宕机的服务器重新恢复后，Eureka会再次将其纳入到服务器集群管理之中；而对于它来说，所有要做的无非是同步一些新的服务注册信息而已</p>
+</blockquote>
+<p>执行完后，如果<code>listener</code>执行没有出错，则将<code>dataStore</code>存储的数据执行插入更新操作<code>dataStore.put(entry.getKey(), entry.getValue())</code>。然后再看看<code>DistroConsistencyServiceImpl</code>的<code>init</code>函数的第二个任务提交<code>executor.submit(notifier)</code>做了什么吧。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Notifier</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> ConcurrentHashMap&lt;String, String&gt; services = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">10</span> * <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> BlockingQueue&lt;Pair&gt; tasks = <span class="keyword">new</span> LinkedBlockingQueue&lt;Pair&gt;(<span class="number">1024</span> * <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addTask</span><span class="params">(String datumKey, ApplyAction action)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (services.containsKey(datumKey) &amp;&amp; action == ApplyAction.CHANGE) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (action == ApplyAction.CHANGE) &#123;</span><br><span class="line">                services.put(datumKey, StringUtils.EMPTY);</span><br><span class="line">            &#125;</span><br><span class="line">            tasks.add(Pair.with(datumKey, action));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getTaskSize</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> tasks.size();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            Loggers.EPHEMERAL.info(<span class="string">"distro notifier started"</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line"></span><br><span class="line">                    Pair pair = tasks.take();</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (pair == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    String datumKey = (String) pair.getValue0();</span><br><span class="line">                    ApplyAction action = (ApplyAction) pair.getValue1();</span><br><span class="line"></span><br><span class="line">                    services.remove(datumKey);</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (!listeners.containsKey(datumKey)) &#123;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">for</span> (RecordListener listener : listeners.get(datumKey)) &#123;</span><br><span class="line"></span><br><span class="line">                        count++;</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">try</span> &#123;</span><br><span class="line">                            <span class="keyword">if</span> (action == ApplyAction.CHANGE) &#123;</span><br><span class="line">                                listener.onChange(datumKey, dataStore.get(datumKey).value);</span><br><span class="line">                                <span class="keyword">continue</span>;</span><br><span class="line">                            &#125;</span><br><span class="line"></span><br><span class="line">                            <span class="keyword">if</span> (action == ApplyAction.DELETE) &#123;</span><br><span class="line">                                listener.onDelete(datumKey);</span><br><span class="line">                                <span class="keyword">continue</span>;</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">                            Loggers.EPHEMERAL.error(<span class="string">"[NACOS-DISTRO] error while notifying listener of key: &#123;&#125;"</span>, datumKey, e);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (Loggers.EPHEMERAL.isDebugEnabled()) &#123;</span><br><span class="line">                        Loggers.EPHEMERAL.debug(<span class="string">"[NACOS-DISTRO] datum change notified, key: &#123;&#125;, listener count: &#123;&#125;, action: &#123;&#125;"</span>,</span><br><span class="line">                            datumKey, count, action.name());</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">                    Loggers.EPHEMERAL.error(<span class="string">"[NACOS-DISTRO] Error while handling notifying task"</span>, e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p><code>Notifier</code>其实就是不断的轮询<code>service</code>事件容器，然后让相应的<code>listener</code>执行<code>onChange</code>事件，而事件的发生，在<code>DistroConsistencyServiceImpl</code>的<code>onPut</code>以及<code>onRemove</code>操作中，对应着<code>Service</code> 加入以及离开</p>
+<p>执行完<code>createEmptyService</code>方法后，就是开始真正执行<code>instance</code>的注册操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addInstance</span><span class="params">(String namespaceId, String serviceName, <span class="keyword">boolean</span> ephemeral, Instance... ips)</span> <span class="keyword">throws</span> NacosException </span>&#123;</span><br><span class="line"></span><br><span class="line">    String key = KeyBuilder.buildInstanceListKey(namespaceId, serviceName, ephemeral);</span><br><span class="line"></span><br><span class="line">    Service service = getService(namespaceId, serviceName);</span><br><span class="line"></span><br><span class="line">    List&lt;Instance&gt; instanceList = addIpAddresses(service, ephemeral, ips);</span><br><span class="line"></span><br><span class="line">    Instances instances = <span class="keyword">new</span> Instances();</span><br><span class="line">    instances.setInstanceList(instanceList);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将该 service 下的 instance 进行更新（根据 ephemeral 进行存储策略选择）</span></span><br><span class="line">    consistencyService.put(key, instances);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此函数中根据<code>namespaceId</code>以及<code>serviceName</code>获取对应的<code>service</code>信息，然后进入<code>addIpAddresses</code>函数进行更新<code>service</code>下的实例信息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 更新实例地址信息</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> List&lt;Instance&gt; <span class="title">updateIpAddresses</span><span class="params">(Service service, String action, <span class="keyword">boolean</span> ephemeral, Instance... ips)</span> <span class="keyword">throws</span> NacosException </span>&#123;</span><br><span class="line"></span><br><span class="line">    Datum datum = consistencyService.get(KeyBuilder.buildInstanceListKey(service.getNamespaceId(), service.getName(), ephemeral));</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 旧的 instance 信息</span></span><br><span class="line">    Map&lt;String, Instance&gt; oldInstanceMap = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">16</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 根据 instance 的 ephemeral 参数属性获取 instance 列表信息</span></span><br><span class="line">    List&lt;Instance&gt; currentIPs = service.allIPs(ephemeral);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用 ConcurrentHashMap 的原因</span></span><br><span class="line">    Map&lt;String, Instance&gt; map = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(currentIPs.size());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (Instance instance : currentIPs) &#123;</span><br><span class="line">        map.put(instance.toIPAddr(), instance);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (datum != <span class="keyword">null</span>) &#123;</span><br><span class="line">        oldInstanceMap = setValid(((Instances) datum.value).getInstanceList(), map);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// use HashMap for deep copy:</span></span><br><span class="line">    HashMap&lt;String, Instance&gt; instanceMap = <span class="keyword">new</span> HashMap&lt;&gt;(oldInstanceMap.size());</span><br><span class="line">    instanceMap.putAll(oldInstanceMap);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 遍历传进来的 instance 列表</span></span><br><span class="line">    <span class="keyword">for</span> (Instance instance : ips) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 判断 instance 所属的集群信息是否存在，如果不存在则创建对应的 cluster 对象</span></span><br><span class="line">        <span class="keyword">if</span> (!service.getClusterMap().containsKey(instance.getClusterName())) &#123;</span><br><span class="line">            Cluster cluster = <span class="keyword">new</span> Cluster(instance.getClusterName());</span><br><span class="line">            cluster.setService(service);</span><br><span class="line">            cluster.init();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 将创建的 cluster 信息更新至 service 所管理的 clusterMap 中</span></span><br><span class="line">            service.getClusterMap().put(instance.getClusterName(), cluster);</span><br><span class="line">            Loggers.SRV_LOG.warn(<span class="string">"cluster: &#123;&#125; not found, ip: &#123;&#125;, will create new cluster with default configuration."</span>,</span><br><span class="line">                    instance.getClusterName(), instance.toJSON());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 根据 Command 策略决定 instanceMap 对 instance 的操作</span></span><br><span class="line">        <span class="keyword">if</span> (UtilsAndCommons.UPDATE_INSTANCE_ACTION_REMOVE.equals(action)) &#123;</span><br><span class="line">            instanceMap.remove(instance.getDatumKey());</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            instanceMap.put(instance.getDatumKey(), instance);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (instanceMap.size() &lt;= <span class="number">0</span> &amp;&amp; UtilsAndCommons.UPDATE_INSTANCE_ACTION_ADD.equals(action)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"ip list can not be empty, service: "</span> + service.getName() + <span class="string">", ip list: "</span></span><br><span class="line">                + JSON.toJSONString(instanceMap.values()));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 返回更新后的 instance 信息</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ArrayList&lt;&gt;(instanceMap.values());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个<code>updateIpAddresses</code>函数就是<code>addIpAddresses</code>函数的底层调用，它的作用就是根据新注册的<code>Instance</code>以及所属的<code>service</code>，对<code>service</code>下的<code>instance</code>实例列表信息进行更新操作，然后返回更新后的实例列表</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nacos/" rel="tag"># nacos</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/28/java-web-30/" rel="next" title="Nacos Client初始化流程">
+                <i class="fa fa-chevron-left"></i> Nacos Client初始化流程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 commiter</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">82</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Client端实例注册"><span class="nav-number">1.</span> <span class="nav-text">Client端实例注册</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Nacos-Server端是如何注册一个Instance的"><span class="nav-number">2.</span> <span class="nav-text">Nacos Server端是如何注册一个Instance的</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#处理Nacos-Client端的instance注册请求"><span class="nav-number">3.</span> <span class="nav-text">处理Nacos Client端的instance注册请求</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/04/29/java-web-31/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

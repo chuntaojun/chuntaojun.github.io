@@ -108,25 +108,24 @@
 
 
 
-  <meta name="description" content="初期介绍 @RequestMapping注解的使用  用过Spring框架的同学或许都使用过@RequestMapping注解吧，这个注解可以方便的将URL映射到我们的方法中。那么，这个是如何实现的呢？在之前我有一篇博客，关于手动实现@ModelAttribute注解的文章；在这篇文章中，采用了java的注解以及反射技术实现了web表单提交的{name:value}值注入到指定的对象中去。同样，我">
-<meta name="keywords" content="spring">
+  <meta name="description" content="题目统计一个数字在排序数组中出现的次数 解题思路既然数组已经是有序的了，那么有两种方法 双指针设立两个指针，一个指向数组的开头元素，另一个指向数组的末尾元素，然后两个指针同时向中间扫描，当遇到目前数字时停止扫描并记录指针所指向的位置；当左右指针完成后进行计算得出目标数字的出现次数 二分查找利用二分查找，分别查找出目标数字的最左出现位置以及最右出现位置即可，然后计算目标数字的出现次数 AC代码123">
 <meta property="og:type" content="article">
-<meta property="og:title" content="手动实现spring中的@RequestMapping注解">
-<meta property="og:url" content="https://www.liaochuntao.cn/2018/06/15/java-web-11/index.html">
+<meta property="og:title" content="牛客网——剑指offer之数字在排序数组中出现的次数">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/05/06/leetcode-23/index.html">
 <meta property="og:site_name" content="唉&#39;s Blog">
-<meta property="og:description" content="初期介绍 @RequestMapping注解的使用  用过Spring框架的同学或许都使用过@RequestMapping注解吧，这个注解可以方便的将URL映射到我们的方法中。那么，这个是如何实现的呢？在之前我有一篇博客，关于手动实现@ModelAttribute注解的文章；在这篇文章中，采用了java的注解以及反射技术实现了web表单提交的{name:value}值注入到指定的对象中去。同样，我">
+<meta property="og:description" content="题目统计一个数字在排序数组中出现的次数 解题思路既然数组已经是有序的了，那么有两种方法 双指针设立两个指针，一个指向数组的开头元素，另一个指向数组的末尾元素，然后两个指针同时向中间扫描，当遇到目前数字时停止扫描并记录指针所指向的位置；当左右指针完成后进行计算得出目标数字的出现次数 二分查找利用二分查找，分别查找出目标数字的最左出现位置以及最右出现位置即可，然后计算目标数字的出现次数 AC代码123">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-06-16T02:00:54.000Z">
+<meta property="og:updated_time" content="2019-05-06T12:01:20.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="手动实现spring中的@RequestMapping注解">
-<meta name="twitter:description" content="初期介绍 @RequestMapping注解的使用  用过Spring框架的同学或许都使用过@RequestMapping注解吧，这个注解可以方便的将URL映射到我们的方法中。那么，这个是如何实现的呢？在之前我有一篇博客，关于手动实现@ModelAttribute注解的文章；在这篇文章中，采用了java的注解以及反射技术实现了web表单提交的{name:value}值注入到指定的对象中去。同样，我">
+<meta name="twitter:title" content="牛客网——剑指offer之数字在排序数组中出现的次数">
+<meta name="twitter:description" content="题目统计一个数字在排序数组中出现的次数 解题思路既然数组已经是有序的了，那么有两种方法 双指针设立两个指针，一个指向数组的开头元素，另一个指向数组的末尾元素，然后两个指针同时向中间扫描，当遇到目前数字时停止扫描并记录指针所指向的位置；当左右指针完成后进行计算得出目标数字的出现次数 二分查找利用二分查找，分别查找出目标数字的最左出现位置以及最右出现位置即可，然后计算目标数字的出现次数 AC代码123">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.liaochuntao.cn/2018/06/15/java-web-11/"/>
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/05/06/leetcode-23/"/>
 
 
 
@@ -136,7 +135,7 @@
   };
 </script>
 
-  <title>手动实现spring中的@RequestMapping注解 | 唉's Blog</title>
+  <title>牛客网——剑指offer之数字在排序数组中出现的次数 | 唉's Blog</title>
   
 
 
@@ -306,7 +305,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/06/15/java-web-11/">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/05/06/leetcode-23/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="liaochuntao">
@@ -323,7 +322,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">手动实现spring中的@RequestMapping注解
+          <h1 class="post-title" itemprop="name headline">牛客网——剑指offer之数字在排序数组中出现的次数
               
             
           </h1>
@@ -348,24 +347,12 @@
                 
               
 
-              <time title="Created: 2018-06-15 20:31:14" itemprop="dateCreated datePublished" datetime="2018-06-15T20:31:14+08:00">2018-06-15</time>
+              <time title="Created: 2019-05-06 13:50:34 / Modified: 20:01:20" itemprop="dateCreated datePublished" datetime="2019-05-06T13:50:34+08:00">2019-05-06</time>
             
 
             
               
 
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2018-06-16 10:00:54" itemprop="dateModified" datetime="2018-06-16T10:00:54+08:00">2018-06-16</time>
               
             
           </span>
@@ -382,7 +369,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a></span>
 
                 
                 
@@ -396,7 +383,7 @@
 
           
           
-             <span id="/2018/06/15/java-web-11/" class="leancloud_visitors" data-flag-title="手动实现spring中的@RequestMapping注解">
+             <span id="/2019/05/06/leetcode-23/" class="leancloud_visitors" data-flag-title="牛客网——剑指offer之数字在排序数组中出现的次数">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -427,24 +414,12 @@
       
 
       
-        <h4 id="初期介绍"><a href="#初期介绍" class="headerlink" title="初期介绍"></a>初期介绍</h4><blockquote>
-<p>@RequestMapping注解的使用</p>
-</blockquote>
-<p>用过Spring框架的同学或许都使用过@RequestMapping注解吧，这个注解可以方便的将URL映射到我们的方法中。那么，这个是如何实现的呢？在之前我有一篇博客，关于<a href="https://www.liaochuntao.cn/2017/12/20/java_web_5/">手动实现@ModelAttribute注解</a>的文章；在这篇文章中，采用了java的注解以及反射技术实现了web表单提交的{name:value}值注入到指定的对象中去。同样，我们也可以使用相同的技术{注解、反射}来实现@RequestMapping注解的功能。</p>
-<blockquote>
-<p>@RequestMapping注解功能的一些原理</p>
-</blockquote>
-<p>要想实现@RequestMapping注解，首先需要解决的就是 url 地址与方法的捆绑问题。这个时候可以考虑使用 Java 语言自带的 Map 这个数据结构，key 为 String 类型的 url 地址，value 为 Method 类型的对象，因此就可以实现 url 地址与方法的绑定。</p>
-<h4 id="开始实现"><a href="#开始实现" class="headerlink" title="开始实现"></a>开始实现</h4><blockquote>
-<p>Mapping.java</p>
-</blockquote>
-<p>首先我们需要创建一个注解，这个注解作用在<code>METHOD</code>上，生命周期是在运行时。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Documented;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.ElementType;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Retention;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.RetentionPolicy;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Target;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Mapping &#123;</span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>Main.java</p>
-</blockquote>
-<p>有了上面的注解，我们就可以方便的实现@RequestMapping这个注解了；首先在整个类创建时先初始化一个 Map 对象进行存储 url 与 Method 对象；然后写一个初始化函数 init(), 在这个函数中实现对被注解作用的方法进行与注解 value 值的绑定。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> test;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.InvocationTargetException;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> test.Mapping;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, Method&gt; methodMap;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        methodMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Mapping</span>(value = <span class="string">"/name"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">name</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"my name is "</span> + name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Mapping</span>(value = <span class="string">"/sex"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sex</span><span class="params">(String sex)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"I am a "</span> + sex);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Method[] methods = Main.class.getMethods();</span><br><span class="line">        <span class="keyword">for</span> (Method each : methods) &#123;</span><br><span class="line">            <span class="keyword">if</span> (each.isAnnotationPresent(Mapping.class)) &#123;</span><br><span class="line">                Mapping maped = each.getAnnotation(Mapping.class);</span><br><span class="line">                methodMap.put(maped.value(), each);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exec</span><span class="params">(Method method, Object o, String param)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            method.invoke(o, param);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InvocationTargetException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Main m = <span class="keyword">new</span> Main();</span><br><span class="line">        m.init();</span><br><span class="line">        m.exec(m.methodMap.get(<span class="string">"/name"</span>), m, args[<span class="number">0</span>]);</span><br><span class="line">        m.exec(m.methodMap.get(<span class="string">"/sex"</span>), m, args[<span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><p>统计一个数字在排序数组中出现的次数</p>
+<h4 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h4><p>既然数组已经是有序的了，那么有两种方法</p>
+<h5 id="双指针"><a href="#双指针" class="headerlink" title="双指针"></a>双指针</h5><p>设立两个指针，一个指向数组的开头元素，另一个指向数组的末尾元素，然后两个指针同时向中间扫描，当遇到目前数字时停止扫描并记录指针所指向的位置；当左右指针完成后进行计算得出目标数字的出现次数</p>
+<h5 id="二分查找"><a href="#二分查找" class="headerlink" title="二分查找"></a>二分查找</h5><p>利用二分查找，分别查找出目标数字的最左出现位置以及最右出现位置即可，然后计算目标数字的出现次数</p>
+<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetNumberOfK</span><span class="params">(<span class="keyword">int</span>[] array , <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (array.length == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> left = leftLoc(array, k);</span><br><span class="line">        <span class="keyword">int</span> right = rightLoc(array, k);;</span><br><span class="line">        <span class="keyword">if</span> (left == <span class="number">0</span> &amp;&amp; right == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> (right - left) + <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">rightLoc</span><span class="params">(<span class="keyword">int</span>[] array, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> right = array.length - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (left == right) &#123;</span><br><span class="line">            <span class="keyword">if</span> (array[left] == k) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (left &lt; right) &#123;</span><br><span class="line">            <span class="keyword">int</span> mid = (left + right) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (array[mid] == k &amp;&amp; (mid == array.length - <span class="number">1</span> || array[mid + <span class="number">1</span>] != k)) &#123;</span><br><span class="line">                <span class="keyword">return</span> mid;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (array[mid] &gt; k) &#123;</span><br><span class="line">                right = mid;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                left = mid + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (array[left] == k) &#123;</span><br><span class="line">            <span class="keyword">return</span> left;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">leftLoc</span><span class="params">(<span class="keyword">int</span>[] array, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> right = array.length - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span> (left == right) &#123;</span><br><span class="line">            <span class="keyword">if</span> (array[left] == k) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (left &lt; right) &#123;</span><br><span class="line">            <span class="keyword">int</span> mid = (left + right) / <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">if</span> (array[mid] == k &amp;&amp; (mid == <span class="number">0</span> || array[mid - <span class="number">1</span>] != k)) &#123;</span><br><span class="line">                <span class="keyword">return</span> mid;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (array[mid] &gt;= k) &#123;</span><br><span class="line">                right = mid;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                left = mid + <span class="number">1</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (array[left] == k) &#123;</span><br><span class="line">            <span class="keyword">return</span> left;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
       
     </div>
 
@@ -462,12 +437,6 @@
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/spring/" rel="tag"># spring</a>
-          
-        </div>
-      
 
       
       
@@ -477,8 +446,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/05/26/java-web-10/" rel="next" title="solr快速搭建">
-                <i class="fa fa-chevron-left"></i> solr快速搭建
+              <a href="/2019/05/06/java-web-33/" rel="next" title="从浏览器请求到WebApplication响应“hello world”的过程是什么">
+                <i class="fa fa-chevron-left"></i> 从浏览器请求到WebApplication响应“hello world”的过程是什么
               </a>
             
           </div>
@@ -487,8 +456,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/09/08/java-web-9/" rel="prev" title="使用Java的观察者以及定期任务实现redis的缓存过期机制">
-                使用Java的观察者以及定期任务实现redis的缓存过期机制 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/05/09/java-web-32/" rel="prev" title="Nacos中的DistroConsistencyServiceImpl工作浅析">
+                Nacos中的DistroConsistencyServiceImpl工作浅析 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -692,7 +661,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#初期介绍"><span class="nav-number">1.</span> <span class="nav-text">初期介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开始实现"><span class="nav-number">2.</span> <span class="nav-text">开始实现</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解题思路"><span class="nav-number">2.</span> <span class="nav-text">解题思路</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#双指针"><span class="nav-number">2.1.</span> <span class="nav-text">双指针</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#二分查找"><span class="nav-number">2.2.</span> <span class="nav-text">二分查找</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AC代码"><span class="nav-number">3.</span> <span class="nav-text">AC代码</span></a></li></ol></div>
             
 
           </div>
@@ -847,7 +816,7 @@
   
     <script type="text/javascript">
       window.livereOptions = {
-        refer: '2018/06/15/java-web-11/'
+        refer: '2019/05/06/leetcode-23/'
       };
       (function(d, s) {
         var j, e = d.getElementsByTagName(s)[0];

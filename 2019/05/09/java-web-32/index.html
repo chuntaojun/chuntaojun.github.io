@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Eureka 一致性策略Eureka是一个AP模式的服务发现框架，在Eureka集群模式下，Eureka采取的是Server之间互相广播各自的数据进行数据复制、更新操作；并且Eureka在客户端与注册中心出现网络故障时，依然能够获取服务注册信息——Eureka实现了客户端对于服务注册信息的缓存  DiscoveryClient  1234567891011121314151617181920212">
+<meta name="keywords" content="nacos">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nacos中的DistroConsistencyServiceImpl工作浅析">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/05/09/java-web-32/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="Eureka 一致性策略Eureka是一个AP模式的服务发现框架，在Eureka集群模式下，Eureka采取的是Server之间互相广播各自的数据进行数据复制、更新操作；并且Eureka在客户端与注册中心出现网络故障时，依然能够获取服务注册信息——Eureka实现了客户端对于服务注册信息的缓存  DiscoveryClient  1234567891011121314151617181920212">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-05-06T12:01:13.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nacos中的DistroConsistencyServiceImpl工作浅析">
+<meta name="twitter:description" content="Eureka 一致性策略Eureka是一个AP模式的服务发现框架，在Eureka集群模式下，Eureka采取的是Server之间互相广播各自的数据进行数据复制、更新操作；并且Eureka在客户端与注册中心出现网络故障时，依然能够获取服务注册信息——Eureka实现了客户端对于服务注册信息的缓存  DiscoveryClient  1234567891011121314151617181920212">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/05/09/java-web-32/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Nacos中的DistroConsistencyServiceImpl工作浅析 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/05/09/java-web-32/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 commiter">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Nacos中的DistroConsistencyServiceImpl工作浅析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-05-09 19:21:39" itemprop="dateCreated datePublished" datetime="2019-05-09T19:21:39+08:00">2019-05-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-05-06 20:01:13" itemprop="dateModified" datetime="2019-05-06T20:01:13+08:00">2019-05-06</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/05/09/java-web-32/" class="leancloud_visitors" data-flag-title="Nacos中的DistroConsistencyServiceImpl工作浅析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="Eureka-一致性策略"><a href="#Eureka-一致性策略" class="headerlink" title="Eureka 一致性策略"></a>Eureka 一致性策略</h4><p>Eureka是一个AP模式的服务发现框架，在Eureka集群模式下，Eureka采取的是Server之间互相广播各自的数据进行数据复制、更新操作；并且Eureka在客户端与注册中心出现网络故障时，依然能够获取服务注册信息——Eureka实现了客户端对于服务注册信息的缓存</p>
+<blockquote>
+<p>DiscoveryClient</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">fetchRegistryFromBackup</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="meta">@SuppressWarnings</span>(<span class="string">"deprecation"</span>)</span><br><span class="line">        BackupRegistry backupRegistryInstance = newBackupRegistryInstance();</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> == backupRegistryInstance) &#123; <span class="comment">// backward compatibility with the old protected method, in case it is being used.</span></span><br><span class="line">            backupRegistryInstance = backupRegistryProvider.get();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> != backupRegistryInstance) &#123;</span><br><span class="line">            Applications apps = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (isFetchingRemoteRegionRegistries()) &#123;</span><br><span class="line">                String remoteRegionsStr = remoteRegionsToFetch.get();</span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">null</span> != remoteRegionsStr) &#123;</span><br><span class="line">                    apps = backupRegistryInstance.fetchRegistry(remoteRegionsStr.split(<span class="string">","</span>));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                apps = backupRegistryInstance.fetchRegistry();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (apps != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">final</span> Applications applications = <span class="keyword">this</span>.filterAndShuffle(apps);</span><br><span class="line">                applications.setAppsHashCode(applications.getReconcileHashCode());</span><br><span class="line">                localRegionApps.set(applications);</span><br><span class="line">                logTotalInstances();</span><br><span class="line">                logger.info(<span class="string">"Fetched registry successfully from the backup"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            logger.warn(<span class="string">"No backup registry instance defined &amp; unable to find any discovery servers."</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">        logger.warn(<span class="string">"Cannot fetch applications from apps although backup registry was specified"</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>正因为Eureka为了能够在Eureka集群无法工作时不影响消费者调用服务提供者而设置的客户端缓存，因此Eureka无法保证服务注册信息的强一致性（CP模式），只能满足数据的最终一致性（AP模式）</p>
+<h4 id="Nacos一致性策略——Distro"><a href="#Nacos一致性策略——Distro" class="headerlink" title="Nacos一致性策略——Distro"></a>Nacos一致性策略——Distro</h4><p>Nacos在AP模式下的一致性策略就类似于Eureka，采用<code>Server</code>之间互相的数据同步来实现数据在集群中的同步、复制操作。</p>
+<h5 id="触发数据广播"><a href="#触发数据广播" class="headerlink" title="触发数据广播"></a>触发数据广播</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">DistroConsistencyServiceImpl.java</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(String key, Record value)</span> <span class="keyword">throws</span> NacosException </span>&#123;</span><br><span class="line">    onPut(key, value);</span><br><span class="line">    taskDispatcher.addTask(key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当调用<code>ConsistencyService</code>接口定义的<code>put</code>、<code>remove</code>方法时，涉及到了<code>Server</code>端数据的变更，此时会创建一个任务，将数据的<code>key</code>传入<code>taskDispatcher.addTask</code>方法中，用于后面数据变更时数据查找操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">TaskDispatcher.java</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addTask</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">    taskSchedulerList.get(UtilsAndCommons.shakeUp(key, cpuCoreCount)).addTask(key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里有一个方法需要注意——<code>shakeUp</code>，查看官方代码注解可知这是将<code>key</code>（<code>key</code>可以看作是一次数据变更事件）这里应该是将任务均匀的路由到不同的<code>TaskScheduler</code>对象，确保每个<code>TaskScheduler</code>所承担的任务都差不多。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TaskScheduler</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> dataSize = <span class="number">0</span>;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">long</span> lastDispatchTime = <span class="number">0L</span>;</span><br><span class="line">    <span class="keyword">private</span> BlockingQueue&lt;String&gt; queue = <span class="keyword">new</span> LinkedBlockingQueue&lt;&gt;(<span class="number">128</span> * <span class="number">1024</span>);</span><br><span class="line">  	...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addTask</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        queue.offer(key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        List&lt;String&gt; keys = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                String key = queue.poll(partitionConfig.getTaskDispatchPeriod(),TimeUnit.MILLISECONDS);</span><br><span class="line">                <span class="keyword">if</span> (Loggers.EPHEMERAL.isDebugEnabled() &amp;&amp; StringUtils.isNotBlank(key)) &#123;</span><br><span class="line">                    Loggers.EPHEMERAL.debug(<span class="string">"got key: &#123;&#125;"</span>, key);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (dataSyncer.getServers() == <span class="keyword">null</span> || dataSyncer.getServers().isEmpty()) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (StringUtils.isBlank(key)) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (dataSize == <span class="number">0</span>) &#123;</span><br><span class="line">                    keys = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">                &#125;</span><br><span class="line">                keys.add(key);</span><br><span class="line">                dataSize++;</span><br><span class="line">                <span class="keyword">if</span> (dataSize == partitionConfig.getBatchSyncKeyCount() ||</span><br><span class="line">                        (System.currentTimeMillis() - lastDispatchTime) &gt; partitionConfig.getTaskDispatchPeriod()) &#123;</span><br><span class="line">                    <span class="keyword">for</span> (Server member : dataSyncer.getServers()) &#123;</span><br><span class="line">                        <span class="comment">// 自己不需要进行数据广播操作</span></span><br><span class="line">                        <span class="keyword">if</span> (NetUtils.localServer().equals(member.getKey())) &#123;</span><br><span class="line">                            <span class="keyword">continue</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                        SyncTask syncTask = <span class="keyword">new</span> SyncTask();</span><br><span class="line">                        syncTask.setKeys(keys);</span><br><span class="line">                        syncTask.setTargetServer(member.getKey());</span><br><span class="line">                        <span class="keyword">if</span> (Loggers.EPHEMERAL.isDebugEnabled() &amp;&amp; StringUtils.isNotBlank(key)) &#123;</span><br><span class="line">                            Loggers.EPHEMERAL.debug(<span class="string">"add sync task: &#123;&#125;"</span>, JSON.toJSONString(syncTask));</span><br><span class="line">                        &#125;</span><br><span class="line">                        dataSyncer.submit(syncTask, <span class="number">0</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                    lastDispatchTime = System.currentTimeMillis();</span><br><span class="line">                    dataSize = <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                Loggers.EPHEMERAL.error(<span class="string">"dispatch sync task failed."</span>, e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>核心方法就是<code>for (Server member : dataSyncer.getServers()) {..}</code>循环体内的代码，此处就是将数据在<code>Nacos Server</code>中进行广播操作；具体步骤如下</p>
+<pre><code>- 创建`SyncTask`，并设置事件集合（就是`key`集合）
+- 将目标`Server`信息设置到`SyncTask`中——`syncTask.setTargetServer(member.getKey())`
+- 将数据广播任务提交到`DataSyncer`中
+</code></pre><h5 id="执行数据广播——DataSyncer"><a href="#执行数据广播——DataSyncer" class="headerlink" title="执行数据广播——DataSyncer"></a>执行数据广播——DataSyncer</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">submit</span><span class="params">(SyncTask task, <span class="keyword">long</span> delay)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// If it's a new task:</span></span><br><span class="line">    <span class="keyword">if</span> (task.getRetryCount() == <span class="number">0</span>) &#123;</span><br><span class="line">        Iterator&lt;String&gt; iterator = task.getKeys().iterator();</span><br><span class="line">        <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">            String key = iterator.next();</span><br><span class="line">            <span class="keyword">if</span> (StringUtils.isNotBlank(taskMap.putIfAbsent(buildKey(key, task.getTargetServer()), key))) &#123;</span><br><span class="line">                <span class="comment">// associated key already exist:</span></span><br><span class="line">                <span class="keyword">if</span> (Loggers.EPHEMERAL.isDebugEnabled()) &#123;</span><br><span class="line">                    Loggers.EPHEMERAL.debug(<span class="string">"sync already in process, key: &#123;&#125;"</span>, key);</span><br><span class="line">                &#125;</span><br><span class="line">                iterator.remove();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (task.getKeys().isEmpty()) &#123;</span><br><span class="line">        <span class="comment">// all keys are removed:</span></span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    GlobalExecutor.submitDataSync(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (servers == <span class="keyword">null</span> || servers.isEmpty()) &#123;</span><br><span class="line">                    Loggers.SRV_LOG.warn(<span class="string">"try to sync data but server list is empty."</span>);</span><br><span class="line">                     <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                List&lt;String&gt; keys = task.getKeys();</span><br><span class="line">                <span class="keyword">if</span> (Loggers.EPHEMERAL.isDebugEnabled()) &#123;</span><br><span class="line">                    Loggers.EPHEMERAL.debug(<span class="string">"sync keys: &#123;&#125;"</span>, keys);</span><br><span class="line">                &#125;</span><br><span class="line">                Map&lt;String, Datum&gt; datumMap = dataStore.batchGet(keys);</span><br><span class="line">                <span class="keyword">if</span> (datumMap == <span class="keyword">null</span> || datumMap.isEmpty()) &#123;</span><br><span class="line">                    <span class="comment">// clear all flags of this task:</span></span><br><span class="line">                    <span class="keyword">for</span> (String key : task.getKeys()) &#123;</span><br><span class="line">                        taskMap.remove(buildKey(key, task.getTargetServer()));</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">byte</span>[] data = serializer.serialize(datumMap);</span><br><span class="line">                <span class="keyword">long</span> timestamp = System.currentTimeMillis();</span><br><span class="line">                <span class="keyword">boolean</span> success = NamingProxy.syncData(data, task.getTargetServer());</span><br><span class="line">                <span class="keyword">if</span> (!success) &#123;</span><br><span class="line">                    SyncTask syncTask = <span class="keyword">new</span> SyncTask();</span><br><span class="line">                    syncTask.setKeys(task.getKeys());</span><br><span class="line">                    syncTask.setRetryCount(task.getRetryCount() + <span class="number">1</span>);</span><br><span class="line">                    syncTask.setLastExecuteTime(timestamp);</span><br><span class="line">                    syncTask.setTargetServer(task.getTargetServer());</span><br><span class="line">                    retrySync(syncTask);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// clear all flags of this task:</span></span><br><span class="line">                    <span class="keyword">for</span> (String key : task.getKeys()) &#123;</span><br><span class="line">                        taskMap.remove(buildKey(key, task.getTargetServer()));</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                Loggers.EPHEMERAL.error(<span class="string">"sync data failed."</span>, e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, delay);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>GlobalExecutor.submitDataSync(Runnable runnable)</code>提交一个数据广播任务；首先通过<code>SyncTask</code>中的<code>key</code>集合去<code>DataStore</code>中去查询<code>key</code>所对应的数据集合，然后对数据进行序列化操作，转为<code>byte[]</code>数组后，执行<code>Http</code>请求操作——<code>NamingProxy.syncData(data, task.getTargetServer())</code>；如果数据广播失败，则将任务重新打包再次压入<code>GlobalExecutor</code>中</p>
+<p>（这里有一个疑问，SyncTask记录了任务重试的次数，但是却没有根据该次数做一些判断，比如超过多少次server未响应可能是server挂掉了，这里仅仅是记录了重试的次数）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">syncData</span><span class="params">(<span class="keyword">byte</span>[] data, String curServer)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Map&lt;String, String&gt; headers = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">128</span>);</span><br><span class="line">        headers.put(<span class="string">"Client-Version"</span>, UtilsAndCommons.SERVER_VERSION);</span><br><span class="line">        headers.put(<span class="string">"User-Agent"</span>, UtilsAndCommons.SERVER_VERSION);</span><br><span class="line">        headers.put(<span class="string">"Accept-Encoding"</span>, <span class="string">"gzip,deflate,sdch"</span>);</span><br><span class="line">        headers.put(<span class="string">"Connection"</span>, <span class="string">"Keep-Alive"</span>);</span><br><span class="line">        headers.put(<span class="string">"Content-Encoding"</span>, <span class="string">"gzip"</span>);</span><br><span class="line"></span><br><span class="line">        HttpClient.HttpResult result = HttpClient.httpPutLarge(<span class="string">"http://"</span> + curServer + RunningConfig.getContextPath()</span><br><span class="line">                + UtilsAndCommons.NACOS_NAMING_CONTEXT + DATA_ON_SYNC_URL, headers, data);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (HttpURLConnection.HTTP_OK == result.code) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (HttpURLConnection.HTTP_NOT_MODIFIED == result.code) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IOException(<span class="string">"failed to req API:"</span> + <span class="string">"http://"</span> + curServer</span><br><span class="line">                + RunningConfig.getContextPath()</span><br><span class="line">                + UtilsAndCommons.NACOS_NAMING_CONTEXT + DATA_ON_SYNC_URL + <span class="string">". code:"</span></span><br><span class="line">                + result.code + <span class="string">" msg: "</span> + result.content);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        Loggers.SRV_LOG.warn(<span class="string">"NamingProxy"</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里将数据提交到了URL为<code>PUT http://ip:port/nacos/v1/ns//distro/datum</code>中，而该URL对应的处理器为<code>DistroController</code>中的<code>public String onSyncDatum(HttpServletRequest request, HttpServletResponse response)</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">onSyncDatum</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">    String entity = IOUtils.toString(request.getInputStream(), <span class="string">"UTF-8"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isBlank(entity)) &#123;</span><br><span class="line">        Loggers.EPHEMERAL.error(<span class="string">"[onSync] receive empty entity!"</span>);</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NacosException(NacosException.INVALID_PARAM, <span class="string">"receive empty entity!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Map&lt;String, Datum&lt;Instances&gt;&gt; dataMap = serializer.deserializeMap(entity.getBytes(), Instances.class);</span><br><span class="line">    <span class="keyword">for</span> (Map.Entry&lt;String, Datum&lt;Instances&gt;&gt; entry : dataMap.entrySet()) &#123;</span><br><span class="line">        <span class="keyword">if</span> (KeyBuilder.matchEphemeralInstanceListKey(entry.getKey())) &#123;</span><br><span class="line">            String namespaceId = KeyBuilder.getNamespace(entry.getKey());</span><br><span class="line">            String serviceName = KeyBuilder.getServiceName(entry.getKey());</span><br><span class="line">            <span class="keyword">if</span> (!serviceManager.containService(namespaceId, serviceName) &amp;&amp; switchDomain.isDefaultInstanceEphemeral()) &#123;</span><br><span class="line">                serviceManager.createEmptyService(namespaceId, serviceName, <span class="keyword">true</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            consistencyService.onPut(entry.getKey(), entry.getValue().value);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">"ok"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里会调用<code>consistencyService.onPut(entry.getKey(), entry.getValue().value)</code>方法进行数据的更新，注意，<code>onPut</code>方法并不会涉及<code>taskDispatcher.addTask(key);</code>操作，而是将数据更新压入了<code>Notifier</code>的<code>Task</code>列表中（<code>Notifier</code>的作用看<a href="https://www.liaochuntao.cn/2019/04/29/java-web-31/">Nacos Server端注册一个服务实例流程</a>）；至此完成了<code>Nacos Server</code>在AP模式下的数据的最终一致性操作。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nacos/" rel="tag"># nacos</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/06/leetcode-23/" rel="next" title="牛客网——剑指offer之数字在排序数组中出现的次数">
+                <i class="fa fa-chevron-left"></i> 牛客网——剑指offer之数字在排序数组中出现的次数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 commiter</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">85</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Eureka-一致性策略"><span class="nav-number">1.</span> <span class="nav-text">Eureka 一致性策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Nacos一致性策略——Distro"><span class="nav-number">2.</span> <span class="nav-text">Nacos一致性策略——Distro</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#触发数据广播"><span class="nav-number">2.1.</span> <span class="nav-text">触发数据广播</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#执行数据广播——DataSyncer"><span class="nav-number">2.2.</span> <span class="nav-text">执行数据广播——DataSyncer</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/05/09/java-web-32/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

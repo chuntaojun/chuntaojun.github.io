@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前话在编写SpringBoot Web程序完后，运行这个web程序，然后用http请求工具发送请求，然后程序对应的请求处理器就会执行相应的操作；那么，这个http请求是如何被web程序所接受的，又是如何路由到我们对应的http handler上的？ Web容器在使用SpringBoot有一大好处——再也不用外部的web容器了，它自身整合了目前流行的几大web容器，当然你也可以实现自己的web容器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从浏览器请求到WebApplication响应“hello world”的过程是什么">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/05/06/java-web-33/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="前话在编写SpringBoot Web程序完后，运行这个web程序，然后用http请求工具发送请求，然后程序对应的请求处理器就会执行相应的操作；那么，这个http请求是如何被web程序所接受的，又是如何路由到我们对应的http handler上的？ Web容器在使用SpringBoot有一大好处——再也不用外部的web容器了，它自身整合了目前流行的几大web容器，当然你也可以实现自己的web容器">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-33-1.png">
+<meta property="og:updated_time" content="2019-05-06T05:24:23.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从浏览器请求到WebApplication响应“hello world”的过程是什么">
+<meta name="twitter:description" content="前话在编写SpringBoot Web程序完后，运行这个web程序，然后用http请求工具发送请求，然后程序对应的请求处理器就会执行相应的操作；那么，这个http请求是如何被web程序所接受的，又是如何路由到我们对应的http handler上的？ Web容器在使用SpringBoot有一大好处——再也不用外部的web容器了，它自身整合了目前流行的几大web容器，当然你也可以实现自己的web容器">
+<meta name="twitter:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-33-1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/05/06/java-web-33/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>从浏览器请求到WebApplication响应“hello world”的过程是什么 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/05/06/java-web-33/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 commiter">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">从浏览器请求到WebApplication响应“hello world”的过程是什么
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-05-06 11:08:18 / Modified: 13:24:23" itemprop="dateCreated datePublished" datetime="2019-05-06T11:08:18+08:00">2019-05-06</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/05/06/java-web-33/" class="leancloud_visitors" data-flag-title="从浏览器请求到WebApplication响应“hello world”的过程是什么">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="前话"><a href="#前话" class="headerlink" title="前话"></a>前话</h4><p>在编写<code>SpringBoot Web</code>程序完后，运行这个<code>web</code>程序，然后用<code>http</code>请求工具发送请求，然后程序对应的请求处理器就会执行相应的操作；那么，这个<code>http</code>请求是如何被<code>web</code>程序所接受的，又是如何路由到我们对应的<code>http handler</code>上的？</p>
+<h4 id="Web容器"><a href="#Web容器" class="headerlink" title="Web容器"></a>Web容器</h4><p>在使用<code>SpringBoot</code>有一大好处——再也不用外部的<code>web</code>容器了，它自身整合了目前流行的几大<code>web</code>容器，当然你也可以实现自己的<code>web</code>容器</p>
+<p><code>SpringBoot</code>关于<code>Web</code>容器相关的代码在<code>org.springframework.boot.web.embedded</code>包中，该包下目前有四种<code>web</code>容器——<code>jetty</code>、<code>netty</code>、<code>tomcat</code>以及<code>undertow</code>；在这里我使用的是<code>netty</code>的<code>web</code>容器</p>
+<h5 id="ReactiveWebServerApplicationContext"><a href="#ReactiveWebServerApplicationContext" class="headerlink" title="ReactiveWebServerApplicationContext"></a>ReactiveWebServerApplicationContext</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onRefresh</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>.onRefresh();</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			createWebServer();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> ApplicationContextException(<span class="string">"Unable to start reactive web server"</span>,</span><br><span class="line">					ex);</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">createWebServer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		ServerManager serverManager = <span class="keyword">this</span>.serverManager;</span><br><span class="line">		<span class="keyword">if</span> (serverManager == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">this</span>.serverManager = ServerManager.get(getWebServerFactory());</span><br><span class="line">		&#125;</span><br><span class="line">		initPropertySources();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个<code>createWebServer</code>方法的执行表示正式开始对<code>WebServer</code>进行相应的前期初始化，因为该方法调用的时期位于<code>ApplicationContext</code>的<code>onRefresh</code>时期，因此<code>ServerManager == null</code>，所以前去执行<code>ServerManager.get(getWebServerFactory())</code>进行创建一个<code>ServerManager</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="title">ServerManager</span><span class="params">(ReactiveWebServerFactory factory)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.handler = <span class="keyword">this</span>::handleUninitialized;</span><br><span class="line">		<span class="keyword">this</span>.server = factory.getWebServer(<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Mono&lt;Void&gt; <span class="title">handleUninitialized</span><span class="params">(ServerHttpRequest request,</span></span></span><br><span class="line"><span class="function"><span class="params">				ServerHttpResponse response)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(</span><br><span class="line">					<span class="string">"The HttpHandler has not yet been initialized"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因此此时整个程序处于<code>onRefresh</code>状态，<code>Handler</code>尚未被<code>Spring</code>加载，此处便用<code>handleUninitialized</code>进行代替（ServerManager的handler此时是一个lambda表达式），在这里又可以看到，需要获取一个<code>WebServer</code></p>
+<h5 id="NettyReactiveWebServerFactory"><a href="#NettyReactiveWebServerFactory" class="headerlink" title="NettyReactiveWebServerFactory"></a>NettyReactiveWebServerFactory</h5><p>这是一个创建<code>netty web</code>容器的工厂，通过调用<code>getWebServer</code>方法即可获得一个<code>web</code>容器</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> WebServer <span class="title">getWebServer</span><span class="params">(HttpHandler httpHandler)</span> </span>&#123;</span><br><span class="line">		HttpServer httpServer = createHttpServer();</span><br><span class="line">		ReactorHttpHandlerAdapter handlerAdapter = <span class="keyword">new</span> ReactorHttpHandlerAdapter(</span><br><span class="line">				httpHandler);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> NettyWebServer(httpServer, handlerAdapter, <span class="keyword">this</span>.lifecycleTimeout);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里需要获取两个对象，一个是<code>HttpServer</code>，另一个是获取<code>http</code>请求的处理器<code>handler</code>；然后创建一个<code>NettyWebServer</code>，这个就是最终的<code>Web</code>容器</p>
+<p>现在再次回到<code>ReactiveWebServerApplicationContext</code>这个对象中，此时<code>onRefresh</code>中相应的操作均已完成，接着就是<code>finishRefresh</code>，此步骤，将会正式启动我们的<code>WebServer</code></p>
+<h5 id="ReactiveWebServerApplicationContext-1"><a href="#ReactiveWebServerApplicationContext-1" class="headerlink" title="ReactiveWebServerApplicationContext"></a>ReactiveWebServerApplicationContext</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">finishRefresh</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>.finishRefresh();</span><br><span class="line">		WebServer webServer = startReactiveWebServer();</span><br><span class="line">		<span class="keyword">if</span> (webServer != <span class="keyword">null</span>) &#123;</span><br><span class="line">			publishEvent(<span class="keyword">new</span> ReactiveWebServerInitializedEvent(webServer, <span class="keyword">this</span>));</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> WebServer <span class="title">startReactiveWebServer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		ServerManager serverManager = <span class="keyword">this</span>.serverManager;</span><br><span class="line">		ServerManager.start(serverManager, <span class="keyword">this</span>::getHttpHandler);</span><br><span class="line">		<span class="keyword">return</span> ServerManager.getWebServer(serverManager);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>经过此前的<code>onRefresh</code>阶段，<code>this.serverManager</code>已经不为null了，因此执行<code>start</code>方法启动<code>WebServer</code>；并且进行<code>Http Handler</code>的加载</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Return the &#123;<span class="doctag">@link</span> HttpHandler&#125; that should be used to process the reactive web</span></span><br><span class="line"><span class="comment">	 * server. By default this method searches for a suitable bean in the context itself.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@return</span> a &#123;<span class="doctag">@link</span> HttpHandler&#125; (never &#123;<span class="doctag">@code</span> null&#125;</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> HttpHandler <span class="title">getHttpHandler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="comment">// Use bean names so that we don't consider the hierarchy</span></span><br><span class="line">		String[] beanNames = getBeanFactory().getBeanNamesForType(HttpHandler.class);</span><br><span class="line">		<span class="keyword">if</span> (beanNames.length == <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> ApplicationContextException(</span><br><span class="line">					<span class="string">"Unable to start ReactiveWebApplicationContext due to missing HttpHandler bean."</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (beanNames.length &gt; <span class="number">1</span>) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> ApplicationContextException(</span><br><span class="line">					<span class="string">"Unable to start ReactiveWebApplicationContext due to multiple HttpHandler beans : "</span></span><br><span class="line">							+ StringUtils.arrayToCommaDelimitedString(beanNames));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> getBeanFactory().getBean(beanNames[<span class="number">0</span>], HttpHandler.class);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>加载完所有的<code>Handler</code>之后，正式启动<code>WebServer</code>，并且重新为<code>handler</code>赋值（此时的<code>Handler</code>为<code>HttpWebHandlerAdapter</code>对象）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ServerManager</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">(ServerManager manager, Supplier&lt;HttpHandler&gt; handlerSupplier)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (manager != <span class="keyword">null</span> &amp;&amp; manager.server != <span class="keyword">null</span>) &#123;</span><br><span class="line">				manager.handler = handlerSupplier.get();</span><br><span class="line">				manager.server.start();</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// NettyWebServer</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> <span class="keyword">throws</span> WebServerException </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.disposableServer == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				<span class="keyword">this</span>.disposableServer = startHttpServer();</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">				ChannelBindException bindException = findBindException(ex);</span><br><span class="line">				<span class="keyword">if</span> (bindException != <span class="keyword">null</span>) &#123;</span><br><span class="line">					<span class="keyword">throw</span> <span class="keyword">new</span> PortInUseException(bindException.localPort());</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">throw</span> <span class="keyword">new</span> WebServerException(<span class="string">"Unable to start Netty"</span>, ex);</span><br><span class="line">			&#125;</span><br><span class="line">			logger.info(<span class="string">"Netty started on port(s): "</span> + getPort());</span><br><span class="line">			startDaemonAwaitThread(<span class="keyword">this</span>.disposableServer);</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> DisposableServer <span class="title">startHttpServer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.lifecycleTimeout != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">this</span>.httpServer.handle(<span class="keyword">this</span>.handlerAdapter)</span><br><span class="line">					.bindNow(<span class="keyword">this</span>.lifecycleTimeout);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>.httpServer.handle(<span class="keyword">this</span>.handlerAdapter).bindNow();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至此整个<code>WebServer</code>容器算是启动完成</p>
+<h4 id="请求处理"><a href="#请求处理" class="headerlink" title="请求处理"></a>请求处理</h4><p>涉及<code>Http</code>请求处理那就要来看<code>ReactorHttpHandlerAdapter</code>、<code>HttpWebHandlerAdapter</code>以及<code>DispatcherHandler</code>了，先来看<code>ReactorHttpHandlerAdapter</code></p>
+<h5 id="ReactorHttpHandlerAdapter"><a href="#ReactorHttpHandlerAdapter" class="headerlink" title="ReactorHttpHandlerAdapter"></a>ReactorHttpHandlerAdapter</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReactorHttpHandlerAdapter</span> <span class="keyword">implements</span> <span class="title">BiFunction</span>&lt;<span class="title">HttpServerRequest</span>, <span class="title">HttpServerResponse</span>, <span class="title">Mono</span>&lt;<span class="title">Void</span>&gt;&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Log logger = HttpLogging.forLogName(ReactorHttpHandlerAdapter.class);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">final</span> HttpHandler httpHandler;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">ReactorHttpHandlerAdapter</span><span class="params">(HttpHandler httpHandler)</span> </span>&#123;</span><br><span class="line">		Assert.notNull(httpHandler, <span class="string">"HttpHandler must not be null"</span>);</span><br><span class="line">		<span class="keyword">this</span>.httpHandler = httpHandler;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> Mono&lt;Void&gt; <span class="title">apply</span><span class="params">(HttpServerRequest reactorRequest, HttpServerResponse reactorResponse)</span> </span>&#123;</span><br><span class="line">		NettyDataBufferFactory bufferFactory = <span class="keyword">new</span> NettyDataBufferFactory(reactorResponse.alloc());</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			ReactorServerHttpRequest request = <span class="keyword">new</span> ReactorServerHttpRequest(reactorRequest, bufferFactory);</span><br><span class="line">			ServerHttpResponse response = <span class="keyword">new</span> ReactorServerHttpResponse(reactorResponse, bufferFactory);</span><br><span class="line"></span><br><span class="line">			<span class="keyword">if</span> (request.getMethod() == HttpMethod.HEAD) &#123;</span><br><span class="line">				response = <span class="keyword">new</span> HttpHeadResponseDecorator(response);</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">this</span>.httpHandler.handle(request, response)</span><br><span class="line">					.doOnError(ex -&gt; logger.trace(request.getLogPrefix() + <span class="string">"Failed to complete: "</span> + ex.getMessage()))</span><br><span class="line">					.doOnSuccess(aVoid -&gt; logger.trace(request.getLogPrefix() + <span class="string">"Handling completed"</span>));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (URISyntaxException ex) &#123;</span><br><span class="line">			<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">				logger.debug(<span class="string">"Failed to get request URI: "</span> + ex.getMessage());</span><br><span class="line">			&#125;</span><br><span class="line">			reactorResponse.status(HttpResponseStatus.BAD_REQUEST);</span><br><span class="line">			<span class="keyword">return</span> Mono.empty();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看出，<code>ReactorHttpHandlerAdapter</code>是最先接收到请求的（具体如何调用到这里的需要结合<code>reactor.netty</code>，这里不细说）然后调用<code>HttpHandler</code>，将请求下发至对应的<code>HttpHandler</code>（即<code>HttpWebHandlerAdapter</code>）</p>
+<h5 id="HttpWebHandlerAdapter"><a href="#HttpWebHandlerAdapter" class="headerlink" title="HttpWebHandlerAdapter"></a>HttpWebHandlerAdapter</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Mono&lt;Void&gt; <span class="title">handle</span><span class="params">(ServerHttpRequest request, ServerHttpResponse response)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.forwardedHeaderTransformer != <span class="keyword">null</span>) &#123;</span><br><span class="line">			request = <span class="keyword">this</span>.forwardedHeaderTransformer.apply(request);</span><br><span class="line">		&#125;</span><br><span class="line">		ServerWebExchange exchange = createExchange(request, response);</span><br><span class="line"></span><br><span class="line">		LogFormatUtils.traceDebug(logger, traceOn -&gt;</span><br><span class="line">				exchange.getLogPrefix() + formatRequest(exchange.getRequest()) +</span><br><span class="line">						(traceOn ? <span class="string">", headers="</span> + formatHeaders(exchange.getRequest().getHeaders()) : <span class="string">""</span>));</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> getDelegate().handle(exchange)</span><br><span class="line">				.doOnSuccess(aVoid -&gt; logResponse(exchange))</span><br><span class="line">				.onErrorResume(ex -&gt; handleUnresolvedError(exchange, ex))</span><br><span class="line">				.then(Mono.defer(response::setComplete));</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">protected</span> ServerWebExchange <span class="title">createExchange</span><span class="params">(ServerHttpRequest request, ServerHttpResponse response)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> DefaultServerWebExchange(request, response, <span class="keyword">this</span>.sessionManager,</span><br><span class="line">				getCodecConfigurer(), getLocaleContextResolver(), <span class="keyword">this</span>.applicationContext);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这里会对<code>ServerHttpRequest request, ServerHttpResponse response</code>进行包装成为<code>ServerWebExchange</code>，然后下发到<code>WebHabdler</code>（此处为<code>ExceptionHandlingWebHandler</code>），这里就是<code>Spring</code>能够拦截到我们程序中出现的异常的原因。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Mono&lt;Void&gt; <span class="title">handle</span><span class="params">(ServerWebExchange exchange)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">		Mono&lt;Void&gt; completion;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">// 处理 http 请求</span></span><br><span class="line">			completion = <span class="keyword">super</span>.handle(exchange);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">			completion = Mono.error(ex);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (WebExceptionHandler handler : <span class="keyword">this</span>.exceptionHandlers) &#123;</span><br><span class="line">			completion = completion.onErrorResume(ex -&gt; handler.handle(exchange, ex));</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> completion;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这时，<code>super.handler</code>跳转到了<code>FilteringWebHandler</code>（此时就是责任链模式了）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> DefaultWebFilterChain chain;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Mono&lt;Void&gt; <span class="title">handle</span><span class="params">(ServerWebExchange exchange)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>.chain.filter(exchange);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Mono&lt;Void&gt; <span class="title">filter</span><span class="params">(ServerWebExchange exchange)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> Mono.defer(() -&gt;</span><br><span class="line">				<span class="keyword">this</span>.currentFilter != <span class="keyword">null</span> &amp;&amp; <span class="keyword">this</span>.next != <span class="keyword">null</span> ?</span><br><span class="line">						<span class="keyword">this</span>.currentFilter.filter(exchange, <span class="keyword">this</span>.next) :</span><br><span class="line">						<span class="keyword">this</span>.handler.handle(exchange));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Spring<code>对于</code>Http<code>请求采用的是责任链模式，会判断当前的</code>filter<code>以及下一个</code>filter<code>，只要有一个为</code>null<code>直接结束责任链，进入</code>handler<code>；而进入责任链模式后，第一个遇到的就是</code>DispatcherHandler`！</p>
+<h5 id="DispatcherHandler"><a href="#DispatcherHandler" class="headerlink" title="DispatcherHandler"></a>DispatcherHandler</h5><p><code>它的内部有三个</code>List`</p>
+<blockquote>
+<p>{@link HandlerMapping} – map requests to handler objects</p>
+<p>{@link HandlerAdapter} – for using any handler interface</p>
+<p>{@link HandlerResultHandler} – process handler return values</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Mono&lt;Void&gt; <span class="title">handle</span><span class="params">(ServerWebExchange exchange)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.handlerMappings == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> createNotFoundError();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> Flux.fromIterable(<span class="keyword">this</span>.handlerMappings)</span><br><span class="line">				.concatMap(mapping -&gt; mapping.getHandler(exchange))</span><br><span class="line">				.next()</span><br><span class="line">				.switchIfEmpty(createNotFoundError())</span><br><span class="line">				.flatMap(handler -&gt; invokeHandler(exchange, handler))</span><br><span class="line">				.flatMap(result -&gt; handleResult(exchange, result));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由注解可知，这里就是进行<code>Http</code>请求分发至相应的请求处理器了，这里截了图以便更为清晰的了解</p>
+<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-33-1.png" alt="DispatcherHandler"></p>
+<p>接着重要的就是如何将请求路由到对应的处理器了，这里是由<code>HandlerMapping.getHandler</code>实现的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Mono&lt;Object&gt; <span class="title">getHandler</span><span class="params">(ServerWebExchange exchange)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> getHandlerInternal(exchange).map(handler -&gt; &#123;</span><br><span class="line">			<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">				logger.debug(exchange.getLogPrefix() + <span class="string">"Mapped to "</span> + handler);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (CorsUtils.isCorsRequest(exchange.getRequest())) &#123;</span><br><span class="line">				CorsConfiguration configA = <span class="keyword">this</span>.corsConfigurationSource.getCorsConfiguration(exchange);</span><br><span class="line">				CorsConfiguration configB = getCorsConfiguration(handler, exchange);</span><br><span class="line">				CorsConfiguration config = (configA != <span class="keyword">null</span> ? configA.combine(configB) : configB);</span><br><span class="line">				<span class="keyword">if</span> (!getCorsProcessor().process(config, exchange) ||</span><br><span class="line">						CorsUtils.isPreFlightRequest(exchange.getRequest())) &#123;</span><br><span class="line">					<span class="keyword">return</span> REQUEST_HANDLED_HANDLER;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span> handler;</span><br><span class="line">		&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>根据代码可以看出，在执行函数<code>getHandlerInternal(exchange)</code>时已经找出了对应的<code>handler</code>了，此操作的执行者为<code>RouterFunctionMapping</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">protected</span> Mono&lt;?&gt; getHandlerInternal(ServerWebExchange exchange) &#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.routerFunction != <span class="keyword">null</span>) &#123;</span><br><span class="line">			ServerRequest request = ServerRequest.create(exchange, <span class="keyword">this</span>.messageReaders);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">this</span>.routerFunction.route(request)</span><br><span class="line">					.doOnNext(handler -&gt; setAttributes(exchange.getAttributes(), request, handler));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> Mono.empty();</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此处<code>route</code>函数的执行者会采用<code>DefaultRouterFunction</code>作为执行者</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> RequestPredicate predicate;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> HandlerFunction&lt;T&gt; handlerFunction;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="keyword">public</span> Mono&lt;HandlerFunction&lt;T&gt;&gt; route(ServerRequest request) &#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.predicate.test(request)) &#123;</span><br><span class="line">				<span class="keyword">if</span> (logger.isTraceEnabled()) &#123;</span><br><span class="line">						String logPrefix = request.exchange().getLogPrefix();</span><br><span class="line">						logger.trace(logPrefix + String.format(<span class="string">"Matched %s"</span>, <span class="keyword">this</span>.predicate));</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">return</span> Mono.just(<span class="keyword">this</span>.handlerFunction);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> Mono.empty();</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到这里有一个<code>this.predicate.test(request)</code>，而这个就是最核心的了，通过<code>RequestPredicate</code>对请求进行判断，是否符合要求，符合要求将<code>HandlerFunction</code>向外发布出去。</p>
+<p><code>RequestPredicate</code>有多个实现子类，所有的子类都在<code>org.springframework.web.reactive.function.server.RequestPredicates</code>下，有关于<code>Http</code>请求类型（get、post、put等等）的验证<code>HttpMethodPredicate</code>；有关于请求URL的验证<code>PathPatternPredicate</code></p>
+<p>主要说一下<code>PathPatternPredicate</code></p>
+<h5 id="PathPatternPredicate"><a href="#PathPatternPredicate" class="headerlink" title="PathPatternPredicate"></a>PathPatternPredicate</h5><p>我的代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span>(value = <span class="string">"NacosRouter"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> RouterFunction <span class="title">NacosRouter</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> route(</span><br><span class="line">                POST(StringConst.API).and(accept(MediaType.APPLICATION_JSON_UTF8))</span><br><span class="line">                        .and(contentType(MediaType.APPLICATION_JSON_UTF8)), nacosHandler::post)</span><br><span class="line">                .andRoute(PUT(StringConst.API).and(accept(MediaType.APPLICATION_JSON_UTF8))</span><br><span class="line">                        .and(contentType(MediaType.APPLICATION_JSON_UTF8)), nacosHandler::put)</span><br><span class="line">                .andRoute(GET(StringConst.API).and(accept(MediaType.APPLICATION_JSON_UTF8))</span><br><span class="line">                        , nacosHandler::get);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码是我的<code>web</code>程序关于路由设定的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">test</span><span class="params">(ServerRequest request)</span> </span>&#123;</span><br><span class="line">		PathContainer pathContainer = request.pathContainer();</span><br><span class="line">		PathPattern.PathMatchInfo info = <span class="keyword">this</span>.pattern.matchAndExtract(pathContainer);</span><br><span class="line">		traceMatch(<span class="string">"Pattern"</span>, <span class="keyword">this</span>.pattern.getPatternString(), request.path(), info != <span class="keyword">null</span>);</span><br><span class="line">		<span class="keyword">if</span> (info != <span class="keyword">null</span>) &#123;</span><br><span class="line">				mergeAttributes(request, info.getUriVariables(), <span class="keyword">this</span>.pattern);</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>根据你设定的请求URL创建一个<code>PathContainer</code>对象，该对象是对URL进行结构化的表示，然后调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PathPattern.PathMatchInfo info = <span class="keyword">this</span>.pattern.matchAndExtract(pathContainer);</span><br></pre></td></tr></table></figure>
+<p>进行实际请求URL与设定的URL信息进行比对</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Nullable</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> PathMatchInfo <span class="title">matchAndExtract</span><span class="params">(PathContainer pathContainer)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.head == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> hasLength(pathContainer) &amp;&amp;</span><br><span class="line">				!(<span class="keyword">this</span>.matchOptionalTrailingSeparator &amp;&amp; pathContainerIsJustSeparator(pathContainer))</span><br><span class="line">				? <span class="keyword">null</span> : PathMatchInfo.EMPTY;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">else</span> <span class="keyword">if</span> (!hasLength(pathContainer)) &#123;</span><br><span class="line">			<span class="keyword">if</span> (<span class="keyword">this</span>.head <span class="keyword">instanceof</span> WildcardTheRestPathElement || <span class="keyword">this</span>.head <span class="keyword">instanceof</span> CaptureTheRestPathElement) &#123;</span><br><span class="line">				pathContainer = EMPTY_PATH; <span class="comment">// Will allow CaptureTheRest to bind the variable to empty</span></span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		MatchingContext matchingContext = <span class="keyword">new</span> MatchingContext(pathContainer, <span class="keyword">true</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">this</span>.head.matches(<span class="number">0</span>, matchingContext) ? matchingContext.getPathMatchResult() : <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过对返回的<code>PathMatchInfo</code>是否为null来对本次请求匹配做判断，具体的匹配模式有很多种，具体的实现看<code>PathElement</code>的子类即可。</p>
+<p>经过以上步骤之后，再次回到<code>DispatcherHandler</code>的<code>handler</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Mono&lt;Void&gt; <span class="title">handle</span><span class="params">(ServerWebExchange exchange)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.handlerMappings == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">return</span> createNotFoundError();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> Flux.fromIterable(<span class="keyword">this</span>.handlerMappings)</span><br><span class="line">				.concatMap(mapping -&gt; mapping.getHandler(exchange))</span><br><span class="line">				.next()</span><br><span class="line">				.switchIfEmpty(createNotFoundError())</span><br><span class="line">				.flatMap(handler -&gt; invokeHandler(exchange, handler))</span><br><span class="line">				.flatMap(result -&gt; handleResult(exchange, result));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这时执行完了<code>mapping.getHandler(exchange)</code>方法了，然后根据返回的<code>handler</code>是否为空决定是否创建<code>Http Not Found</code>错误；如果<code>handler</code>不为空，就是将请求信息送入对应的<code>handler</code>去处理了以及获取<code>handler</code>处理后的返回信息进行拦截返回。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Mono&lt;HandlerResult&gt; <span class="title">invokeHandler</span><span class="params">(ServerWebExchange exchange, Object handler)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.handlerAdapters != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">for</span> (HandlerAdapter handlerAdapter : <span class="keyword">this</span>.handlerAdapters) &#123;</span><br><span class="line">				<span class="keyword">if</span> (handlerAdapter.supports(handler)) &#123;</span><br><span class="line">					<span class="keyword">return</span> handlerAdapter.handle(exchange, handler);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> Mono.error(<span class="keyword">new</span> IllegalStateException(<span class="string">"No HandlerAdapter: "</span> + handler));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Mono&lt;Void&gt; <span class="title">handleResult</span><span class="params">(ServerWebExchange exchange, HandlerResult result)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> getResultHandler(result).handleResult(exchange, result)</span><br><span class="line">				.onErrorResume(ex -&gt; result.applyExceptionHandler(ex).flatMap(exceptionResult -&gt;</span><br><span class="line">						getResultHandler(exceptionResult).handleResult(exchange, exceptionResult)));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> HandlerResultHandler <span class="title">getResultHandler</span><span class="params">(HandlerResult handlerResult)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.resultHandlers != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">for</span> (HandlerResultHandler resultHandler : <span class="keyword">this</span>.resultHandlers) &#123;</span><br><span class="line">				<span class="keyword">if</span> (resultHandler.supports(handlerResult)) &#123;</span><br><span class="line">					<span class="keyword">return</span> resultHandler;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"No HandlerResultHandler for "</span> + handlerResult.getReturnValue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/29/java-web-31/" rel="next" title="Nacos Server端注册一个服务实例流程">
+                <i class="fa fa-chevron-left"></i> Nacos Server端注册一个服务实例流程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 commiter</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">83</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前话"><span class="nav-number">1.</span> <span class="nav-text">前话</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Web容器"><span class="nav-number">2.</span> <span class="nav-text">Web容器</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ReactiveWebServerApplicationContext"><span class="nav-number">2.1.</span> <span class="nav-text">ReactiveWebServerApplicationContext</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#NettyReactiveWebServerFactory"><span class="nav-number">2.2.</span> <span class="nav-text">NettyReactiveWebServerFactory</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ReactiveWebServerApplicationContext-1"><span class="nav-number">2.3.</span> <span class="nav-text">ReactiveWebServerApplicationContext</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#请求处理"><span class="nav-number">3.</span> <span class="nav-text">请求处理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ReactorHttpHandlerAdapter"><span class="nav-number">3.1.</span> <span class="nav-text">ReactorHttpHandlerAdapter</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#HttpWebHandlerAdapter"><span class="nav-number">3.2.</span> <span class="nav-text">HttpWebHandlerAdapter</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#DispatcherHandler"><span class="nav-number">3.3.</span> <span class="nav-text">DispatcherHandler</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#PathPatternPredicate"><span class="nav-number">3.4.</span> <span class="nav-text">PathPatternPredicate</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/05/06/java-web-33/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

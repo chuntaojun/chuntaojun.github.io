@@ -108,25 +108,24 @@
 
 
 
-  <meta name="description" content="这是Leetcode的原题目  &amp;quot;&amp;quot;&amp;quot; In this problem, a tree is an undirected graph that is connected and has no cycles.  The given input is a graph that started as a tree with N nodes (with distinct va">
-<meta name="keywords" content="并查集">
+  <meta name="description" content="题目每年六一儿童节,牛客都会准备一些小礼物去看望孤儿院的小朋友,今年亦是如此。HF作为牛客的资深元老,自然也准备了一些小游戏。其中,有个游戏是这样的:首先,让小朋友们围成一个大圈。然后,他随机指定一个数m,让编号为0的小朋友开始报数。每次喊到m-1的那个小朋友要出列唱首歌,然后可以在礼品箱中任意的挑选礼物,并且不再回到圈中,从他的下一个小朋友开始,继续0…m-1报数….这样下去….直到剩下最后一个">
 <meta property="og:type" content="article">
-<meta property="og:title" content="leetcode回顾——并查集 解决无向图是否有环的问题">
-<meta property="og:url" content="https://www.liaochuntao.cn/2017/12/09/leetcode_1/index.html">
+<meta property="og:title" content="牛客网——剑指offer之孩子们的游戏(圆圈中最后剩下的数)">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/05/21/leetcode-24/index.html">
 <meta property="og:site_name" content="唉&#39;s Blog">
-<meta property="og:description" content="这是Leetcode的原题目  &amp;quot;&amp;quot;&amp;quot; In this problem, a tree is an undirected graph that is connected and has no cycles.  The given input is a graph that started as a tree with N nodes (with distinct va">
+<meta property="og:description" content="题目每年六一儿童节,牛客都会准备一些小礼物去看望孤儿院的小朋友,今年亦是如此。HF作为牛客的资深元老,自然也准备了一些小游戏。其中,有个游戏是这样的:首先,让小朋友们围成一个大圈。然后,他随机指定一个数m,让编号为0的小朋友开始报数。每次喊到m-1的那个小朋友要出列唱首歌,然后可以在礼品箱中任意的挑选礼物,并且不再回到圈中,从他的下一个小朋友开始,继续0…m-1报数….这样下去….直到剩下最后一个">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-01-06T06:28:00.000Z">
+<meta property="og:updated_time" content="2019-05-22T09:12:01.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="leetcode回顾——并查集 解决无向图是否有环的问题">
-<meta name="twitter:description" content="这是Leetcode的原题目  &amp;quot;&amp;quot;&amp;quot; In this problem, a tree is an undirected graph that is connected and has no cycles.  The given input is a graph that started as a tree with N nodes (with distinct va">
+<meta name="twitter:title" content="牛客网——剑指offer之孩子们的游戏(圆圈中最后剩下的数)">
+<meta name="twitter:description" content="题目每年六一儿童节,牛客都会准备一些小礼物去看望孤儿院的小朋友,今年亦是如此。HF作为牛客的资深元老,自然也准备了一些小游戏。其中,有个游戏是这样的:首先,让小朋友们围成一个大圈。然后,他随机指定一个数m,让编号为0的小朋友开始报数。每次喊到m-1的那个小朋友要出列唱首歌,然后可以在礼品箱中任意的挑选礼物,并且不再回到圈中,从他的下一个小朋友开始,继续0…m-1报数….这样下去….直到剩下最后一个">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.liaochuntao.cn/2017/12/09/leetcode_1/"/>
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/05/21/leetcode-24/"/>
 
 
 
@@ -136,7 +135,7 @@
   };
 </script>
 
-  <title>leetcode回顾——并查集 解决无向图是否有环的问题 | 唉's Blog</title>
+  <title>牛客网——剑指offer之孩子们的游戏(圆圈中最后剩下的数) | 唉's Blog</title>
   
 
 
@@ -306,7 +305,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2017/12/09/leetcode_1/">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/05/21/leetcode-24/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="liaochuntao">
@@ -323,7 +322,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">leetcode回顾——并查集 解决无向图是否有环的问题
+          <h1 class="post-title" itemprop="name headline">牛客网——剑指offer之孩子们的游戏(圆圈中最后剩下的数)
               
             
           </h1>
@@ -348,7 +347,7 @@
                 
               
 
-              <time title="Created: 2017-12-09 14:51:19" itemprop="dateCreated datePublished" datetime="2017-12-09T14:51:19+08:00">2017-12-09</time>
+              <time title="Created: 2019-05-21 23:18:07" itemprop="dateCreated datePublished" datetime="2019-05-21T23:18:07+08:00">2019-05-21</time>
             
 
             
@@ -365,7 +364,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-01-06 14:28:00" itemprop="dateModified" datetime="2019-01-06T14:28:00+08:00">2019-01-06</time>
+                <time title="Modified: 2019-05-22 17:12:01" itemprop="dateModified" datetime="2019-05-22T17:12:01+08:00">2019-05-22</time>
               
             
           </span>
@@ -396,7 +395,7 @@
 
           
           
-             <span id="/2017/12/09/leetcode_1/" class="leancloud_visitors" data-flag-title="leetcode回顾——并查集 解决无向图是否有环的问题">
+             <span id="/2019/05/21/leetcode-24/" class="leancloud_visitors" data-flag-title="牛客网——剑指offer之孩子们的游戏(圆圈中最后剩下的数)">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -427,55 +426,87 @@
       
 
       
-        <p>这是Leetcode的原题目</p>
-<blockquote>
-<pre><code>&quot;&quot;&quot;
-In this problem, a tree is an undirected graph that is connected and has no cycles.
-
-The given input is a graph that started as a tree with N nodes (with distinct values 1, 2, ..., N), with one additional
-edge added. The added edge has two different vertices chosen from 1 to N, and was not an edge that already existed.
-
-The resulting graph is given as a 2D-array of edges. Each element of edges is a pair [u, v] with u &lt; v, that represents
-an undirected edge connecting nodes u and v.
-
-Return an edge that can be removed so that the resulting graph is a tree of N nodes. If there are multiple answers,
-return the answer that occurs last in the given 2D-array. The answer edge [u, v] should be in the same format,
-with u &lt; v.
-
-Example 1:
-Input: [[1,2], [1,3], [2,3]]
-Output: [2,3]
-Explanation: The given undirected graph will be like this:
-  1
- / \
-2 - 3
-Example 2:
-Input: [[1,2], [2,3], [3,4], [1,4], [1,5]]
-Output: [1,4]
-Explanation: The given undirected graph will be like this:
-5 - 1 - 2
-    |   |
-    4 - 3
-Note:
-The size of the input 2D-array will be between 3 and 1000.
-Every integer represented in the 2D-array will be between 1 and N, where N is the size of the input array.
-
-Update (2017-09-26):
-We have overhauled the problem description + test cases and specified clearly the graph is an undirected graph. For the
-directed graph follow up please see Redundant Connection II). We apologize for any inconvenience caused.
-&quot;&quot;&quot;
-</code></pre></blockquote>
-<p>通读题目，以及观察样例，我们其实很容易发现这题的根本问题——查找一个无向图中是否含有环，若存在环，那么可以删除一条边使图依旧连通，那么这个时候，对于无向图这个结构来说，我们用并查集的方法来实现，就很快能解决问题了。那什么是并查集？这里引用维基百科的解释：</p>
-<blockquote>
-<p>在计算机科学中，<strong>并查集</strong>是一种树型的数据结构，用于处理一些不相交集合（Disjoint Sets）的合并及查询问题。有一个<strong>联合-查找算法</strong>（<strong>union-find algorithm</strong>）定义了两个用于此数据结构的操作：</p>
-<ul>
-<li>Find：确定元素属于哪一个子集。它可以被用来确定两个元素是否属于同一子集。</li>
-<li>Union：将两个子集合并成同一个集合。</li>
-</ul>
+        <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><p>每年六一儿童节,牛客都会准备一些小礼物去看望孤儿院的小朋友,今年亦是如此。HF作为牛客的资深元老,自然也准备了一些小游戏。其中,有个游戏是这样的:首先,让小朋友们围成一个大圈。然后,他随机指定一个数m,让编号为0的小朋友开始报数。每次喊到m-1的那个小朋友要出列唱首歌,然后可以在礼品箱中任意的挑选礼物,并且不再回到圈中,从他的下一个小朋友开始,继续0…m-1报数….这样下去….直到剩下最后一个小朋友,可以不用表演,并且拿到牛客名贵的“名侦探柯南”典藏版(名额有限哦!!^_^)。请你试着想下,哪个小朋友会得到这份礼品呢？(注：小朋友的编号是从0到n-1)</p>
+<h4 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h4><blockquote>
+<p>题目假设：n=7，m=3</p>
 </blockquote>
-<p>因此，我们可以得出并查集算法最重要的两个方法：find方法和union（merge）方法，find方法用于查找某个元素的老大（可能是自己），union（merge）用于解决两个元素的从属问题，就是帮小弟认老大；并查集算法的实现，可能还需要前期以一些数据工作的准备，将所有元素去重存储到一个array或者list中，并初始化他们的老大为他们自己对应的数组下标，接着，用一个循环去遍历原始信息，在遍历中调用union方法从而首先元素的归属问题。</p>
-<p>接着，我们在回到本题，如果是判断一个无向图中是否有环，我们只需要判断两个元素的老大是不是同一个即可，如果是用一个老大，我们就把这条边放到一个list当中，当遍历结束，list里面的元素就是本题答案。</p>
-<p>这里贴上本题leetcode的AC代码：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self.a, self.ans = &#123;&#125;, []</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">findRedundantConnection</span><span class="params">(self, edges)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type edges: List[List[int]]</span></span><br><span class="line"><span class="string">        :rtype: List[int]</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        cnt = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> edges:</span><br><span class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> i:</span><br><span class="line">                <span class="keyword">if</span> j <span class="keyword">not</span> <span class="keyword">in</span> self.a.keys():</span><br><span class="line">                    self.a[j] = cnt</span><br><span class="line">                    cnt += <span class="number">1</span></span><br><span class="line">        self.temp = list(range(len(self.a)))</span><br><span class="line">        [self.union(self.a[i], self.a[j]) <span class="keyword">for</span> i, j <span class="keyword">in</span> edges]</span><br><span class="line">        <span class="keyword">return</span> [key <span class="keyword">for</span> key <span class="keyword">in</span> self.a.keys() <span class="keyword">if</span> self.a[key] == self.ans[<span class="number">0</span>][<span class="number">0</span>] <span class="keyword">or</span> self.a[key] == self.ans[<span class="number">0</span>][<span class="number">1</span>]]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">union</span><span class="params">(self, i, j)</span>:</span></span><br><span class="line">        f1, f2 = self.find(i), self.find(j)</span><br><span class="line">        <span class="keyword">if</span> f1 == f2:</span><br><span class="line">            self.ans.append([i, j])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.temp[f1] = f2</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">find</span><span class="params">(self, i)</span>:</span></span><br><span class="line">        <span class="keyword">while</span> i != self.temp[i]:</span><br><span class="line">            i = self.temp[i]</span><br><span class="line">        <span class="keyword">return</span> i</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    s = Solution()</span><br><span class="line">    <span class="keyword">print</span> s.findRedundantConnection([[<span class="number">1</span>, <span class="number">2</span>], [<span class="number">2</span>, <span class="number">3</span>], [<span class="number">1</span>, <span class="number">5</span>], [<span class="number">3</span>, <span class="number">4</span>], [<span class="number">1</span>, <span class="number">4</span>]]</span><br></pre></td></tr></table></figure></p>
+<p>这道题可以用数组+记录下一位小朋友的位置的方法来做</p>
+<p>首先创建一个长度为<code>n</code>的数组，每个位置代表一个小盆友的编号信息，然后，每个小朋友记录自己报数时的下一位小朋友的编号信息</p>
+<table>
+<thead>
+<tr>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>2</td>
+<td>3</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>每次报数，当某位小朋友的数字为目标的（m-1）时，将该小朋友A的下一小朋友B的编号，赋值给该小朋友A的前一位小朋友C，自己将编号设置为-1</p>
+<table>
+<thead>
+<tr>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>3</td>
+<td>-1</td>
+<td>4</td>
+<td>5</td>
+<td>6</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>这样不断执行，最后会发现，当只剩下一位小朋友时，他的下一位小朋友的编号就是他自己</p>
+<table>
+<thead>
+<tr>
+<th>0</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+<th>6</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-1</td>
+<td>-1</td>
+<td>-1</td>
+<td>3</td>
+<td>-1</td>
+<td>-1</td>
+<td>-1</td>
+</tr>
+</tbody>
+</table>
+<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@author</span> liaochuntao</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Solution</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">LastRemaining_Solution</span><span class="params">(<span class="keyword">int</span> n, <span class="keyword">int</span> m)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (n &lt;= <span class="number">0</span> || m &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> target = m - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span>[] childens = <span class="keyword">new</span> <span class="keyword">int</span>[n];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i ++) &#123;</span><br><span class="line">            childens[i] = i + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        childens[n - <span class="number">1</span>] = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> preIndex = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> index = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">int</span> cnt = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (childens[index] != index) &#123;</span><br><span class="line">            cnt ++;</span><br><span class="line">            preIndex = index;</span><br><span class="line">            index = childens[index];</span><br><span class="line">            <span class="keyword">if</span> (cnt == target) &#123;</span><br><span class="line">                childens[preIndex] = childens[index];</span><br><span class="line">                index = childens[index];</span><br><span class="line">                cnt = <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> index;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = <span class="number">7</span>, m = <span class="number">3</span>;</span><br><span class="line">        Solution s = <span class="keyword">new</span> Solution();</span><br><span class="line">        System.out.println(s.LastRemaining_Solution(n, m));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
     </div>
@@ -494,12 +525,6 @@ directed graph follow up please see Redundant Connection II). We apologize for a
 
     <footer class="post-footer">
       
-        <div class="post-tags">
-          
-            <a href="/tags/并查集/" rel="tag"># 并查集</a>
-          
-        </div>
-      
 
       
       
@@ -509,8 +534,8 @@ directed graph follow up please see Redundant Connection II). We apologize for a
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/12/07/data_struct_10/" rel="next" title="图论相关——邻接多重表与十字链表">
-                <i class="fa fa-chevron-left"></i> 图论相关——邻接多重表与十字链表
+              <a href="/2019/05/17/java-web-36/" rel="next" title="记一次解决Nacos-SpringBoot不支持@ConditionalOnProperty">
+                <i class="fa fa-chevron-left"></i> 记一次解决Nacos-SpringBoot不支持@ConditionalOnProperty
               </a>
             
           </div>
@@ -518,10 +543,6 @@ directed graph follow up please see Redundant Connection II). We apologize for a
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/12/10/data_struct_11/" rel="prev" title="平衡树——AVL树">
-                平衡树——AVL树 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -571,8 +592,17 @@ directed graph follow up please see Redundant Connection II). We apologize for a
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -705,6 +735,22 @@ directed graph follow up please see Redundant Connection II). We apologize for a
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解题思路"><span class="nav-number">2.</span> <span class="nav-text">解题思路</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AC代码"><span class="nav-number">3.</span> <span class="nav-text">AC代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -854,7 +900,7 @@ directed graph follow up please see Redundant Connection II). We apologize for a
   
     <script type="text/javascript">
       window.livereOptions = {
-        refer: '2017/12/09/leetcode_1/'
+        refer: '2019/05/21/leetcode-24/'
       };
       (function(d, s) {
         var j, e = d.getElementsByTagName(s)[0];

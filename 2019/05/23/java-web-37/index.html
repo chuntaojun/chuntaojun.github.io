@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="如何发起健康检查在注册实例时，会需要带上集群信息；而集群信息在nacos-server端，会有相应的额外信息增加以及额外的初始化动作。其中，健康检查的设定操作如下 123456789101112131415161718// Clusterpublic void init() &amp;#123;    if (inited) &amp;#123;        return;    &amp;#125;    check">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nacos是如何实现TCP端口测探方式检测实例是否存活">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/05/23/java-web-37/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="如何发起健康检查在注册实例时，会需要带上集群信息；而集群信息在nacos-server端，会有相应的额外信息增加以及额外的初始化动作。其中，健康检查的设定操作如下 123456789101112131415161718// Clusterpublic void init() &amp;#123;    if (inited) &amp;#123;        return;    &amp;#125;    check">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-05-25T14:30:16.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nacos是如何实现TCP端口测探方式检测实例是否存活">
+<meta name="twitter:description" content="如何发起健康检查在注册实例时，会需要带上集群信息；而集群信息在nacos-server端，会有相应的额外信息增加以及额外的初始化动作。其中，健康检查的设定操作如下 123456789101112131415161718// Clusterpublic void init() &amp;#123;    if (inited) &amp;#123;        return;    &amp;#125;    check">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/05/23/java-web-37/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Nacos是如何实现TCP端口测探方式检测实例是否存活 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/05/23/java-web-37/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 commiter">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Nacos是如何实现TCP端口测探方式检测实例是否存活
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-05-23 21:24:19" itemprop="dateCreated datePublished" datetime="2019-05-23T21:24:19+08:00">2019-05-23</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-05-25 22:30:16" itemprop="dateModified" datetime="2019-05-25T22:30:16+08:00">2019-05-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/05/23/java-web-37/" class="leancloud_visitors" data-flag-title="Nacos是如何实现TCP端口测探方式检测实例是否存活">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="如何发起健康检查"><a href="#如何发起健康检查" class="headerlink" title="如何发起健康检查"></a>如何发起健康检查</h4><p>在注册实例时，会需要带上集群信息；而集群信息在<code>nacos-server</code>端，会有相应的额外信息增加以及额外的初始化动作。其中，健康检查的设定操作如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Cluster</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (inited) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    checkTask = <span class="keyword">new</span> HealthCheckTask(<span class="keyword">this</span>);</span><br><span class="line">    HealthCheckReactor.scheduleCheck(checkTask);</span><br><span class="line">    inited = <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// HealthCheckTask</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">HealthCheckTask</span><span class="params">(Cluster cluster)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.cluster = cluster;</span><br><span class="line">    distroMapper = SpringContext.getAppContext().getBean(DistroMapper.class);</span><br><span class="line">    switchDomain = SpringContext.getAppContext().getBean(SwitchDomain.class);</span><br><span class="line">    healthCheckProcessor = SpringContext.getAppContext().getBean(HealthCheckProcessorDelegate.class);</span><br><span class="line">    initCheckRT();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在<code>Cluster</code>的<code>init</code>函数中，可以看到在创建<code>Cluster</code>对象时，会创建一个<code>HealthCheckTask</code>，然后将该任务放入<code>HealthCheckReactor</code>中进行调度运行；而在创建<code>HealthCheckTask</code>时，会创建一个健康检查方式的策略对象<code>HealthCheckProcessorDelegate</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span>(<span class="string">"healthCheckDelegate"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HealthCheckProcessorDelegate</span> <span class="keyword">implements</span> <span class="title">HealthCheckProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Map&lt;String, HealthCheckProcessor&gt; healthCheckProcessorMap</span><br><span class="line">        = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">HealthCheckProcessorDelegate</span><span class="params">(HealthCheckExtendProvider provider)</span> </span>&#123;</span><br><span class="line">        provider.init();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addProcessor</span><span class="params">(Collection&lt;HealthCheckProcessor&gt; processors)</span></span>&#123;</span><br><span class="line">        healthCheckProcessorMap.putAll(processors.stream()</span><br><span class="line">            .filter(processor -&gt; processor.getType() != <span class="keyword">null</span>)</span><br><span class="line">            .collect(Collectors.toMap(HealthCheckProcessor::getType, processor -&gt; processor)));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(HealthCheckTask task)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 典型的策略模式的的实现</span></span><br><span class="line">        String type = task.getCluster().getHealthChecker().getType();</span><br><span class="line">        HealthCheckProcessor processor = healthCheckProcessorMap.get(type);</span><br><span class="line">        <span class="keyword">if</span>(processor == <span class="keyword">null</span>)&#123;</span><br><span class="line">            processor = healthCheckProcessorMap.get(<span class="string">"none"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        processor.process(task);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该对象在初始化后，会调用<code>addProcessor(Collection&lt;HealthCheckProcessor&gt; processors)</code>方法，将所有类型的<code>HealthCheckProcessor</code>加载。</p>
+<p>加载完毕后，因为<code>HealthCheckTask</code>是一个任务，会被线程池中的线程调度，那么接下来要看的就是<code>run</code>方法了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (distroMapper.responsible(cluster.getService().getName()) &amp;&amp;</span><br><span class="line">            switchDomain.isHealthCheckEnabled(cluster.getService().getName())) &#123;</span><br><span class="line">            healthCheckProcessor.process(<span class="keyword">this</span>);</span><br><span class="line">            <span class="keyword">if</span> (Loggers.EVT_LOG.isDebugEnabled()) &#123;</span><br><span class="line">                Loggers.EVT_LOG.debug(<span class="string">"[HEALTH-CHECK] schedule health check task: &#123;&#125;"</span>, cluster.getService().getName());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">        Loggers.SRV_LOG.error(<span class="string">"[HEALTH-CHECK] error while process health check for &#123;&#125;:&#123;&#125;"</span>,</span><br><span class="line">                cluster.getService().getName(), cluster.getName(), e);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (!cancelled) &#123;</span><br><span class="line">            HealthCheckReactor.scheduleCheck(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// worst == 0 means never checked</span></span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.getCheckRTWorst() &gt; <span class="number">0</span></span><br><span class="line">                    &amp;&amp; switchDomain.isHealthCheckEnabled(cluster.getService().getName())</span><br><span class="line">                    &amp;&amp; distroMapper.responsible(cluster.getService().getName())) &#123;</span><br><span class="line">                    <span class="comment">// TLog doesn't support float so we must convert it into long</span></span><br><span class="line">                <span class="keyword">long</span> diff = ((<span class="keyword">this</span>.getCheckRTLast() - <span class="keyword">this</span>.getCheckRTLastLast()) * <span class="number">10000</span>)</span><br><span class="line">                        / <span class="keyword">this</span>.getCheckRTLastLast();</span><br><span class="line"></span><br><span class="line">                <span class="keyword">this</span>.setCheckRTLastLast(<span class="keyword">this</span>.getCheckRTLast());</span><br><span class="line"></span><br><span class="line">                Cluster cluster = <span class="keyword">this</span>.getCluster();</span><br><span class="line">                Loggers.CHECK_RT.info(<span class="string">"&#123;&#125;:&#123;&#125;@&#123;&#125;-&gt;normalized: &#123;&#125;, worst: &#123;&#125;, best: &#123;&#125;, last: &#123;&#125;, diff: &#123;&#125;"</span>,</span><br><span class="line">                        cluster.getService().getName(), cluster.getName(), cluster.getHealthChecker().getType(),</span><br><span class="line">                        <span class="keyword">this</span>.getCheckRTNormalized(), <span class="keyword">this</span>.getCheckRTWorst(), <span class="keyword">this</span>.getCheckRTBest(),</span><br><span class="line">                        <span class="keyword">this</span>.getCheckRTLast(), diff);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先回去判断集群是否开启了健康检查，如果开启的话，调用健康检查策略对象<code>healthCheckProcessor</code>执行<code>process</code>方法，执行健康检查，因为这里要介绍的<code>TCP</code>形式的健康检查，因此直接来看该方法执行跳转到<code>TcpSuperSenseProcessor</code>的<code>process</code>方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TcpSuperSenseProcessor</span> <span class="keyword">implements</span> <span class="title">HealthCheckProcessor</span>, <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">process</span><span class="params">(HealthCheckTask task)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 首先，TCP 测探实例健康，必须要求实例为持久化实例</span></span><br><span class="line">        List&lt;Instance&gt; ips = task.getCluster().allIPs(<span class="keyword">false</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (CollectionUtils.isEmpty(ips)) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Service service = task.getCluster().getService();</span><br><span class="line">		    <span class="comment">// 遍历集群中的所有服务实例</span></span><br><span class="line">        <span class="keyword">for</span> (Instance ip : ips) &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (ip.isMarked()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (SRV_LOG.isDebugEnabled()) &#123;</span><br><span class="line">                    SRV_LOG.debug(<span class="string">"tcp check, ip is marked as to skip health check, ip:"</span> + ip.getIp());</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!ip.markChecking()) &#123;</span><br><span class="line">                SRV_LOG.warn(<span class="string">"tcp check started before last one finished, service: "</span></span><br><span class="line">                    + task.getCluster().getService().getName() + <span class="string">":"</span></span><br><span class="line">                    + task.getCluster().getName() + <span class="string">":"</span></span><br><span class="line">                    + ip.getIp() + <span class="string">":"</span></span><br><span class="line">                    + ip.getPort());</span><br><span class="line"></span><br><span class="line">                healthCheckCommon.reEvaluateCheckRT(task.getCheckRTNormalized() * <span class="number">2</span>, task, switchDomain.getTcpHealthParams());</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 创建心跳任务信息，加入任务队列中</span></span><br><span class="line">            Beat beat = <span class="keyword">new</span> Beat(ip, task);</span><br><span class="line">            taskQueue.add(beat);</span><br><span class="line">            MetricsMonitor.getTcpHealthCheckMonitor().incrementAndGet();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//        selector.wakeup();</span></span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先遍历该集群下的所有服务实例，对每一个服务实例<code>Instance</code>，创建一个心跳信息<code>Beat</code>，然后加入任务队列<code>taskQueue</code>中；由于<code>TcpSuperSenseProcessor</code>本身也是一个<code>Runnable</code>，因此，这个<code>taskQueue</code>是会在<code>TcpSuperSenseProcessor</code>中不断被消费的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">processTask</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    Collection&lt;Callable&lt;Void&gt;&gt; tasks = <span class="keyword">new</span> LinkedList&lt;Callable&lt;Void&gt;&gt;();</span><br><span class="line">    <span class="keyword">do</span> &#123;</span><br><span class="line">        Beat beat = taskQueue.poll(CONNECT_TIMEOUT_MS / <span class="number">2</span>, TimeUnit.MILLISECONDS);</span><br><span class="line">        <span class="keyword">if</span> (beat == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        tasks.add(<span class="keyword">new</span> TaskProcessor(beat));</span><br><span class="line">    &#125; <span class="keyword">while</span> (taskQueue.size() &gt; <span class="number">0</span> &amp;&amp; tasks.size() &lt; NIO_THREAD_COUNT * <span class="number">64</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (Future&lt;?&gt; f : NIO_EXECUTOR.invokeAll(tasks)) &#123;</span><br><span class="line">        f.get();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            processTask();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> readyCount = selector.selectNow();</span><br><span class="line">            <span class="keyword">if</span> (readyCount &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            Iterator&lt;SelectionKey&gt; iter = selector.selectedKeys().iterator();</span><br><span class="line">            <span class="keyword">while</span> (iter.hasNext()) &#123;</span><br><span class="line">                SelectionKey key = iter.next();</span><br><span class="line">                iter.remove();</span><br><span class="line"></span><br><span class="line">                NIO_EXECUTOR.execute(<span class="keyword">new</span> PostProcessor(key));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">            SRV_LOG.error(<span class="string">"[HEALTH-CHECK] error while processing NIO task"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在<code>run</code>方法中，首先会调用<code>processTask()</code>方法，从<code>taskQueue</code>中弹出最大任务数量为<code>NIO_THREAD_COUNT * 64</code>的<code>TaskProcessor</code>任务，然后调入线程池<code>NIO_EXECUTOR.invokeAll(tasks)</code>全部执行。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">TaskProcessor</span> <span class="keyword">implements</span> <span class="title">Callable</span>&lt;<span class="title">Void</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_WAIT_TIME_MILLISECONDS = <span class="number">500</span>;</span><br><span class="line">    Beat beat = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TaskProcessor</span><span class="params">(Beat beat)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.beat = beat;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Void <span class="title">call</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> waited = System.currentTimeMillis() - beat.getStartTime();</span><br><span class="line">        <span class="keyword">if</span> (waited &gt; MAX_WAIT_TIME_MILLISECONDS) &#123;</span><br><span class="line">            Loggers.SRV_LOG.warn(<span class="string">"beat task waited too long: "</span> + waited + <span class="string">"ms"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        SocketChannel channel = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Instance instance = beat.getIp();</span><br><span class="line">            Cluster cluster = beat.getTask().getCluster();</span><br><span class="line"></span><br><span class="line">            BeatKey beatKey = keyMap.get(beat.toString());</span><br><span class="line">            <span class="keyword">if</span> (beatKey != <span class="keyword">null</span> &amp;&amp; beatKey.key.isValid()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (System.currentTimeMillis() - beatKey.birthTime &lt; TCP_KEEP_ALIVE_MILLIS) &#123;</span><br><span class="line">                    instance.setBeingChecked(<span class="keyword">false</span>);</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                beatKey.key.cancel();</span><br><span class="line">                beatKey.key.channel().close();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            channel = SocketChannel.open();</span><br><span class="line">            channel.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line">            <span class="comment">// only by setting this can we make the socket close event asynchronous</span></span><br><span class="line">            channel.socket().setSoLinger(<span class="keyword">false</span>, -<span class="number">1</span>);</span><br><span class="line">            channel.socket().setReuseAddress(<span class="keyword">true</span>);</span><br><span class="line">            channel.socket().setKeepAlive(<span class="keyword">true</span>);</span><br><span class="line">            channel.socket().setTcpNoDelay(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> port = cluster.isUseIPPort4Check() ? instance.getPort() : cluster.getDefCkport();</span><br><span class="line">            channel.connect(<span class="keyword">new</span> InetSocketAddress(instance.getIp(), port));</span><br><span class="line"></span><br><span class="line">            SelectionKey key = channel.register(selector, SelectionKey.OP_CONNECT | SelectionKey.OP_READ);</span><br><span class="line">            key.attach(beat);</span><br><span class="line">            keyMap.put(beat.toString(), <span class="keyword">new</span> BeatKey(key));</span><br><span class="line"></span><br><span class="line">            beat.setStartTime(System.currentTimeMillis());</span><br><span class="line"></span><br><span class="line">            NIO_EXECUTOR.schedule(<span class="keyword">new</span> TimeOutTask(key), CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        		beat.finishCheck(<span class="keyword">false</span>, <span class="keyword">false</span>, switchDomain.getTcpHealthParams().getMax(), <span class="string">"tcp:error:"</span> + e.getMessage());</span><br><span class="line"></span><br><span class="line">						<span class="keyword">if</span> (channel != <span class="keyword">null</span>) &#123;</span><br><span class="line">								<span class="keyword">try</span> &#123;</span><br><span class="line">										channel.close();</span><br><span class="line">								&#125; <span class="keyword">catch</span> (Exception ignore) &#123;</span><br><span class="line">								&#125;</span><br><span class="line">						&#125;</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这里<code>nacos-server</code>采用的是<code>SocketChannel</code>非阻塞的<code>Socket</code>，然后注册感兴趣的事件<code>SelectionKey.OP_CONNECT | SelectionKey.OP_READ</code>，同时将心跳信息作为附件放入<code>key</code>中——<code>key.attach(beat)</code>；发起链接操作——<code>channel.connect</code>之后，会开启一个超时任务<code>NIO_EXECUTOR.schedule(new TimeOutTask(key), CONNECT_TIMEOUT_MS, TimeUnit.MILLISECONDS);</code>该任务根据延迟执行的方式，如果执行时，发现<code>channel</code>仍旧为链接成功，因此认为本次检查失败。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 超时任务</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">TimeOutTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    SelectionKey key;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (key != <span class="keyword">null</span> &amp;&amp; key.isValid()) &#123;</span><br><span class="line">            SocketChannel channel = (SocketChannel) key.channel();</span><br><span class="line">            Beat beat = (Beat) key.attachment();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (channel.isConnected()) &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 调用此方法完成链接，然后将此移除，因为已经超过了规定的最大延迟时间</span></span><br><span class="line">                channel.finishConnect();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception ignore) &#123;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                beat.finishCheck(<span class="keyword">false</span>, <span class="keyword">false</span>, beat.getTask().getCheckRTNormalized() * <span class="number">2</span>, <span class="string">"tcp:timeout"</span>);</span><br><span class="line"></span><br><span class="line">                key.cancel();</span><br><span class="line">                key.channel().close();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception ignore) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来继续<code>TcpSuperSenseProcessor</code>中的<code>run</code>方法，执行完<code>processTask()</code>方法后，会通过<code>selector.selectNow()</code>判断当前已准备好的channle数量，然后通过<code>selector.selectedKeys().iterator()</code>访问“已选择键集（selected key set）”中的就绪通道，最终在循环中，通过创建<code>PostProcessor</code>完成最终的<code>TCP</code>健康检查步骤</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PostProcessor</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    SelectionKey key;</span><br><span class="line">    ...</span><br><span class="line">        </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Beat beat = (Beat) key.attachment();</span><br><span class="line">        SocketChannel channel = (SocketChannel) key.channel();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (!beat.isHealthy()) &#123;</span><br><span class="line">                <span class="comment">//invalid beat means this server is no longer responsible for the current service</span></span><br><span class="line">                key.cancel();</span><br><span class="line">                key.channel().close();</span><br><span class="line"></span><br><span class="line">                beat.finishCheck();</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (key.isValid() &amp;&amp; key.isConnectable()) &#123;</span><br><span class="line">                <span class="comment">//connected</span></span><br><span class="line">                channel.finishConnect();</span><br><span class="line">                beat.finishCheck(<span class="keyword">true</span>, <span class="keyword">false</span>, System.currentTimeMillis() - beat.getTask().getStartTime(), <span class="string">"tcp:ok+"</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (key.isValid() &amp;&amp; key.isReadable()) &#123;</span><br><span class="line">                <span class="comment">//disconnected</span></span><br><span class="line">                ByteBuffer buffer = ByteBuffer.allocate(<span class="number">128</span>);</span><br><span class="line">                <span class="keyword">if</span> (channel.read(buffer) == -<span class="number">1</span>) &#123;</span><br><span class="line">                    key.cancel();</span><br><span class="line">                    key.channel().close();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// not terminate request, ignore</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ConnectException e) &#123;</span><br><span class="line">            <span class="comment">// unable to connect, possibly port not opened</span></span><br><span class="line">            beat.finishCheck(<span class="keyword">false</span>, <span class="keyword">true</span>, switchDomain.getTcpHealthParams().getMax(), <span class="string">"tcp:unable2connect:"</span> + e.getMessage());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            beat.finishCheck(<span class="keyword">false</span>, <span class="keyword">false</span>, switchDomain.getTcpHealthParams().getMax(), <span class="string">"tcp:error:"</span> + e.getMessage());</span><br><span class="line"></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                key.cancel();</span><br><span class="line">                key.channel().close();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception ignore) &#123;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在此方法中最终完成<code>TCP</code>健康检查的所有操作，如果服务实例可以连接，则本次健康检查成功，随后，执行链接断开操作，至此，整个<code>nacos-server</code>端的<code>TCP</code>策略的健康检查流程完成</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/21/leetcode-24/" rel="next" title="牛客网——剑指offer之孩子们的游戏(圆圈中最后剩下的数)">
+                <i class="fa fa-chevron-left"></i> 牛客网——剑指offer之孩子们的游戏(圆圈中最后剩下的数)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 commiter</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">90</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#如何发起健康检查"><span class="nav-number">1.</span> <span class="nav-text">如何发起健康检查</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/05/23/java-web-37/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

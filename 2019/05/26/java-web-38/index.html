@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="如何实现配置在集群间同步的？前提步骤 部署MySQL，并执行sql脚本创建nacos schema 参照官网的nacos集群部署指南——nacos 集群部署指南 启动nacos集群  开始设置 在集群中任意登陆一台nacos server节点，然后创建配置 再次登陆其余节点，会发现配置信息已经同步到其余的节点中了  配置信息如何在集群间同步？其实，这个配置信息同步是很简单的——直接从MySQL中读">
+<meta name="keywords" content="nacos">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nacos-Server 集群之配置中心">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/05/26/java-web-38/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="如何实现配置在集群间同步的？前提步骤 部署MySQL，并执行sql脚本创建nacos schema 参照官网的nacos集群部署指南——nacos 集群部署指南 启动nacos集群  开始设置 在集群中任意登陆一台nacos server节点，然后创建配置 再次登陆其余节点，会发现配置信息已经同步到其余的节点中了  配置信息如何在集群间同步？其实，这个配置信息同步是很简单的——直接从MySQL中读">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-38-1.png">
+<meta property="og:updated_time" content="2019-05-27T07:28:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nacos-Server 集群之配置中心">
+<meta name="twitter:description" content="如何实现配置在集群间同步的？前提步骤 部署MySQL，并执行sql脚本创建nacos schema 参照官网的nacos集群部署指南——nacos 集群部署指南 启动nacos集群  开始设置 在集群中任意登陆一台nacos server节点，然后创建配置 再次登陆其余节点，会发现配置信息已经同步到其余的节点中了  配置信息如何在集群间同步？其实，这个配置信息同步是很简单的——直接从MySQL中读">
+<meta name="twitter:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-38-1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/05/26/java-web-38/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Nacos-Server 集群之配置中心 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/05/26/java-web-38/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 commiter">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Nacos-Server 集群之配置中心
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-05-26 22:40:57" itemprop="dateCreated datePublished" datetime="2019-05-26T22:40:57+08:00">2019-05-26</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-05-27 15:28:55" itemprop="dateModified" datetime="2019-05-27T15:28:55+08:00">2019-05-27</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/05/26/java-web-38/" class="leancloud_visitors" data-flag-title="Nacos-Server 集群之配置中心">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="如何实现配置在集群间同步的？"><a href="#如何实现配置在集群间同步的？" class="headerlink" title="如何实现配置在集群间同步的？"></a>如何实现配置在集群间同步的？</h4><h5 id="前提步骤"><a href="#前提步骤" class="headerlink" title="前提步骤"></a>前提步骤</h5><ul>
+<li>部署<code>MySQL</code>，并执行<code>sql</code>脚本创建<code>nacos schema</code></li>
+<li>参照官网的<code>nacos</code>集群部署指南——<a href="https://nacos.io/zh-cn/docs/cluster-mode-quick-start.html" target="_blank" rel="noopener">nacos 集群部署指南</a></li>
+<li>启动<code>nacos</code>集群</li>
+</ul>
+<h5 id="开始设置"><a href="#开始设置" class="headerlink" title="开始设置"></a>开始设置</h5><ul>
+<li>在集群中任意登陆一台<code>nacos server</code>节点，然后创建配置</li>
+<li>再次登陆其余节点，会发现配置信息已经同步到其余的节点中了</li>
+</ul>
+<h5 id="配置信息如何在集群间同步？"><a href="#配置信息如何在集群间同步？" class="headerlink" title="配置信息如何在集群间同步？"></a>配置信息如何在集群间同步？</h5><p>其实，这个配置信息同步是很简单的——直接从<code>MySQL</code>中读取就好了，在集群模式下，<code>nacos-server</code>需要使用数据库进行存储<code>config</code>配置信息，然后其他<code>nacos-server config</code>节点直接从数据库中读取即可</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 此处为 nacos-server-config拉取所有配置信息列表</span></span><br><span class="line"><span class="comment"> * 查询配置信息，返回JSON格式。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(params = <span class="string">"search=accurate"</span>, method = RequestMethod.GET)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Page&lt;ConfigInfo&gt; <span class="title">searchConfig</span><span class="params">(HttpServletRequest request,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         HttpServletResponse response,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         @RequestParam(<span class="string">"dataId"</span>)</span> String dataId,</span></span><br><span class="line"><span class="function">                                         @<span class="title">RequestParam</span><span class="params">(<span class="string">"group"</span>)</span> String group,</span></span><br><span class="line"><span class="function">                                         @<span class="title">RequestParam</span><span class="params">(value = <span class="string">"appName"</span>, required = <span class="keyword">false</span>)</span> String appName,</span></span><br><span class="line"><span class="function">                                         @<span class="title">RequestParam</span><span class="params">(value = <span class="string">"tenant"</span>, required = <span class="keyword">false</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                                             defaultValue = StringUtils.EMPTY)</span> String tenant,</span></span><br><span class="line"><span class="function">                                         @<span class="title">RequestParam</span><span class="params">(value = <span class="string">"config_tags"</span>, required = <span class="keyword">false</span>)</span> String configTags,</span></span><br><span class="line"><span class="function">                                         @<span class="title">RequestParam</span><span class="params">(<span class="string">"pageNo"</span>)</span> <span class="keyword">int</span> pageNo,</span></span><br><span class="line"><span class="function">                                         @<span class="title">RequestParam</span><span class="params">(<span class="string">"pageSize"</span>)</span> <span class="keyword">int</span> pageSize) </span>&#123;</span><br><span class="line">    Map&lt;String, Object&gt; configAdvanceInfo = <span class="keyword">new</span> HashMap&lt;String, Object&gt;(<span class="number">100</span>);</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isNotBlank(appName)) &#123;</span><br><span class="line">        configAdvanceInfo.put(<span class="string">"appName"</span>, appName);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isNotBlank(configTags)) &#123;</span><br><span class="line">        configAdvanceInfo.put(<span class="string">"config_tags"</span>, configTags);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> persistService.findConfigInfo4Page(pageNo, pageSize, dataId, group, tenant,</span><br><span class="line">                configAdvanceInfo);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        String errorMsg = <span class="string">"serialize page error, dataId="</span> + dataId + <span class="string">", group="</span> + group;</span><br><span class="line">        log.error(errorMsg, e);</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(errorMsg, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="CommunicationController的作用"><a href="#CommunicationController的作用" class="headerlink" title="CommunicationController的作用"></a><code>CommunicationController</code>的作用</h4><p>既然部署了<code>nacos-server config</code>集群，那么<code>nacos-client</code>连接的时候，基本上都是写上<code>nacos-server cluster</code>集群下所有节点的<code>IP</code>地址信息，那么这里就会有一个问题了，假设现在有三台<code>nacos-server-config</code>，分别为<code>nacos-A/nacos-B/nacos-C</code>，同时有一个<code>nacos-client</code>，它连接到了<code>nacos-A</code>，但是运维的同学，却在<code>nacos-B</code>进行了配置发布，那么<code>nacos-client</code>要怎么才能获取到最新的配置信息，换句话说，<code>nacos-A</code>要怎么才能知道配置已经更新了？这个时候<code>CommunicationController</code>的作用就体现出来了</p>
+<p><code>CommunicationController</code>是用于其他节点通知的控制器，是被动接受配置更新通知的。那么，这个通知是怎么发出的呢？这个时候回到<code>ConfigController.publishConfig</code></p>
+<blockquote>
+<p>关键代码</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (StringUtils.isBlank(betaIps)) &#123;</span><br><span class="line">	<span class="keyword">if</span> (StringUtils.isBlank(tag)) &#123;</span><br><span class="line">		<span class="comment">// 配置信息持久化存储</span></span><br><span class="line">		persistService.insertOrUpdate(srcIp, srcUser, configInfo, time, configAdvanceInfo, <span class="keyword">false</span>);</span><br><span class="line">		<span class="comment">// 进行事件发布</span></span><br><span class="line">		EventDispatcher.fireEvent(<span class="keyword">new</span> ConfigDataChangeEvent(<span class="keyword">false</span>, dataId, group, tenant, time.getTime()));</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		persistService.insertOrUpdateTag(configInfo, tag, srcIp, srcUser, time, <span class="keyword">false</span>);</span><br><span class="line">		EventDispatcher.fireEvent(<span class="keyword">new</span> ConfigDataChangeEvent(<span class="keyword">false</span>, dataId, group, tenant, tag, time.getTime()));</span><br><span class="line">	&#125;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	<span class="comment">// beta publish，配置信息灰度发布</span></span><br><span class="line">	persistService.insertOrUpdateBeta(configInfo, betaIps, srcIp, srcUser, time, <span class="keyword">false</span>);</span><br><span class="line">	EventDispatcher.fireEvent(<span class="keyword">new</span> ConfigDataChangeEvent(<span class="keyword">true</span>, dataId, group, tenant, time.getTime()));</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>这里可以看到，在<code>publishConfig</code>时，会发布一个<code>ConfigDataChangeEvent</code>事件，然后这个事件，会被监听器<code>AsyncNotifyService</code>接收</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 异步通知任务，如果发生配置信息变更事件，将此事件广播给所有 nacos-server 集群</span></span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onEvent</span><span class="params">(Event event)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 并发产生 ConfigDataChangeEvent</span></span><br><span class="line">	<span class="keyword">if</span> (event <span class="keyword">instanceof</span> ConfigDataChangeEvent) &#123;</span><br><span class="line">		ConfigDataChangeEvent evt = (ConfigDataChangeEvent)event;</span><br><span class="line">		<span class="keyword">long</span> dumpTs = evt.lastModifiedTs;</span><br><span class="line">		String dataId = evt.dataId;</span><br><span class="line">		String group = evt.group;</span><br><span class="line">		String tenant = evt.tenant;</span><br><span class="line">		String tag = evt.tag;</span><br><span class="line">		List&lt;?&gt; ipList = serverListService.getServerList();</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 其实这里任何类型队列都可以</span></span><br><span class="line">		Queue&lt;NotifySingleTask&gt; queue = <span class="keyword">new</span> LinkedList&lt;NotifySingleTask&gt;();</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; ipList.size(); i++) &#123;</span><br><span class="line"></span><br><span class="line">		<span class="comment">/**</span></span><br><span class="line"><span class="comment">			* 构建通知url ：&#123;<span class="doctag">@link</span> com.alibaba.nacos.config.server.controller.CommunicationController#notifyConfigInfo(HttpServletRequest, HttpServletResponse, String, String, String, String)&#125;</span></span><br><span class="line"><span class="comment">			*/</span></span><br><span class="line">		queue.add(<span class="keyword">new</span> NotifySingleTask(dataId, group, tenant, tag, dumpTs, (String)ipList.get(i), evt.isBeta));</span><br><span class="line">		&#125;</span><br><span class="line">		EXCUTOR.execute(<span class="keyword">new</span> AsyncTask(httpclient, queue));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到在循环语句中，创建了<code>NotifySingleTask</code>这个任务，并且构造函数中的参数中，有一个入参为<code>(String)ipList.get(i)</code>，而这个其实就是<code>nacos-server config</code>集群中每个节点的<code>IP</code>地址信息。然后再次创建一个<code>AsyncTask</code>任务，去消费刚刚的<code>Queue&lt;NotifySingleTask&gt;</code></p>
+<blockquote>
+<p>核心方法</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">executeAsyncInvoke</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> (!queue.isEmpty()) &#123;</span><br><span class="line"></span><br><span class="line">		NotifySingleTask task = queue.poll();</span><br><span class="line">		String targetIp = task.getTargetIP();</span><br><span class="line">		<span class="keyword">if</span> (serverListService.getServerList().contains(targetIp)) &#123;</span><br><span class="line">			<span class="comment">// 启动健康检查且有不监控的ip则直接把放到通知队列，否则通知</span></span><br><span class="line">			<span class="keyword">if</span> (serverListService.isHealthCheck() &amp;&amp; ServerListService.getServerListUnhealth().contains(targetIp)) &#123;</span><br><span class="line">				<span class="comment">// target ip 不健康，则放入通知列表中</span></span><br><span class="line">				ConfigTraceService.logNotifyEvent(task.getDataId(), task.getGroup(), task.getTenant(), <span class="keyword">null</span>, task.getLastModified(), LOCAL_IP, ConfigTraceService.NOTIFY_EVENT_UNHEALTH, <span class="number">0</span>, task.target);</span><br><span class="line">				<span class="comment">// get delay time and set fail count to the task</span></span><br><span class="line">				<span class="keyword">int</span> delay = getDelayTime(task);</span><br><span class="line">				Queue&lt;NotifySingleTask&gt; queue = <span class="keyword">new</span> LinkedList&lt;NotifySingleTask&gt;();</span><br><span class="line">				queue.add(task);</span><br><span class="line">				AsyncTask asyncTask = <span class="keyword">new</span> AsyncTask(httpclient, queue);</span><br><span class="line">				((ScheduledThreadPoolExecutor)EXCUTOR).schedule(asyncTask, delay, TimeUnit.MILLISECONDS);</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				HttpGet request = <span class="keyword">new</span> HttpGet(task.url);</span><br><span class="line">				request.setHeader(NotifyService.NOTIFY_HEADER_LAST_MODIFIED, String.valueOf(task.getLastModified()));</span><br><span class="line">				request.setHeader(NotifyService.NOTIFY_HEADER_OP_HANDLE_IP, LOCAL_IP);</span><br><span class="line">				<span class="keyword">if</span> (task.isBeta) &#123;</span><br><span class="line">					request.setHeader(<span class="string">"isBeta"</span>, <span class="string">"true"</span>);</span><br><span class="line">				&#125;</span><br><span class="line">				httpclient.execute(request, <span class="keyword">new</span> AyscNotifyCallBack(httpclient, task));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后会对<code>nacos-server config</code>每个节点数据进行判断，符合条件的话，直接先<code>nacos-server config</code>节点的<code>/v1/cs/communication/dataChange</code>接口发起通知，告知有配置已更新</p>
+<h5 id="其他节点接收此更新事件的后续操作"><a href="#其他节点接收此更新事件的后续操作" class="headerlink" title="其他节点接收此更新事件的后续操作"></a>其他节点接收此更新事件的后续操作</h5><p>在接收到更新事件通知后，<code>CommunicationController.notifyConfigInfo</code>会执行下面的方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (StringUtils.isNotBlank(isBetaStr) &amp;&amp; trueStr.equals(isBetaStr)) &#123;</span><br><span class="line">	dumpService.dump(dataId, group, tenant, lastModifiedTs, handleIp, <span class="keyword">true</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	dumpService.dump(dataId, group, tenant, tag, lastModifiedTs, handleIp);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>而最终，会进入到<code>TaskManager</code>对象中，并且由<code>DumpProcessor</code>进行处理；在<code>DumpProcessor</code>的<code>process</code>方法中，调用了一个重要的对象——<code>ConfigService</code>。这个对象的所有数据更新操作，都会发布一个事件<code>LocalDataChangeEvent</code>，而这个事件，在<code>LongPollingService</code>处理，而这里存储的，是<code>nacos-client</code>为了获取配置信息而发起的长链接的<code>AsyncServlet</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onEvent</span><span class="params">(Event event)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (isFixedPolling()) &#123;</span><br><span class="line">		<span class="comment">// ignore</span></span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// LocalDataChangeEvent 事件在 ConfigService 中发布</span></span><br><span class="line">		<span class="comment">// 如果本地配置文件信息发生变更，则触发响应的事件</span></span><br><span class="line">		<span class="keyword">if</span> (event <span class="keyword">instanceof</span> LocalDataChangeEvent) &#123;</span><br><span class="line">			LocalDataChangeEvent evt = (LocalDataChangeEvent)event;</span><br><span class="line">			scheduler.execute(<span class="keyword">new</span> DataChangeTask(evt.groupKey, evt.isBeta, evt.betaIps));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>LongPollingService</code>会根据<code>LocalDataChangeEvent</code>创建出一个<code>DataChangeTask</code>任务，而这个对象，就是将<code>nacos-client</code>感兴趣的配置信息主动告诉<code>nacos-client</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		ConfigService.getContentBetaMd5(groupKey);</span><br><span class="line">		<span class="comment">// 遍历所有长链接用户列表</span></span><br><span class="line">		<span class="keyword">for</span> (Iterator&lt;ClientLongPolling&gt; iter = allSubs.iterator(); iter.hasNext(); ) &#123;</span><br><span class="line">			ClientLongPolling clientSub = iter.next();</span><br><span class="line">			<span class="keyword">if</span> (clientSub.clientMd5Map.containsKey(groupKey)) &#123;</span><br><span class="line">				<span class="comment">// 如果beta发布且不在beta列表直接跳过</span></span><br><span class="line">				<span class="keyword">if</span> (isBeta &amp;&amp; !betaIps.contains(clientSub.ip)) &#123;</span><br><span class="line">					<span class="keyword">continue</span>;</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				<span class="comment">// 如果tag发布且不在tag列表直接跳过</span></span><br><span class="line">				<span class="keyword">if</span> (StringUtils.isNotBlank(tag) &amp;&amp; !tag.equals(clientSub.tag)) &#123;</span><br><span class="line">					<span class="keyword">continue</span>;</span><br><span class="line">				&#125;</span><br><span class="line"></span><br><span class="line">				getRetainIps().put(clientSub.ip, System.currentTimeMillis());</span><br><span class="line">				iter.remove(); <span class="comment">// 删除订阅关系</span></span><br><span class="line">				LogUtil.clientLog.info(<span class="string">"&#123;&#125;|&#123;&#125;|&#123;&#125;|&#123;&#125;|&#123;&#125;|&#123;&#125;|&#123;&#125;"</span>, (System.currentTimeMillis() - changeTime), <span class="string">"in-advance"</span>, RequestUtil.getRemoteIp((HttpServletRequest)clientSub.asyncContext.getRequest()), <span class="string">"polling"</span>, clientSub.clientMd5Map.size(), clientSub.probeRequestSize, groupKey);</span><br><span class="line">				clientSub.sendResponse(Arrays.asList(groupKey));</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">		LogUtil.defaultLog.error(<span class="string">"data change error:"</span> + t.getMessage(), t.getCause());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至此，链接了<code>nacos-A</code>的<code>nacos-client</code>，如果开发人员在<code>nacos-B</code>上进行配置信息发布，也能够接受到最新的配置信息</p>
+<h4 id="代码流程图"><a href="#代码流程图" class="headerlink" title="代码流程图"></a>代码流程图</h4><p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-38-1.png" alt="nacos-server config集群间同步"></p>
+<h4 id="待增加"><a href="#待增加" class="headerlink" title="待增加"></a>待增加</h4><p>还没搞清楚<code>DumpService</code>中<code>dump</code>出的文件的作用是什么，还需要和<code>nacos</code>的开发人员交流一下，此部分代补充</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nacos/" rel="tag"># nacos</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/23/java-web-37/" rel="next" title="Nacos是如何实现TCP端口测探方式检测实例是否存活">
+                <i class="fa fa-chevron-left"></i> Nacos是如何实现TCP端口测探方式检测实例是否存活
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 commiter</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">91</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#如何实现配置在集群间同步的？"><span class="nav-number">1.</span> <span class="nav-text">如何实现配置在集群间同步的？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#前提步骤"><span class="nav-number">1.1.</span> <span class="nav-text">前提步骤</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#开始设置"><span class="nav-number">1.2.</span> <span class="nav-text">开始设置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#配置信息如何在集群间同步？"><span class="nav-number">1.3.</span> <span class="nav-text">配置信息如何在集群间同步？</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CommunicationController的作用"><span class="nav-number">2.</span> <span class="nav-text">CommunicationController的作用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#其他节点接收此更新事件的后续操作"><span class="nav-number">2.1.</span> <span class="nav-text">其他节点接收此更新事件的后续操作</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码流程图"><span class="nav-number">3.</span> <span class="nav-text">代码流程图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#待增加"><span class="nav-number">4.</span> <span class="nav-text">待增加</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/05/26/java-web-38/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

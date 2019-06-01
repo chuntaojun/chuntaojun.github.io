@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="两种一致性策略如何在nacos中共存或许会有疑问，为什么早先的cp模式的Zookeeper或者AP模式的Eureka，都只有支持CAP理论下大家常用的AP实现或者CP实现，而nacos却能够两个都实现呢？ 其实CAP理论，仅仅是针对分布式下数据的一致性而言，如果你对于数据的一致性要求不高，可忍受最终一致性，那么AP模式的Eureka就可以满足你了，如果说你对数据的一致性要求很高，那么就使用CP模式">
+<meta name="keywords" content="nacos">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nacos 是如何同时实现AP与CP的">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/06/01/java-web-41/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="两种一致性策略如何在nacos中共存或许会有疑问，为什么早先的cp模式的Zookeeper或者AP模式的Eureka，都只有支持CAP理论下大家常用的AP实现或者CP实现，而nacos却能够两个都实现呢？ 其实CAP理论，仅仅是针对分布式下数据的一致性而言，如果你对于数据的一致性要求不高，可忍受最终一致性，那么AP模式的Eureka就可以满足你了，如果说你对数据的一致性要求很高，那么就使用CP模式">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-06-01T06:35:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nacos 是如何同时实现AP与CP的">
+<meta name="twitter:description" content="两种一致性策略如何在nacos中共存或许会有疑问，为什么早先的cp模式的Zookeeper或者AP模式的Eureka，都只有支持CAP理论下大家常用的AP实现或者CP实现，而nacos却能够两个都实现呢？ 其实CAP理论，仅仅是针对分布式下数据的一致性而言，如果你对于数据的一致性要求不高，可忍受最终一致性，那么AP模式的Eureka就可以满足你了，如果说你对数据的一致性要求很高，那么就使用CP模式">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/06/01/java-web-41/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Nacos 是如何同时实现AP与CP的 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/06/01/java-web-41/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 commiter">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Nacos 是如何同时实现AP与CP的
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-06-01 10:32:05 / Modified: 14:35:42" itemprop="dateCreated datePublished" datetime="2019-06-01T10:32:05+08:00">2019-06-01</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/06/01/java-web-41/" class="leancloud_visitors" data-flag-title="Nacos 是如何同时实现AP与CP的">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="两种一致性策略如何在nacos中共存"><a href="#两种一致性策略如何在nacos中共存" class="headerlink" title="两种一致性策略如何在nacos中共存"></a>两种一致性策略如何在nacos中共存</h4><p>或许会有疑问，为什么早先的<code>cp</code>模式的<code>Zookeeper</code>或者<code>AP</code>模式的<code>Eureka</code>，都只有支持<code>CAP</code>理论下大家常用的<code>AP</code>实现或者<code>CP</code>实现，而nacos却能够两个都实现呢？</p>
+<p>其实<code>CAP</code>理论，仅仅是针对分布式下数据的一致性而言，如果你对于数据的一致性要求不高，可忍受最终一致性，那么<code>AP</code>模式的<code>Eureka</code>就可以满足你了，如果说你对数据的一致性要求很高，那么就使用<code>CP</code>模式的<code>Zookeeper</code>，而追其根本，并不是说<code>Eureka</code>是<code>AP</code>的，或者说<code>Zookeeper</code>是<code>CP</code>的，而是他们存储的数据的一致性，满足<code>AP</code>或者<code>CP</code>，因此也就不难实现在一个组件中实现<code>AP</code>模式与<code>CP</code>模式共存</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span>(<span class="string">"consistencyDelegate"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DelegateConsistencyServiceImpl</span> <span class="keyword">implements</span> <span class="title">ConsistencyService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> PersistentConsistencyService persistentConsistencyService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> EphemeralConsistencyService ephemeralConsistencyService;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>DelegateConsistencyServiceImpl</code>是一个一致性策略选择的类，根据不同的策略触发条件(在nacos中，<code>CP</code>与<code>AP</code>切换的条件是注册的服务实例是否是临时实例)，选择<code>PersistentConsistencyService</code>策略或者<code>EphemeralConsistencyService</code>策略，而<code>EphemeralConsistencyService</code>对应的是<code>DistroConsistencyServiceImpl</code>，采用的协议是阿里自研的<code>Distro</code>，我个人觉得就像<code>gossip</code>协议；<code>PersistentConsistencyService</code>对应的是<code>RaftConsistencyServiceImpl</code>，其底层采用的是<code>Raft</code>协议；这两种一致性策略下的数据存储互不影响，所以<code>nacos</code>实现了<code>AP</code>模式与<code>CP</code>模式在一个组件中同时存在</p>
+<h4 id="AP实现"><a href="#AP实现" class="headerlink" title="AP实现"></a>AP实现</h4><p><a href="https://www.liaochuntao.cn/2019/05/09/java-web-32/">Nacos中的DistroConsistencyServiceImpl工作浅析</a></p>
+<h4 id="CP实现"><a href="#CP实现" class="headerlink" title="CP实现"></a>CP实现</h4><h5 id="重要的协议——RAFT"><a href="#重要的协议——RAFT" class="headerlink" title="重要的协议——RAFT"></a>重要的协议——RAFT</h5><p>动画演示地址：<a href="[http://thesecretlivesofdata.com/raft/](http://thesecretlivesofdata.com/raft/">raft-protocol</a>)</p>
+<h5 id="nacos是如何实现CP-raft-的"><a href="#nacos是如何实现CP-raft-的" class="headerlink" title="nacos是如何实现CP(raft)的"></a>nacos是如何实现CP(raft)的</h5><blockquote>
+<p>RaftController</p>
+</blockquote>
+<p><code>RaftController</code>控制器是<code>raft</code>集群内部节点间通信使用的，具体的信息如下</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">POST HTTP://&#123;ip:port&#125;/v1/ns/raft/vote : 进行投票请求</span><br><span class="line"></span><br><span class="line">POST HTTP://&#123;ip:port&#125;/v1/ns/raft/beat : Leader向Follower发送心跳信息</span><br><span class="line"></span><br><span class="line">GET HTTP://&#123;ip:port&#125;/v1/ns/raft/peer : 获取该节点的RaftPeer信息</span><br><span class="line"></span><br><span class="line">PUT HTTP://&#123;ip:port&#125;/v1/ns/raft/datum/reload : 重新加载某日志信息</span><br><span class="line"></span><br><span class="line">POST HTTP://&#123;ip:port&#125;/v1/ns/raft/datum : Leader接收传来的数据并存入</span><br><span class="line"></span><br><span class="line">DELETE HTTP://&#123;ip:port&#125;/v1/ns/raft/datum : Leader接收传来的数据删除操作</span><br><span class="line"></span><br><span class="line">GET HTTP://&#123;ip:port&#125;/v1/ns/raft/datum : 获取该节点存储的数据信息</span><br><span class="line"></span><br><span class="line">GET HTTP://&#123;ip:port&#125;/v1/ns/raft/state : 获取该节点的状态信息&#123;UP or DOWN&#125;</span><br><span class="line"></span><br><span class="line">POST HTTP://&#123;ip:port&#125;/v1/ns/raft/datum/commit : Follower节点接收Leader传来得到数据存入操作</span><br><span class="line"></span><br><span class="line">DELETE HTTP://&#123;ip:port&#125;/v1/ns/raft/datum : Follower节点接收Leader传来的数据删除操作</span><br><span class="line"></span><br><span class="line">GET HTTP://&#123;ip:port&#125;/v1/ns/raft/leader : 获取当前集群的Leader节点信息</span><br><span class="line"></span><br><span class="line">GET HTTP://&#123;ip:port&#125;/v1/ns/raft/listeners : 获取当前Raft集群的所有事件监听者</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>RaftPeerSet</p>
+</blockquote>
+<p>这个对象存储的是所有<code>raft</code>协议下的节点信息，存储的元素如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 集群节点地址管理</span></span><br><span class="line"><span class="keyword">private</span> ServerListManager serverListManager;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 周期数</span></span><br><span class="line"><span class="keyword">private</span> AtomicLong localTerm = <span class="keyword">new</span> AtomicLong(<span class="number">0L</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 当前周期内的Leader</span></span><br><span class="line"><span class="keyword">private</span> RaftPeer leader = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 所有的节点信息</span></span><br><span class="line"><span class="keyword">private</span> Map&lt;String, RaftPeer&gt; peers = <span class="keyword">new</span> HashMap&lt;String, RaftPeer&gt;();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 暂时不清楚用途</span></span><br><span class="line"><span class="keyword">private</span> Set&lt;String&gt; sites = <span class="keyword">new</span> HashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 本节点是否已准备完毕</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">boolean</span> ready = <span class="keyword">false</span>;</span><br></pre></td></tr></table></figure>
+<p>同时还具备了<code>raft</code>协议下必要的方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 当前IP对应的节点是否是Leader</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isLeader</span><span class="params">(String ip)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (STANDALONE_MODE) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (leader == <span class="keyword">null</span>) &#123;</span><br><span class="line">        Loggers.RAFT.warn(<span class="string">"[IS LEADER] no leader is available now!"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> StringUtils.equals(leader.ip, ip);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 决定Leader节点，根据投票结果以及是否满足majorityCount机制</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> RaftPeer <span class="title">decideLeader</span><span class="params">(RaftPeer candidate)</span> </span>&#123;</span><br><span class="line">    peers.put(candidate.ip, candidate);</span><br><span class="line">    SortedBag ips = <span class="keyword">new</span> TreeBag();</span><br><span class="line">    <span class="keyword">int</span> maxApproveCount = <span class="number">0</span>;</span><br><span class="line">    String maxApprovePeer = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">for</span> (RaftPeer peer : peers.values()) &#123;</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isEmpty(peer.voteFor)) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      	<span class="comment">// 选票计数</span></span><br><span class="line">        ips.add(peer.voteFor);</span><br><span class="line">      	<span class="comment">// 如果某节点的得票数大于当前的最大得票数，则更新候选Leader信息</span></span><br><span class="line">        <span class="keyword">if</span> (ips.getCount(peer.voteFor) &gt; maxApproveCount) &#123;</span><br><span class="line">            maxApproveCount = ips.getCount(peer.voteFor);</span><br><span class="line">            maxApprovePeer = peer.voteFor;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  	<span class="comment">// 是否满足majorityCount数量的限制</span></span><br><span class="line">    <span class="keyword">if</span> (maxApproveCount &gt;= majorityCount()) &#123;</span><br><span class="line">      	<span class="comment">// 若满足则设置Leader节点信息</span></span><br><span class="line">        RaftPeer peer = peers.get(maxApprovePeer);</span><br><span class="line">        peer.state = RaftPeer.State.LEADER;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!Objects.equals(leader, peer)) &#123;</span><br><span class="line">            leader = peer;</span><br><span class="line">            Loggers.RAFT.info(<span class="string">"&#123;&#125; has become the LEADER"</span>, leader.ip);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> leader;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> RaftPeer <span class="title">makeLeader</span><span class="params">(RaftPeer candidate)</span> </span>&#123;</span><br><span class="line">  	<span class="comment">// 如果当前Leader与Candidate节点不一样，则进行Leader信息更改</span></span><br><span class="line">    <span class="keyword">if</span> (!Objects.equals(leader, candidate)) &#123;</span><br><span class="line">        leader = candidate;</span><br><span class="line">        Loggers.RAFT.info(<span class="string">"&#123;&#125; has become the LEADER, local: &#123;&#125;, leader: &#123;&#125;"</span>,</span><br><span class="line">        leader.ip, JSON.toJSONString(local()), JSON.toJSONString(leader));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">final</span> RaftPeer peer : peers.values()) &#123;</span><br><span class="line">        Map&lt;String, String&gt; params = <span class="keyword">new</span> HashMap&lt;String, String&gt;(<span class="number">1</span>);</span><br><span class="line">      	<span class="comment">// 如果当前节点与远程Leader节点不等且是Follower节点</span></span><br><span class="line">        <span class="keyword">if</span> (!Objects.equals(peer, candidate) &amp;&amp; peer.state == RaftPeer.State.LEADER) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">              	<span class="comment">// 获取每个节点的RaftPeer节点信息对象数据</span></span><br><span class="line">                String url = RaftCore.buildURL(peer.ip, RaftCore.API_GET_PEER);</span><br><span class="line">                HttpClient.asyncHttpGet(url, <span class="keyword">null</span>, params, <span class="keyword">new</span> AsyncCompletionHandler&lt;Integer&gt;() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="function"><span class="keyword">public</span> Integer <span class="title">onCompleted</span><span class="params">(Response response)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                        <span class="keyword">if</span> (response.getStatusCode() != HttpURLConnection.HTTP_OK) &#123;</span><br><span class="line">                            Loggers.RAFT.error(<span class="string">"[NACOS-RAFT] get peer failed: &#123;&#125;, peer: &#123;&#125;"</span>, response.getResponseBody(), peer.ip);</span><br><span class="line">                            peer.state = RaftPeer.State.FOLLOWER;</span><br><span class="line">                            <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                        update(JSON.parseObject(response.getResponseBody(), RaftPeer.class));</span><br><span class="line">                        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                peer.state = RaftPeer.State.FOLLOWER;</span><br><span class="line">                Loggers.RAFT.error(<span class="string">"[NACOS-RAFT] error while getting peer from peer: &#123;&#125;"</span>, peer.ip);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> update(candidate);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>RaftCore</p>
+</blockquote>
+<p>该对象是<code>nacos</code>中<code>raft</code>协议的主要实现，在启动之初，会进行一系列初始化的操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PostConstruct</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">	Loggers.RAFT.info(<span class="string">"initializing Raft sub-system"</span>);</span><br><span class="line">	executor.submit(notifier);</span><br><span class="line">	<span class="keyword">long</span> start = System.currentTimeMillis();</span><br><span class="line">  <span class="comment">// 进行日志文件的加载到内存数据对象Datums的操作</span></span><br><span class="line">	datums = raftStore.loadDatums(notifier);</span><br><span class="line">  <span class="comment">// 设置当前的周期数</span></span><br><span class="line">	setTerm(NumberUtils.toLong(raftStore.loadMeta().getProperty(<span class="string">"term"</span>), <span class="number">0L</span>));</span><br><span class="line">	Loggers.RAFT.info(<span class="string">"cache loaded, datum count: &#123;&#125;, current term: &#123;&#125;"</span>, datums.size(), peers.getTerm());</span><br><span class="line">	<span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    <span class="comment">// 等待上一步的数据加载任务全部完成</span></span><br><span class="line">		<span class="keyword">if</span> (notifier.tasks.size() &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		Thread.sleep(<span class="number">1000L</span>);</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="comment">// 初始化标识更改</span></span><br><span class="line">	initialized = <span class="keyword">true</span>;</span><br><span class="line">	Loggers.RAFT.info(<span class="string">"finish to load data from disk, cost: &#123;&#125; ms."</span>, (System.currentTimeMillis() - start));</span><br><span class="line">  <span class="comment">// 开启定时的Leader选举任务</span></span><br><span class="line">	GlobalExecutor.registerMasterElection(<span class="keyword">new</span> MasterElection());</span><br><span class="line">  <span class="comment">// 开启定时的Leader心跳服务</span></span><br><span class="line">	GlobalExecutor.registerHeartbeat(<span class="keyword">new</span> HeartBeat());</span><br><span class="line"></span><br><span class="line">	Loggers.RAFT.info(<span class="string">"timer started: leader timeout ms: &#123;&#125;, heart-beat timeout ms: &#123;&#125;"</span>,</span><br><span class="line">	GlobalExecutor.LEADER_TIMEOUT_MS, GlobalExecutor.HEARTBEAT_INTERVAL_MS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>初始化的一系列操作完成后，此时集群还无法对外提供服务，因为此时<code>Leader</code>还未选举出来，需要在<code>MasterElection</code>选举<code>Leader</code>成功后才可以对外提供服务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Leader 选举任务</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MasterElection</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">// 当前节点是否已准备完毕</span></span><br><span class="line">			<span class="keyword">if</span> (!peers.isReady()) &#123;</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line">      <span class="comment">// 获取自身节点信息</span></span><br><span class="line">			RaftPeer local = peers.local();</span><br><span class="line">      <span class="comment">// 本地存储的Leader任期时间</span></span><br><span class="line">			local.leaderDueMs -= GlobalExecutor.TICK_PERIOD_MS;</span><br><span class="line">      <span class="comment">// 如果Leader任期时间还在允许范围内，则不进行Leader选举</span></span><br><span class="line">			<span class="keyword">if</span> (local.leaderDueMs &gt; <span class="number">0</span>) &#123;</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">// reset timeout</span></span><br><span class="line">			local.resetLeaderDue();</span><br><span class="line">			local.resetHeartbeatDue();</span><br><span class="line">      <span class="comment">// 向其他节点发起投票请求</span></span><br><span class="line">			sendVote();</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			Loggers.RAFT.warn(<span class="string">"[RAFT] error while master election &#123;&#125;"</span>, e);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendVote</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		RaftPeer local = peers.get(NetUtils.localServer());</span><br><span class="line">		Loggers.RAFT.info(<span class="string">"leader timeout, start voting,leader: &#123;&#125;, term: &#123;&#125;"</span>,</span><br><span class="line">		JSON.toJSONString(getLeader()), local.term);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Raft node cluster rest</span></span><br><span class="line">		peers.reset();</span><br><span class="line">		local.term.incrementAndGet();</span><br><span class="line">		<span class="comment">// 设置给自己投票</span></span><br><span class="line">		local.voteFor = local.ip;</span><br><span class="line">		<span class="comment">// update node status to CANDIDATE</span></span><br><span class="line">		local.state = RaftPeer.State.CANDIDATE;</span><br><span class="line">		Map&lt;String, String&gt; params = <span class="keyword">new</span> HashMap&lt;String, String&gt;(<span class="number">1</span>);</span><br><span class="line">		params.put(<span class="string">"vote"</span>, JSON.toJSONString(local));</span><br><span class="line">    <span class="comment">// 遍历所有的节点信息(除了自己之外)</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">final</span> String server : peers.allServersWithoutMySelf()) &#123;</span><br><span class="line">			<span class="keyword">final</span> String url = buildURL(server, API_VOTE);</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				HttpClient.asyncHttpPost(url, <span class="keyword">null</span>, params, <span class="keyword">new</span> AsyncCompletionHandler&lt;Integer&gt;() &#123;</span><br><span class="line">					<span class="meta">@Override</span></span><br><span class="line">					<span class="function"><span class="keyword">public</span> Integer <span class="title">onCompleted</span><span class="params">(Response response)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">						<span class="keyword">if</span> (response.getStatusCode() != HttpURLConnection.HTTP_OK) &#123;</span><br><span class="line">							Loggers.RAFT.error(<span class="string">"NACOS-RAFT vote failed: &#123;&#125;, url: &#123;&#125;"</span>, response.getResponseBody(), url);</span><br><span class="line">							<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">						&#125;</span><br><span class="line">            <span class="comment">// 获取投票结果，并进行Leader的选举工作</span></span><br><span class="line">						RaftPeer peer = JSON.parseObject(response.getResponseBody(), RaftPeer.class);</span><br><span class="line">						Loggers.RAFT.info(<span class="string">"received approve from peer: &#123;&#125;"</span>, JSON.toJSONString(peer));</span><br><span class="line">						peers.decideLeader(peer);</span><br><span class="line">						<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;);</span><br><span class="line">			&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">				Loggers.RAFT.warn(<span class="string">"error while sending vote to server: &#123;&#125;"</span>, server);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每个节点启动时，都会认为自己可以作为<code>Leader</code>，因此都会以自去己作为被选举人，向其他节点发起投票请求，而其他节点在接收到投票请求后的工作流程如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 其他节点接收到投票请求后的反应</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> RaftPeer <span class="title">receivedVote</span><span class="params">(RaftPeer remote)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 被选举人是否在raft集群节点列表中</span></span><br><span class="line">	<span class="keyword">if</span> (!peers.contains(remote)) &#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"can not find peer: "</span> + remote.ip);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"> 	<span class="comment">// 获取自身节点信息</span></span><br><span class="line">	RaftPeer local = peers.get(NetUtils.localServer());</span><br><span class="line">  <span class="comment">// 如果被选举节点的周期数小于本节点的周期数，则将自己的投票投给自己并告诉被选举者</span></span><br><span class="line">	<span class="keyword">if</span> (remote.term.get() &lt;= local.term.get()) &#123;</span><br><span class="line">		String msg = <span class="string">"received illegitimate vote"</span> + <span class="string">", voter-term:"</span> + remote.term + <span class="string">", votee-term:"</span> + local.term;</span><br><span class="line">		Loggers.RAFT.info(msg);</span><br><span class="line">		<span class="keyword">if</span> (StringUtils.isEmpty(local.voteFor)) &#123;</span><br><span class="line">			local.voteFor = local.ip;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> local;</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="comment">// 满足投票条件后，本节点确认将自己的票投给被选举者</span></span><br><span class="line">	local.resetLeaderDue();</span><br><span class="line">	local.state = RaftPeer.State.FOLLOWER;</span><br><span class="line">	local.voteFor = remote.ip;</span><br><span class="line">	local.term.set(remote.term.get());</span><br><span class="line">	Loggers.RAFT.info(<span class="string">"vote &#123;&#125; as leader, term: &#123;&#125;"</span>, remote.ip, remote.term);</span><br><span class="line">	<span class="keyword">return</span> local;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过以上步骤，最终选举出了<code>Leader</code>节点，接下来，就可以对外提供服务了</p>
+<p>因为是<code>CP</code>模式，所以操作都是通过<code>Leader</code>节点进行传达的，<code>Follower</code>节点本身不与<code>Client</code>进行联系，<code>Follower</code>只能接受来自<code>Leader</code>的操作请求，因此就存在请求转发的问题。因此在<code>RaftCore</code>中的<code>singlePublish</code>以及<code>singleDelete</code>中，存在着对<code>Leader</code>节点的判断以及请求转发的逻辑</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">signalPublish</span><span class="params">(String key, Record value)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!isLeader()) &#123;</span><br><span class="line">		JSONObject params = <span class="keyword">new</span> JSONObject();</span><br><span class="line">		params.put(<span class="string">"key"</span>, key);</span><br><span class="line">		params.put(<span class="string">"value"</span>, value);</span><br><span class="line">		Map&lt;String, String&gt; parameters = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">1</span>);</span><br><span class="line">		parameters.put(<span class="string">"key"</span>, key);</span><br><span class="line">		<span class="comment">// 请求转发</span></span><br><span class="line">		raftProxy.proxyPostLarge(getLeader().ip, API_PUB, params.toJSONString(), parameters);</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">signalDelete</span><span class="params">(<span class="keyword">final</span> String key)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">	OPERATE_LOCK.lock();</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (!isLeader()) &#123;</span><br><span class="line">			Map&lt;String, String&gt; params = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">1</span>);</span><br><span class="line">			params.put(<span class="string">"key"</span>, URLEncoder.encode(key, <span class="string">"UTF-8"</span>));</span><br><span class="line">			<span class="comment">// 删除请求进行转发给 leader 进行处理</span></span><br><span class="line">			raftProxy.proxy(getLeader().ip, API_DEL, params, HttpMethod.DELETE);</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同时，还有一个重要的机制——心跳机制，<code>raft</code>通过心跳机制来维持<code>Leader</code>以及<code>Follower</code>的关系</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 心跳任务，如果成为Leader，需要对 follower 发送心跳信息</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HeartBeat</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="comment">// 程序是否已准备完毕</span></span><br><span class="line">			<span class="keyword">if</span> (!peers.isReady()) &#123;</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			RaftPeer local = peers.local();</span><br><span class="line">			local.heartbeatDueMs -= GlobalExecutor.TICK_PERIOD_MS;</span><br><span class="line">      <span class="comment">// 心跳周期判断</span></span><br><span class="line">			<span class="keyword">if</span> (local.heartbeatDueMs &gt; <span class="number">0</span>) &#123;</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line">      <span class="comment">// 重置心跳发送周期</span></span><br><span class="line">			local.resetHeartbeatDue();</span><br><span class="line">      <span class="comment">// 发送心跳信息</span></span><br><span class="line">			sendBeat();</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			Loggers.RAFT.warn(<span class="string">"[RAFT] error while sending beat &#123;&#125;"</span>, e);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sendBeat</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException </span>&#123;</span><br><span class="line">		RaftPeer local = peers.local();</span><br><span class="line">    <span class="comment">// 如果自己不是Leader节点或者处于单机模式下，则直接返回</span></span><br><span class="line">		<span class="keyword">if</span> (local.state != RaftPeer.State.LEADER &amp;&amp; !STANDALONE_MODE) &#123;</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		Loggers.RAFT.info(<span class="string">"[RAFT] send beat with &#123;&#125; keys."</span>, datums.size());</span><br><span class="line">    <span class="comment">// 重置Leader任期时间</span></span><br><span class="line">		local.resetLeaderDue();</span><br><span class="line">		<span class="comment">// build data</span></span><br><span class="line">		JSONObject packet = <span class="keyword">new</span> JSONObject();</span><br><span class="line">		packet.put(<span class="string">"peer"</span>, local);</span><br><span class="line">		JSONArray array = <span class="keyword">new</span> JSONArray();</span><br><span class="line">		<span class="keyword">if</span> (switchDomain.isSendBeatOnly()) &#123;</span><br><span class="line">			Loggers.RAFT.info(<span class="string">"[SEND-BEAT-ONLY] &#123;&#125;"</span>, String.valueOf(switchDomain.isSendBeatOnly()));</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (!switchDomain.isSendBeatOnly()) &#123;</span><br><span class="line">      <span class="comment">// 如果开启了在心跳包中携带Leader存储的数据进行发送，则对数据进行打包操作</span></span><br><span class="line">			<span class="keyword">for</span> (Datum datum : datums.values()) &#123;</span><br><span class="line">				JSONObject element = <span class="keyword">new</span> JSONObject();</span><br><span class="line">				<span class="keyword">if</span> (KeyBuilder.matchServiceMetaKey(datum.key)) &#123;</span><br><span class="line">					element.put(<span class="string">"key"</span>, KeyBuilder.briefServiceMetaKey(datum.key));</span><br><span class="line">				&#125; <span class="keyword">else</span> <span class="keyword">if</span> (KeyBuilder.matchInstanceListKey(datum.key)) &#123;</span><br><span class="line">					element.put(<span class="string">"key"</span>, KeyBuilder.briefInstanceListkey(datum.key));</span><br><span class="line">				&#125;</span><br><span class="line">				element.put(<span class="string">"timestamp"</span>, datum.timestamp);</span><br><span class="line">				array.add(element);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			Loggers.RAFT.info(<span class="string">"[RAFT] send beat only."</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		packet.put(<span class="string">"datums"</span>, array);</span><br><span class="line">		<span class="comment">// broadcast</span></span><br><span class="line">		Map&lt;String, String&gt; params = <span class="keyword">new</span> HashMap&lt;String, String&gt;(<span class="number">1</span>);</span><br><span class="line">		params.put(<span class="string">"beat"</span>, JSON.toJSONString(packet));</span><br><span class="line">    <span class="comment">// 将参数信息进行 Gzip算法压缩，降低网络消耗</span></span><br><span class="line">		String content = JSON.toJSONString(params);</span><br><span class="line">		ByteArrayOutputStream out = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">		GZIPOutputStream gzip = <span class="keyword">new</span> GZIPOutputStream(out);</span><br><span class="line">		gzip.write(content.getBytes(<span class="string">"UTF-8"</span>));</span><br><span class="line">		gzip.close();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">byte</span>[] compressedBytes = out.toByteArray();</span><br><span class="line">		String compressedContent = <span class="keyword">new</span> String(compressedBytes, <span class="string">"UTF-8"</span>);</span><br><span class="line">		Loggers.RAFT.info(<span class="string">"raw beat data size: &#123;&#125;, size of compressed data: &#123;&#125;"</span>, content.length(), compressedContent.length());</span><br><span class="line">    <span class="comment">// 遍历所有的Follower节点进行发送心跳数据包</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">final</span> String server : peers.allServersWithoutMySelf()) &#123;</span><br><span class="line">			<span class="keyword">try</span> &#123;</span><br><span class="line">				<span class="keyword">final</span> String url = buildURL(server, API_BEAT);</span><br><span class="line">				Loggers.RAFT.info(<span class="string">"send beat to server "</span> + server);</span><br><span class="line">        <span class="comment">// 采用异步HTTP请求进行心跳数据发送</span></span><br><span class="line">				HttpClient.asyncHttpPostLarge(url, <span class="keyword">null</span>, compressedBytes, <span class="keyword">new</span> AsyncCompletionHandler&lt;Integer&gt;() &#123;</span><br><span class="line">					<span class="meta">@Override</span></span><br><span class="line">					<span class="function"><span class="keyword">public</span> Integer <span class="title">onCompleted</span><span class="params">(Response response)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">						<span class="keyword">if</span> (response.getStatusCode() != HttpURLConnection.HTTP_OK) &#123;</span><br><span class="line">							Loggers.RAFT.error(<span class="string">"NACOS-RAFT beat failed: &#123;&#125;, peer: &#123;&#125;"</span>, response.getResponseBody(), server);</span><br><span class="line">            	MetricsMonitor.getLeaderSendBeatFailedException().increment();</span><br><span class="line">						&#125;</span><br><span class="line">            <span class="comment">// 成功后接收Follower节点的心跳回复(Follower节点的当前信息)进行节点更新操作</span></span><br><span class="line">						peers.update(JSON.parseObject(response.getResponseBody(), RaftPeer.class));</span><br><span class="line">						Loggers.RAFT.info(<span class="string">"receive beat response from: &#123;&#125;"</span>, url);</span><br><span class="line">						<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">					&#125;</span><br><span class="line"></span><br><span class="line">					<span class="meta">@Override</span></span><br><span class="line">					<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onThrowable</span><span class="params">(Throwable t)</span> </span>&#123;</span><br><span class="line">						Loggers.RAFT.error(<span class="string">"NACOS-RAFT error while sending heart-beat to peer: &#123;&#125; &#123;&#125;"</span>, server, t);</span><br><span class="line">						MetricsMonitor.getLeaderSendBeatFailedException().increment();</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;);</span><br><span class="line">			&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">				Loggers.RAFT.error(<span class="string">"error while sending heart-beat to peer: &#123;&#125; &#123;&#125;"</span>, server, e);</span><br><span class="line">				MetricsMonitor.getLeaderSendBeatFailedException().increment();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至于心跳接收的回复操作基本就是<code>Follower</code>节点将自己当前的信息进行数据打包发送给<code>Leader</code>节点，同时也会重置当前<code>Leader</code>的任期时间信息，并且根据接收到心跳信息，进行拉取<code>Leader</code>节点的最新数据信息</p>
+<h4 id="为什么要同时实现CP和AP两套一致性策略模式？"><a href="#为什么要同时实现CP和AP两套一致性策略模式？" class="headerlink" title="为什么要同时实现CP和AP两套一致性策略模式？"></a>为什么要同时实现CP和AP两套一致性策略模式？</h4><p>或许有的人会问，为什么<code>Nacos</code>要同时实现<code>CP</code>以及<code>AP</code>两种数据的一致性策略。其实在一个组件中同时实现两种数据一致性策略，我觉得这样在做服务注册中心选型时，就不必操心<code>AP</code>选什么组件，<code>CP</code>选什么组件，直接采用<code>nacos</code>就好了，同时满足你<code>AP</code>以及<code>CP</code>的数据一致性需求；直接在一个组件中，享受<code>Zookeeper</code>以及<code>Eureka</code>组件的服务，避免了需要同时维护两种不同的组件的运维代价，只需要根据自己的实例需求，选择不同的注册模式即可。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nacos/" rel="tag"># nacos</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/30/java-web-40/" rel="next" title="记一次Java程序CPU占用率100%的问题排查、定位、解决">
+                <i class="fa fa-chevron-left"></i> 记一次Java程序CPU占用率100%的问题排查、定位、解决
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 commiter</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">96</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#两种一致性策略如何在nacos中共存"><span class="nav-number">1.</span> <span class="nav-text">两种一致性策略如何在nacos中共存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AP实现"><span class="nav-number">2.</span> <span class="nav-text">AP实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CP实现"><span class="nav-number">3.</span> <span class="nav-text">CP实现</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#重要的协议——RAFT"><span class="nav-number">3.1.</span> <span class="nav-text">重要的协议——RAFT</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#nacos是如何实现CP-raft-的"><span class="nav-number">3.2.</span> <span class="nav-text">nacos是如何实现CP(raft)的</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么要同时实现CP和AP两套一致性策略模式？"><span class="nav-number">4.</span> <span class="nav-text">为什么要同时实现CP和AP两套一致性策略模式？</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/06/01/java-web-41/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

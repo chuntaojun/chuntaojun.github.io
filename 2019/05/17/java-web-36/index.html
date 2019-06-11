@@ -121,7 +121,7 @@
 <meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-36-2.png">
 <meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-36-3.png">
 <meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-36-4.png">
-<meta property="og:updated_time" content="2019-05-26T07:13:09.000Z">
+<meta property="og:updated_time" content="2019-06-10T08:37:36.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="记一次解决Nacos-SpringBoot不支持@ConditionalOnProperty">
 <meta name="twitter:description" content="错误介绍@ConditionalOnProperty配置生效问题 错误原因分析在使用Nacos-Config-SpringBoot时，有使用者反馈说无法支持@ConditionalOnProperty注解，经过研究Nacos-Config-SpringBoot、Nacos-Spring-Context源码以及调试跟踪SpringBoot的初始化流程，最终发现问题所在——@ConditionalOn">
@@ -371,7 +371,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-05-26 15:13:09" itemprop="dateModified" datetime="2019-05-26T15:13:09+08:00">2019-05-26</time>
+                <time title="Modified: 2019-06-10 16:37:36" itemprop="dateModified" datetime="2019-06-10T16:37:36+08:00">2019-06-10</time>
               
             
           </span>
@@ -458,7 +458,8 @@
 <p>（提醒：之所以这里nacos的配置能够与<code>SpringBoot</code>的<code>@ConditionalOnProperty</code>，是因为我这进行了修改，初步解决了此问题）</p>
 <p>而<code>Nacos-Spring-Context</code>中相关的<code>bean</code>，都是在这之后才被解析、装载进入<code>Spring Container</code>的，为什么这么说？这里直接拉出官方对于<code>ConfigurationClassPostProcessor</code>的注释</p>
 <blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&gt; * &#123;@link BeanFactoryPostProcessor&#125; used for bootstrapping processing of</span><br><span class="line">&gt; * &#123;@link Configuration @Configuration&#125; classes.</span><br><span class="line">&gt; *</span><br><span class="line">&gt; * &lt;p&gt;Registered by default when using &#123;@code &lt;context:annotation-config/&gt;&#125; or</span><br><span class="line">&gt; * &#123;@code &lt;context:component-scan/&gt;&#125;. Otherwise, may be declared manually as</span><br><span class="line">&gt; * with any other BeanFactoryPostProcessor.</span><br><span class="line">&gt; *</span><br><span class="line">&gt; * &lt;p&gt;This post processor is priority-ordered as it is important that any</span><br><span class="line">&gt; * &#123;@link Bean&#125; methods declared in &#123;@code @Configuration&#125; classes have</span><br><span class="line">&gt; * their corresponding bean definitions registered before any other</span><br><span class="line">&gt; * &#123;@link BeanFactoryPostProcessor&#125; executes.</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+<p>{@link BeanFactoryPostProcessor} used for bootstrapping processing of<br>{@link Configuration @Configuration} classes.</p>
+<p></p><p>Registered by default when using {@code <a href="context:annotation-config/" target="_blank" rel="noopener">context:annotation-config/</a>} or<br>{@code <a href="context:component-scan/" target="_blank" rel="noopener">context:component-scan/</a>}. Otherwise, may be declared manually as<br>with any other BeanFactoryPostProcessor.<br>This post processor is priority-ordered as it is important that any<br>{@link Bean} methods declared in {@code @Configuration} classes have<br>their corresponding bean definitions registered before any other<br>{@link BeanFactoryPostProcessor} executes.</p>
 </blockquote>
 <p>大致意思就是，<code>ConfigurationClassPostProcessor</code>的优先级是所有<code>BeanFactoryPostProcessor</code>实现中最高的，他必须在其他的<code>BeanFactoryPostProcessor</code>之前执行，因为其他的<code>BeanFactoryPostProcessor</code>需要<code>ConfigurationClassPostProcessor</code>进行解析装载进<code>Spring Container</code>。</p>
 <h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h4><p>清楚该ISSUE为什么会出现的原因之后，那么相应的解决方案就很快的出来了。之前说到<code>ConfigurationClassPostProcessor</code>它会去解析<code>@ConditionalOnProperty</code>，并且它的执行先于其他的<code>BeanFactoryPostProcessor</code>实现；那么，还有什么比它先执行呢？</p>
@@ -588,7 +589,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">97</span>
+                    <span class="site-state-item-count">98</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>

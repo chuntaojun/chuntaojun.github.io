@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Nacos Client 心跳上报1234567891011121314151617181920212223242526272829303132333435363738class BeatProcessor implements Runnable &amp;#123;	@Override	public void run() &amp;#123;		try &amp;#123;			for (Map.Entry&amp;lt;St">
+<meta name="keywords" content="nacos">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nacos 是如何剔除非健康实例的">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/06/09/java-web-43/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="Nacos Client 心跳上报1234567891011121314151617181920212223242526272829303132333435363738class BeatProcessor implements Runnable &amp;#123;	@Override	public void run() &amp;#123;		try &amp;#123;			for (Map.Entry&amp;lt;St">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-06-13T10:59:45.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nacos 是如何剔除非健康实例的">
+<meta name="twitter:description" content="Nacos Client 心跳上报1234567891011121314151617181920212223242526272829303132333435363738class BeatProcessor implements Runnable &amp;#123;	@Override	public void run() &amp;#123;		try &amp;#123;			for (Map.Entry&amp;lt;St">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/06/09/java-web-43/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Nacos 是如何剔除非健康实例的 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/06/09/java-web-43/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 commiter">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Nacos 是如何剔除非健康实例的
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-06-09 20:43:22" itemprop="dateCreated datePublished" datetime="2019-06-09T20:43:22+08:00">2019-06-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-06-13 18:59:45" itemprop="dateModified" datetime="2019-06-13T18:59:45+08:00">2019-06-13</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/06/09/java-web-43/" class="leancloud_visitors" data-flag-title="Nacos 是如何剔除非健康实例的">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="Nacos-Client-心跳上报"><a href="#Nacos-Client-心跳上报" class="headerlink" title="Nacos Client 心跳上报"></a>Nacos Client 心跳上报</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BeatProcessor</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="keyword">for</span> (Map.Entry&lt;String, BeatInfo&gt; entry : dom2Beat.entrySet()) &#123;</span><br><span class="line">				BeatInfo beatInfo = entry.getValue();</span><br><span class="line">				<span class="keyword">if</span> (beatInfo.isScheduled()) &#123;</span><br><span class="line">					<span class="keyword">continue</span>;</span><br><span class="line">				&#125;</span><br><span class="line">				beatInfo.setScheduled(<span class="keyword">true</span>);</span><br><span class="line">				executorService.schedule(<span class="keyword">new</span> BeatTask(beatInfo), <span class="number">0</span>, TimeUnit.MILLISECONDS);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			NAMING_LOGGER.error(<span class="string">"[CLIENT-BEAT] Exception while scheduling beat."</span>, e);</span><br><span class="line">		&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">			executorService.schedule(<span class="keyword">this</span>, clientBeatInterval, TimeUnit.MILLISECONDS);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BeatTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	BeatInfo beatInfo;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">BeatTask</span><span class="params">(BeatInfo beatInfo)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.beatInfo = beatInfo;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">long</span> result = serverProxy.sendBeat(beatInfo);</span><br><span class="line">		beatInfo.setScheduled(<span class="keyword">false</span>);</span><br><span class="line">		<span class="keyword">if</span> (result &gt; <span class="number">0</span>) &#123;</span><br><span class="line">			clientBeatInterval = result;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述代码就是<code>nacos client</code>向<code>nacos naming server</code>上报自己的心跳信息</p>
+<h4 id="Nacos-Naming-Server-处理心跳"><a href="#Nacos-Naming-Server-处理心跳" class="headerlink" title="Nacos Naming Server 处理心跳"></a>Nacos Naming Server 处理心跳</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@CanDistro</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/beat"</span>, method = RequestMethod.PUT)</span><br><span class="line"><span class="function"><span class="keyword">public</span> JSONObject <span class="title">beat</span><span class="params">(HttpServletRequest request)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">	JSONObject result = <span class="keyword">new</span> JSONObject();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 告诉 nacos-client 以后每隔 &#123;clientBeatInterval&#125; 进行一次心跳上报</span></span><br><span class="line">	result.put(<span class="string">"clientBeatInterval"</span>, switchDomain.getClientBeatInterval());</span><br><span class="line"></span><br><span class="line">	String namespaceId = WebUtils.optional(request, CommonParams.NAMESPACE_ID, Constants.DEFAULT_NAMESPACE_ID);</span><br><span class="line">	String beat = WebUtils.required(request, <span class="string">"beat"</span>);</span><br><span class="line">  <span class="comment">// 将心跳信息进行转为 RsInfo 对象，以留作后面的任务信息</span></span><br><span class="line">	RsInfo clientBeat = JSON.parseObject(beat, RsInfo.class);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 如果是非临时实例，直接返回</span></span><br><span class="line">	<span class="keyword">if</span> (!switchDomain.isDefaultInstanceEphemeral() &amp;&amp; !clientBeat.isEphemeral()) &#123;</span><br><span class="line">		<span class="keyword">return</span> result;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (StringUtils.isBlank(clientBeat.getCluster())) &#123;</span><br><span class="line">		clientBeat.setCluster(UtilsAndCommons.DEFAULT_CLUSTER_NAME);</span><br><span class="line">	&#125;</span><br><span class="line">	String serviceName = WebUtils.required(request, CommonParams.SERVICE_NAME);</span><br><span class="line">	String clusterName = clientBeat.getCluster();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (Loggers.DEBUG_LOG.isDebugEnabled()) &#123;</span><br><span class="line">		Loggers.DEBUG_LOG.debug(<span class="string">"[CLIENT-BEAT] full arguments: beat: &#123;&#125;, serviceName: &#123;&#125;"</span>, clientBeat, serviceName);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 从 ServiceManager 取出对应的 Instance 实例信息</span></span><br><span class="line">	Instance instance = serviceManager.getInstance(namespaceId, serviceName, clientBeat.getCluster(), clientBeat.getIp(), clientBeat.getPort());</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 如果没有相应的实例信息，那么本次为首次心跳 or 数据补偿(非本次注册，但是由于某些原因实例没有续约成功</span></span><br><span class="line">  <span class="comment">// 导致被剔除，后面再次续约成功)</span></span><br><span class="line">	<span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">		instance = <span class="keyword">new</span> Instance();</span><br><span class="line">		instance.setPort(clientBeat.getPort());</span><br><span class="line">		instance.setIp(clientBeat.getIp());</span><br><span class="line">		instance.setWeight(clientBeat.getWeight());</span><br><span class="line">		instance.setMetadata(clientBeat.getMetadata());</span><br><span class="line">		instance.setClusterName(clusterName);</span><br><span class="line">		instance.setServiceName(serviceName);</span><br><span class="line">		instance.setInstanceId(instance.generateInstanceId());</span><br><span class="line">		instance.setEphemeral(clientBeat.isEphemeral());</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 注册实例</span></span><br><span class="line">		serviceManager.registerInstance(namespaceId, serviceName, instance);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 获取服务信息</span></span><br><span class="line">	Service service = serviceManager.getService(namespaceId, serviceName);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (service == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> NacosException(NacosException.SERVER_ERROR, <span class="string">"service not found: "</span> + serviceName + <span class="string">"@"</span> + namespaceId);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 处理 nacos-client 端的心跳信息</span></span><br><span class="line">	service.processClientBeat(clientBeat);</span><br><span class="line">	<span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在进行心跳任务的末尾，会创建一个处理本次客户端心跳包的任务进行处理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">processClientBeat</span><span class="params">(<span class="keyword">final</span> RsInfo rsInfo)</span> </span>&#123;</span><br><span class="line">	ClientBeatProcessor clientBeatProcessor = <span class="keyword">new</span> ClientBeatProcessor();</span><br><span class="line">	clientBeatProcessor.setService(<span class="keyword">this</span>);</span><br><span class="line">	clientBeatProcessor.setRsInfo(rsInfo);</span><br><span class="line">	HealthCheckReactor.scheduleNow(clientBeatProcessor);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>进行通知所有的服务订阅者</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	Service service = <span class="keyword">this</span>.service;</span><br><span class="line">	<span class="keyword">if</span> (Loggers.EVT_LOG.isDebugEnabled()) &#123;</span><br><span class="line">		Loggers.EVT_LOG.debug(<span class="string">"[CLIENT-BEAT] processing beat: &#123;&#125;"</span>, rsInfo.toString());</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	String ip = rsInfo.getIp();</span><br><span class="line">	String clusterName = rsInfo.getCluster();</span><br><span class="line">	<span class="keyword">int</span> port = rsInfo.getPort();</span><br><span class="line">  <span class="comment">// 获取集群信息</span></span><br><span class="line">	Cluster cluster = service.getClusterMap().get(clusterName);</span><br><span class="line">  <span class="comment">// 获取该集群下的所有临时实例</span></span><br><span class="line">	List&lt;Instance&gt; instances = cluster.allIPs(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (Instance instance : instances) &#123;</span><br><span class="line">    <span class="comment">// 进行目标实例查找</span></span><br><span class="line">		<span class="keyword">if</span> (instance.getIp().equals(ip) &amp;&amp; instance.getPort() == port) &#123;</span><br><span class="line">			<span class="keyword">if</span> (Loggers.EVT_LOG.isDebugEnabled()) &#123;</span><br><span class="line">				Loggers.EVT_LOG.debug(<span class="string">"[CLIENT-BEAT] refresh beat: &#123;&#125;"</span>, rsInfo.toString());</span><br><span class="line">			&#125;</span><br><span class="line">      <span class="comment">// 设置实例的最新一次心跳时间</span></span><br><span class="line">			instance.setLastBeat(System.currentTimeMillis());</span><br><span class="line">			<span class="keyword">if</span> (!instance.isMarked()) &#123;</span><br><span class="line">				<span class="keyword">if</span> (!instance.isHealthy()) &#123;</span><br><span class="line">          <span class="comment">// 更新实例的健康状态信息</span></span><br><span class="line">					instance.setHealthy(<span class="keyword">true</span>);</span><br><span class="line">					Loggers.EVT_LOG.info(<span class="string">"service: &#123;&#125; &#123;POS&#125; &#123;IP-ENABLED&#125; valid: &#123;&#125;:&#123;&#125;@&#123;&#125;, region: &#123;&#125;, msg: client beat ok"</span>,  cluster.getService().getName(), ip, port, cluster.getName(), UtilsAndCommons.LOCALHOST_SITE);</span><br><span class="line">          <span class="comment">// 通知所有订阅了服务为 Service.getName() 的订阅者</span></span><br><span class="line">					getPushService().serviceChanged(service.getNamespaceId(), <span class="keyword">this</span>.service.getName());</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="剔除非健康实例"><a href="#剔除非健康实例" class="headerlink" title="剔除非健康实例"></a>剔除非健康实例</h4><p>这个时候就涉及<code>Service</code>这个对象了，在创建<code>Service</code>时，会判断实例类型是否为临时实例，如果是，则会开启一个任务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ServiceManager</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createEmptyService</span><span class="params">(String namespaceId, String serviceName, <span class="keyword">boolean</span> local)</span> <span class="keyword">throws</span> NacosException </span>&#123;</span><br><span class="line">	Service service = getService(namespaceId, serviceName);</span><br><span class="line">	<span class="keyword">if</span> (service == <span class="keyword">null</span>) &#123;</span><br><span class="line"></span><br><span class="line">		Loggers.SRV_LOG.info(<span class="string">"creating empty service &#123;&#125;:&#123;&#125;"</span>, namespaceId, serviceName);</span><br><span class="line">		service = <span class="keyword">new</span> Service();</span><br><span class="line">		service.setName(serviceName);</span><br><span class="line">		service.setNamespaceId(namespaceId);</span><br><span class="line">		service.setGroupName(NamingUtils.getGroupName(serviceName));</span><br><span class="line">		<span class="comment">// now validate the service. if failed, exception will be thrown</span></span><br><span class="line">		service.setLastModifiedMillis(System.currentTimeMillis());</span><br><span class="line">		service.recalculateChecksum();</span><br><span class="line">		service.validate();</span><br><span class="line">		<span class="keyword">if</span> (local) &#123;</span><br><span class="line">			<span class="comment">// 临时实例下，开启一个任务，用于处理临时实例的健康状况</span></span><br><span class="line">			putService(service);</span><br><span class="line">			service.init();</span><br><span class="line">               	consistencyService.listen(KeyBuilder.buildInstanceListKey(service.getNamespaceId(), service.getName(), <span class="keyword">true</span>), service);</span><br><span class="line">                consistencyService.listen(KeyBuilder.buildInstanceListKey(service.getNamespaceId(), service.getName(), <span class="keyword">false</span>), service);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			addOrReplaceService(service);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Service</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 这里就会开启定时执行的任务</span></span><br><span class="line">	HealthCheckReactor.scheduleCheck(clientBeatCheckTask);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> (Map.Entry&lt;String, Cluster&gt; entry : clusterMap.entrySet()) &#123;</span><br><span class="line">		entry.getValue().setService(<span class="keyword">this</span>);</span><br><span class="line">		entry.getValue().init();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个<code>ClientBeatCheckTask</code>根据名字就知道，它是用于处理实例心跳信息检查的，也就是实例健康处理的任务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ClientBeatCheckTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 任务处理对象</span></span><br><span class="line">	<span class="keyword">private</span> Service service;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">ClientBeatCheckTask</span><span class="params">(Service service)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.service = service;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 这是给订阅者服务的</span></span><br><span class="line">	<span class="meta">@JSONField</span>(serialize = <span class="keyword">false</span>)</span><br><span class="line">	<span class="function"><span class="keyword">public</span> PushService <span class="title">getPushService</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> SpringContext.getAppContext().getBean(PushService.class);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 用于寻找实例的权威 Server</span></span><br><span class="line">	<span class="meta">@JSONField</span>(serialize = <span class="keyword">false</span>)</span><br><span class="line">	<span class="function"><span class="keyword">public</span> DistroMapper <span class="title">getDistroMapper</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> SpringContext.getAppContext().getBean(DistroMapper.class);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> GlobalConfig <span class="title">getGlobalConfig</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> SpringContext.getAppContext().getBean(GlobalConfig.class);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">taskKey</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> service.getName();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">// 自己是否是该服务的权威server，如果是则进行处理，否则不处理</span></span><br><span class="line">			<span class="keyword">if</span> (!getDistroMapper().responsible(service.getName())) &#123;</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 获取所有的临时实例</span></span><br><span class="line">			List&lt;Instance&gt; instances = service.allIPs(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">			<span class="comment">// first set health status of instances:</span></span><br><span class="line">			<span class="keyword">for</span> (Instance instance : instances) &#123;</span><br><span class="line">        <span class="comment">// 如果实例的上次心跳时间距离当前时间超过了心跳过期时间</span></span><br><span class="line">				<span class="keyword">if</span> (System.currentTimeMillis() - instance.getLastBeat() &gt; ClientBeatProcessor.CLIENT_BEAT_TIMEOUT) &#123;</span><br><span class="line">					<span class="keyword">if</span> (!instance.isMarked()) &#123;</span><br><span class="line">						<span class="keyword">if</span> (instance.isHealthy()) &#123;</span><br><span class="line">              <span class="comment">// 将实例健康状态设置为fasle</span></span><br><span class="line">							instance.setHealthy(<span class="keyword">false</span>);</span><br><span class="line">							Loggers.EVT_LOG.info(<span class="string">"&#123;POS&#125; &#123;IP-DISABLED&#125; valid: &#123;&#125;:&#123;&#125;@&#123;&#125;@&#123;&#125;, region: &#123;&#125;, msg: client timeout after &#123;&#125;, last beat: &#123;&#125;"</span>,</span><br><span class="line">							instance.getIp(), instance.getPort(), instance.getClusterName(), service.getName(), UtilsAndCommons.LOCALHOST_SITE, ClientBeatProcessor.CLIENT_BEAT_TIMEOUT, instance.getLastBeat());</span><br><span class="line">              <span class="comment">// 通知订阅者相关的数据改变</span></span><br><span class="line">							getPushService().serviceChanged(service.getNamespaceId(), service.getName());</span><br><span class="line">						&#125;</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">      <span class="comment">// 是否开启了实例过期设置</span></span><br><span class="line">			<span class="keyword">if</span> (!getGlobalConfig().isExpireInstance()) &#123;</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">// then remove obsolete instances:</span></span><br><span class="line">			<span class="keyword">for</span> (Instance instance : instances) &#123;</span><br><span class="line">        <span class="comment">// IP will be deleted if it has not send beat for some time, default timeout is 30 seconds.</span></span><br><span class="line">        <span class="comment">// 如果该实例上次心跳时间距离现在超过了设置的 DeleteTimeout，则对实例进行摘除</span></span><br><span class="line">				<span class="keyword">if</span> (System.currentTimeMillis() - instance.getLastBeat() &gt; service.getIpDeleteTimeout()) &#123;</span><br><span class="line">					<span class="comment">// delete instance</span></span><br><span class="line">					Loggers.SRV_LOG.info(<span class="string">"[AUTO-DELETE-IP] service: &#123;&#125;, ip: &#123;&#125;"</span>, service.getName(), JSON.toJSONString(instance));</span><br><span class="line">					deleteIP(instance);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			Loggers.SRV_LOG.warn(<span class="string">"Exception while processing client beat time out."</span>, e);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">deleteIP</span><span class="params">(Instance instance)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">// 创建一个实例删除请求，将删除请求定位到自己对应的 RequestMapping</span></span><br><span class="line">			NamingProxy.Request request = NamingProxy.Request.newRequest();</span><br><span class="line">			request.appendParam(<span class="string">"ip"</span>, instance.getIp())</span><br><span class="line">                .appendParam(<span class="string">"port"</span>, String.valueOf(instance.getPort()))</span><br><span class="line">                .appendParam(<span class="string">"ephemeral"</span>, <span class="string">"true"</span>)</span><br><span class="line">                .appendParam(<span class="string">"clusterName"</span>, instance.getClusterName())</span><br><span class="line">                .appendParam(<span class="string">"serviceName"</span>, service.getName())</span><br><span class="line">                .appendParam(<span class="string">"namespaceId"</span>, service.getNamespaceId());</span><br><span class="line"></span><br><span class="line">			String url = <span class="string">"http://127.0.0.1:"</span> + RunningConfig.getServerPort() + RunningConfig.getContextPath() + UtilsAndCommons.NACOS_NAMING_CONTEXT + <span class="string">"/instance?"</span> + request.toUrl();</span><br><span class="line"></span><br><span class="line">			<span class="comment">// 开启一个异步的 Http 请求任务进行删除实例数据</span></span><br><span class="line">			HttpClient.asyncHttpDelete(url, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">new</span> AsyncCompletionHandler() &#123;</span><br><span class="line">				<span class="meta">@Override</span></span><br><span class="line">				<span class="function"><span class="keyword">public</span> Object <span class="title">onCompleted</span><span class="params">(Response response)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">					<span class="keyword">if</span> (response.getStatusCode() != HttpURLConnection.HTTP_OK) &#123;</span><br><span class="line">						Loggers.SRV_LOG.error(<span class="string">"[IP-DEAD] failed to delete ip automatically, ip: &#123;&#125;, caused &#123;&#125;, resp code: &#123;&#125;"</span>, instance.toJSON(), response.getResponseBody(), response.getStatusCode());</span><br><span class="line">					&#125;</span><br><span class="line">					<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			Loggers.SRV_LOG.error(<span class="string">"[IP-DEAD] failed to delete ip automatically, ip: &#123;&#125;, error: &#123;&#125;"</span>, instance.toJSON(), e);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/nacos/" rel="tag"># nacos</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/03/java-web-42/" rel="next" title="nacos是如何知道哪些客户端订阅了某项服务的">
+                <i class="fa fa-chevron-left"></i> nacos是如何知道哪些客户端订阅了某项服务的
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/09/java-web-44/" rel="prev" title="Spring中Bean的Scope周期的详解">
+                Spring中Bean的Scope周期的详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 commiter</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">99</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Nacos-Client-心跳上报"><span class="nav-number">1.</span> <span class="nav-text">Nacos Client 心跳上报</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Nacos-Naming-Server-处理心跳"><span class="nav-number">2.</span> <span class="nav-text">Nacos Naming Server 处理心跳</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#剔除非健康实例"><span class="nav-number">3.</span> <span class="nav-text">剔除非健康实例</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/06/09/java-web-43/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

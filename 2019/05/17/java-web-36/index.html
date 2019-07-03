@@ -121,7 +121,7 @@
 <meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-36-2.png">
 <meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-36-3.png">
 <meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-36-4.png">
-<meta property="og:updated_time" content="2019-06-13T06:26:16.000Z">
+<meta property="og:updated_time" content="2019-06-25T12:31:23.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="记一次解决Nacos-SpringBoot不支持@ConditionalOnProperty">
 <meta name="twitter:description" content="错误介绍@ConditionalOnProperty配置生效问题 错误原因分析在使用Nacos-Config-SpringBoot时，有使用者反馈说无法支持@ConditionalOnProperty注解，经过研究Nacos-Config-SpringBoot、Nacos-Spring-Context源码以及调试跟踪SpringBoot的初始化流程，最终发现问题所在——@ConditionalOn">
@@ -371,7 +371,7 @@
                 
                   <span class="post-meta-item-text">Edited on</span>
                 
-                <time title="Modified: 2019-06-13 14:26:16" itemprop="dateModified" datetime="2019-06-13T14:26:16+08:00">2019-06-13</time>
+                <time title="Modified: 2019-06-25 20:31:23" itemprop="dateModified" datetime="2019-06-25T20:31:23+08:00">2019-06-25</time>
               
             
           </span>
@@ -435,7 +435,7 @@
       
         <h4 id="错误介绍"><a href="#错误介绍" class="headerlink" title="错误介绍"></a>错误介绍</h4><p><a href="https://github.com/nacos-group/nacos-spring-boot-project/issues/18" target="_blank" rel="noopener">@ConditionalOnProperty配置生效问题</a></p>
 <h4 id="错误原因分析"><a href="#错误原因分析" class="headerlink" title="错误原因分析"></a>错误原因分析</h4><p>在使用<code>Nacos-Config-SpringBoot</code>时，有使用者反馈说无法支持<code>@ConditionalOnProperty</code>注解，经过研究<code>Nacos-Config-SpringBoot</code>、<code>Nacos-Spring-Context</code>源码以及调试跟踪<code>SpringBoot</code>的初始化流程，最终发现问题所在——<code>@ConditionalOnProperty</code>的解析时间与<code>Nacos-Spring-Context</code>相关<code>Bean</code>的注册以及工作时间存在先后问题（其本质原因就是<code>Bean</code>的加载顺序）</p>
-<h5 id="ConditionalOnProperty解析时间"><a href="#ConditionalOnProperty解析时间" class="headerlink" title="@ConditionalOnProperty解析时间"></a>@ConditionalOnProperty解析时间</h5><p>要想知道<code>@ConditionalOnProperty</code>注解何时被<code>Spring</code>解析，首先要看另外一个类——<code>ConfigurationClassPostProcessor</code>，这个类实现了<code>BeanFactoryPostProcessor</code>接口，因此他可以在<code>Spring</code>的<code>bean</code>创建之前，对<code>bean</code>进行修改，即<code>Spring</code>允许<code>BeanFactoryPostProcessor</code>在容器实例化任何其他<code>bean</code>之前读取配置元数据，并根据其进行修改，就比如<code>@ConditionalOnProperty</code>注解常用来根据配置文件的相关配置控制是否需要创建相应的<code>bean</code>。</p>
+<h5 id="ConditionalOnProperty解析时间"><a href="#ConditionalOnProperty解析时间" class="headerlink" title="@ConditionalOnProperty解析时间"></a>@ConditionalOnProperty解析时间</h5><p>要想知道<code>@ConditionalOnProperty</code>注解何时被<code>Spring</code>解析，首先要看另外一个类——<code>ConfigurationClassPostProcessor</code>，这个类实现了<code>BeanFactoryPostProcessor</code>接口，该接口是在所有的<code>BeanDefinition</code>加载之后执行的，可以在此接口中对<code>bean</code>的定义进行修改。即<code>Spring</code>允许<code>BeanFactoryPostProcessor</code>在容器实例化任何其他<code>bean</code>之前读取配置元数据，并根据其进行修改，就比如<code>@ConditionalOnProperty</code>注解常用来根据配置文件的相关配置控制是否需要创建相应的<code>bean</code>。</p>
 <blockquote>
 <p>核心代码</p>
 </blockquote>

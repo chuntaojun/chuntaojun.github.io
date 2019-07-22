@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="自定义注解首先需要创建几个注解用于使用RPC EnableTensorRPC 开启RPC服务 RpcRegister 将接口注册为一个服务 RpcService 用于标注该接口是一个远程服务 服务接口创建代理类为了方便，我直接和Spring进行了整合，这里使用了Spring的回调接口BeanPostProcessor来进行上述三个注解的处理工作（当然目前这个很粗糙）  处理 EnableTenso">
+<meta property="og:type" content="article">
+<meta property="og:title" content="手动实现一个简单的RPC框架">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/07/16/java-web-47/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="自定义注解首先需要创建几个注解用于使用RPC EnableTensorRPC 开启RPC服务 RpcRegister 将接口注册为一个服务 RpcService 用于标注该接口是一个远程服务 服务接口创建代理类为了方便，我直接和Spring进行了整合，这里使用了Spring的回调接口BeanPostProcessor来进行上述三个注解的处理工作（当然目前这个很粗糙）  处理 EnableTenso">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-07-22T08:31:19.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="手动实现一个简单的RPC框架">
+<meta name="twitter:description" content="自定义注解首先需要创建几个注解用于使用RPC EnableTensorRPC 开启RPC服务 RpcRegister 将接口注册为一个服务 RpcService 用于标注该接口是一个远程服务 服务接口创建代理类为了方便，我直接和Spring进行了整合，这里使用了Spring的回调接口BeanPostProcessor来进行上述三个注解的处理工作（当然目前这个很粗糙）  处理 EnableTenso">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/07/16/java-web-47/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>手动实现一个简单的RPC框架 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/07/16/java-web-47/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 commiter">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">手动实现一个简单的RPC框架
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-07-16 12:50:07" itemprop="dateCreated datePublished" datetime="2019-07-16T12:50:07+08:00">2019-07-16</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-22 16:31:19" itemprop="dateModified" datetime="2019-07-22T16:31:19+08:00">2019-07-22</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/07/16/java-web-47/" class="leancloud_visitors" data-flag-title="手动实现一个简单的RPC框架">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h4><p>首先需要创建几个注解用于使用RPC</p>
+<p><code>EnableTensorRPC</code> 开启RPC服务</p>
+<p><code>RpcRegister</code> 将接口注册为一个服务</p>
+<p><code>RpcService</code> 用于标注该接口是一个远程服务</p>
+<h4 id="服务接口创建代理类"><a href="#服务接口创建代理类" class="headerlink" title="服务接口创建代理类"></a>服务接口创建代理类</h4><p>为了方便，我直接和<code>Spring</code>进行了整合，这里使用了<code>Spring</code>的回调接口<code>BeanPostProcessor</code>来进行上述三个注解的处理工作（当然目前这个很粗糙）</p>
+<blockquote>
+<p>处理 EnableTensorRPC 注解</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EnableTensorRPCBeanPostProcessor</span> <span class="keyword">implements</span> <span class="title">BeanPostProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        EnableTensorRPC rpc = bean.getClass().getAnnotation(EnableTensorRPC.class);</span><br><span class="line">        <span class="keyword">if</span> (rpc == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> bean;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            RpcApplication.init(rpc);</span><br><span class="line">            <span class="keyword">if</span> (Objects.equals(rpc.type(), RpcType.PROVIDER)) &#123;</span><br><span class="line">                log.info(<span class="string">"[TENSOR RPC] work type is provider"</span>);</span><br><span class="line">                NettyServer.start(rpc);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                log.info(<span class="string">"[TENSOR RPC] work type is consumer"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessAfterInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该<code>BeanPostProcessor</code>主要的工作就是启动<code>rpc server</code>操作，因为可能项目既作为服务的提供者也作为服务的消费者（此处没考虑到仅仅作为服务的消费者的情况，在此情况下就会存在资源浪费）</p>
+<blockquote>
+<p>处理 RpcRegister 注解</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcRegisterInjectBeanPostProcessor</span> <span class="keyword">implements</span> <span class="title">BeanPostProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 接口服务注册</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> bean</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> beanName</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> BeansException</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        Class cls = bean.getClass();</span><br><span class="line">        RpcRegister rpcRegister = (RpcRegister) cls.getAnnotation(RpcRegister.class);</span><br><span class="line">        <span class="keyword">if</span> (rpcRegister != <span class="keyword">null</span>) &#123;</span><br><span class="line">            String serviceName = rpcRegister.serviceName();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 为该接口服务创建一个方法签名信息</span></span><br><span class="line"></span><br><span class="line">            Class&lt;?&gt; registerType = rpcRegister.value();</span><br><span class="line"></span><br><span class="line">            String key = KeyBuilder.buildServiceKey(serviceName, rpcRegister.ip(), rpcRegister.port());</span><br><span class="line">            ApplicationManager.getRpcInfoManager().providerRegister(registerType.getCanonicalName(), rpcRegister);</span><br><span class="line">            ApplicationManager.getNativeMethodManager().register(bean, cls);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessAfterInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该<code>BeanPostProcessor</code>注解是处理对外暴露接口的，这里做的很简单，根据注解所标注的接口，为该接口创建一个签名然后放入一个本地方法池中，而目前的方法签名很简单，就是类的全路径名称</p>
+<blockquote>
+<p>处理 RpcService 注解</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcServiceInjectBeanPostProcessor</span> <span class="keyword">implements</span> <span class="title">BeanPostProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessAfterInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        Class&lt;?&gt; cls = bean.getClass();</span><br><span class="line">        rpcServiceInject(cls, bean);</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 接口进行代理，对接口的所有操作转为 RPC 远程调用操作</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> cls &#123;<span class="doctag">@link</span> Class&#125; interface type</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> bean &#123;<span class="doctag">@link</span> Object&#125; Spring's bean</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">rpcServiceInject</span><span class="params">(Class cls, Object bean)</span> </span>&#123;</span><br><span class="line">        Field[] fields = cls.getDeclaredFields();</span><br><span class="line">        <span class="keyword">for</span> (Field field : fields) &#123;</span><br><span class="line">            field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">            <span class="keyword">if</span> (field.isAnnotationPresent(RpcService.class)) &#123;</span><br><span class="line">                RpcService rpcService = field.getAnnotation(RpcService.class);</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    field.set(bean, RpcInjectProxy.inject(rpcService, field.getType()));</span><br><span class="line">                    ApplicationManager.getRpcInfoManager().consumerRegister(field.getType().getCanonicalName(), rpcService);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该<code>BeanPostProcessor</code>注解是为远程接口创建一个代理类，当服务消费者调用远程接口服务时，实际是由代理类进行远程访问调用服务提供者的方法的</p>
+<h4 id="如何正确进行方法的调用"><a href="#如何正确进行方法的调用" class="headerlink" title="如何正确进行方法的调用"></a>如何正确进行方法的调用</h4><p>当一个服务消费者调用远程服务时，首先来的是代理类的拦截方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcCGlibCallBackHandler</span> <span class="keyword">extends</span> <span class="title">AbstractRpcCallBackHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String serviceName;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RpcCGlibCallBackHandler</span><span class="params">(String serviceName)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.serviceName = serviceName;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">intercept</span><span class="params">(Object obj, Method method, Object[] args, MethodProxy proxy)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        Class&lt;?&gt; cls = method.getDeclaringClass();</span><br><span class="line">      <span class="comment">// 获取服务接口的注解信息(目的就是为了得知服务的接口的全信息，好做调用)</span></span><br><span class="line">        RpcService rpcService = ApplicationManager.getRpcInfoManager().getRpcService(cls.getCanonicalName());</span><br><span class="line">      <span class="comment">// 创建future进行异步RPC请求</span></span><br><span class="line">        RpcResult future = getMethodInvoker().invoke(methodRequest(cls.getCanonicalName(), method, args), rpcService);</span><br><span class="line">        <span class="keyword">return</span> future.result();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 封装本次RPC请求的信息，请求id、服务者key、请求方法、请求参数、返回类型</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> RpcMethodRequest <span class="title">methodRequest</span><span class="params">(String className, Method method, Object[] args)</span> </span>&#123;</span><br><span class="line">        String reqId = UUID.randomUUID().toString();</span><br><span class="line">        Class&lt;?&gt; returnType = method.getReturnType();</span><br><span class="line">        <span class="keyword">return</span> RpcMethodRequest.builder()</span><br><span class="line">                .reqId(reqId)</span><br><span class="line">                .ownerName(className)</span><br><span class="line">                .methodName(KeyBuilder.methodSign(method))</span><br><span class="line">                .param(args)</span><br><span class="line">                .returnType(returnType)</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后是进入方法调用链（用于判断走的是RPC还是Native），这里就给出走RPC时的方法吧</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcMethodExecutor</span> <span class="keyword">implements</span> <span class="title">MethodExecutor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RpcMethodExecutor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RpcResult <span class="title">invoke</span><span class="params">(Invoker invoker, MethodExecutorChain chain)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        RpcResult[] future = <span class="keyword">new</span> RpcResult[<span class="number">1</span>];</span><br><span class="line">        Mono.just(invoker)</span><br><span class="line">                .map(invoker1 -&gt; &#123;</span><br><span class="line">                    RpcMethodRequest request = invoker1.getRequest();</span><br><span class="line">                    <span class="keyword">if</span> (request == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"[RPC 调用过程出现异常！]"</span>);</span><br><span class="line">                    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Void.class.equals(request.getReturnType())) &#123;</span><br><span class="line">                        future[<span class="number">0</span>] = RpcResultPool.createFuture(request.getReqId(), <span class="keyword">true</span>);</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        future[<span class="number">0</span>] = RpcResultPool.createFuture(request.getReqId());</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">return</span> invoker1;</span><br><span class="line">                &#125;)</span><br><span class="line">                .publishOn(Schedulers.fromExecutor(RpcSchedule.RpcExecutor.RPC))</span><br><span class="line">                .subscribe(<span class="keyword">this</span>::sendRequest);</span><br><span class="line">        <span class="keyword">return</span> future[<span class="number">0</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">priority</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 这里会创建一个Netty channel连接(已做了优化，如果存在直接复用，不会每次请求都去创建)</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">sendRequest</span><span class="params">(Invoker invoker)</span> </span>&#123;</span><br><span class="line">        RpcService rpcService = invoker.getService();</span><br><span class="line">        RpcMethodRequest request = invoker.getRequest();</span><br><span class="line">        String serviceName = rpcService.serviceName();</span><br><span class="line">        String ip = rpcService.ip();</span><br><span class="line">        <span class="keyword">int</span> port = rpcService.port();</span><br><span class="line">        Channel channel = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            channel = NettyClient.getConnection(serviceName, ip, port);</span><br><span class="line">            channel.writeAndFlush(request).sync();</span><br><span class="line">            NettyClient.release(channel, serviceName, ip, port);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接着就是当<code>RPC</code>请求来到了服务提供者时怎么路由到方法了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NativeMethodExecutor</span> <span class="keyword">implements</span> <span class="title">MethodExecutor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NativeMethodExecutor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RpcResult <span class="title">invoke</span><span class="params">(Invoker invoker, MethodExecutorChain chain)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (invoker.isNative()) &#123;</span><br><span class="line">            <span class="keyword">return</span> innerExec(invoker.getRequest());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (invoker.isRpcRequest()) &#123;</span><br><span class="line">            <span class="keyword">return</span> innerExec(invoker.getRequest(), invoker.getChannel());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> chain.chain(invoker);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 本地方法直接调用</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> msg &#123;<span class="doctag">@link</span> RpcMethodRequest&#125;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> &#123;<span class="doctag">@link</span> RpcResult&#125;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> RpcResult <span class="title">innerExec</span><span class="params">(RpcMethodRequest msg)</span> </span>&#123;</span><br><span class="line">        RpcResult[] future = <span class="keyword">new</span> RpcResult[<span class="number">1</span>];</span><br><span class="line">        future[<span class="number">0</span>] = RpcResultPool.createFuture(msg.getReqId());</span><br><span class="line">        Mono.just(msg)</span><br><span class="line">                .publishOn(Schedulers.fromExecutor(RpcSchedule.RpcExecutor.RPC))</span><br><span class="line">                .map(request -&gt; ApplicationManager.getNativeMethodManager().getExecutor(request.getOwnerName()))</span><br><span class="line">                .map(f -&gt; f.apply(msg))</span><br><span class="line">                .subscribe(rpcMethodResponse -&gt; future[<span class="number">0</span>].complete(rpcMethodResponse));</span><br><span class="line">        <span class="keyword">return</span> future[<span class="number">0</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 用于接收RPC Request请求，执行相应的方法</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> msg &#123;<span class="doctag">@link</span> RpcMethodRequest&#125;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> channel &#123;<span class="doctag">@link</span> Channel&#125;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> &#123;<span class="doctag">@link</span> RpcResult&#125;</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> RpcResult <span class="title">innerExec</span><span class="params">(RpcMethodRequest msg, Channel channel)</span> </span>&#123;</span><br><span class="line">        Mono.just(msg)</span><br><span class="line">                .map(request -&gt; ApplicationManager.getNativeMethodManager().getExecutor(request.getOwnerName()))</span><br><span class="line">                .map(executor -&gt; executor)</span><br><span class="line">                .publishOn(Schedulers.fromExecutor(RpcSchedule.RpcExecutor.RPC))</span><br><span class="line">                .map(f -&gt; f.apply(msg))</span><br><span class="line">                .subscribe(channel::writeAndFlush);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">priority</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> -<span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里其实就是用到了之前在创建请求时设置的接口全路径名了以及一个管理本地注册为服务的接口方法管理对象<code>ApplicationManager</code>了</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ApplicationManager</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> RpcInfoManager RPC_INFO_MANAGER = <span class="keyword">new</span> RpcInfoManager();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> NativeMethodManager NATIVE_METHOD_MANAGER = <span class="keyword">new</span> NativeMethodManager();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> RpcInfoManager <span class="title">getRpcInfoManager</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> RPC_INFO_MANAGER;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> NativeMethodManager <span class="title">getNativeMethodManager</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> NATIVE_METHOD_MANAGER;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcInfoManager</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        RpcInfoManager() &#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> ConcurrentHashMap&lt;String, RpcService&gt; SERVICE_MAP = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> ConcurrentHashMap&lt;String, RpcRegister&gt; REGISTER_MAP = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">consumerRegister</span><span class="params">(String key, RpcService value)</span> </span>&#123;</span><br><span class="line">            SERVICE_MAP.put(key, value);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">providerRegister</span><span class="params">(String key, RpcRegister value)</span> </span>&#123;</span><br><span class="line">            REGISTER_MAP.put(key, value);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> RpcService <span class="title">getRpcService</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> SERVICE_MAP.get(key);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> RpcRegister <span class="title">getRpcRegister</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> REGISTER_MAP.get(key);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">containRegisterInfo</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> REGISTER_MAP.containsKey(key);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">NativeMethodManager</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> ConcurrentHashMap&lt;String, RegisterInfo&gt; METHOD_EXECUTOR = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        NativeMethodManager() &#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(Object owner, Class&lt;?&gt; cls)</span> </span>&#123;</span><br><span class="line">            Class[] interfaces = cls.getInterfaces();</span><br><span class="line">            <span class="keyword">for</span> (Class inter : interfaces) &#123;</span><br><span class="line">                METHOD_EXECUTOR.put(inter.getCanonicalName(), <span class="keyword">new</span> RegisterInfo(owner, inter));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Executor <span class="title">getExecutor</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Executor(METHOD_EXECUTOR.get(key));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 接口注册的信息，该接口下的所有方法信息</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">RegisterInfo</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">            Object owner;</span><br><span class="line">            Map&lt;String, Method&gt; methodMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">            RegisterInfo(Object owner, Class&lt;?&gt; cls) &#123;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">this</span>.owner = owner;</span><br><span class="line"></span><br><span class="line">                Method[] methods = cls.getMethods();</span><br><span class="line">                <span class="keyword">for</span> (Method method : methods) &#123;</span><br><span class="line">                    methodMap.put(KeyBuilder.methodSign(method), method);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="function">Method <span class="title">getMethod</span><span class="params">(String sign)</span> </span>&#123;</span><br><span class="line">                <span class="keyword">return</span> methodMap.get(sign);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Executor</span> <span class="keyword">implements</span> <span class="title">Function</span>&lt;<span class="title">RpcMethodRequest</span>, <span class="title">RpcMethodResponse</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">            RegisterInfo worker;</span><br><span class="line"></span><br><span class="line">            Executor(RegisterInfo worker) &#123;</span><br><span class="line">                <span class="keyword">this</span>.worker = worker;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> RpcMethodResponse <span class="title">apply</span><span class="params">(RpcMethodRequest request)</span> </span>&#123;</span><br><span class="line">                Exception err = <span class="keyword">null</span>;</span><br><span class="line">                Object result = <span class="keyword">new</span> Object();</span><br><span class="line">                <span class="keyword">if</span> (worker == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    err = <span class="keyword">new</span> Exception(<span class="string">"[Tensor RPC] : Not this function"</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                  <span class="comment">// 方法对象的获取</span></span><br><span class="line">                    Method method = worker.getMethod(request.getMethodName());</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        result = method.invoke(worker.owner, request.getParam());</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (IllegalAccessException | InvocationTargetException e) &#123;</span><br><span class="line">                        err = e;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">              <span class="comment">// 创建方法返回响应，会带请求id、返回对象序列化、返回错误信息</span></span><br><span class="line">                <span class="keyword">return</span> RpcMethodResponse</span><br><span class="line">                        .builder()</span><br><span class="line">                        .respId(request.getReqId())</span><br><span class="line">                        .returnVal(GsonSerializer.encode(result))</span><br><span class="line">                        .returnType(request.getReturnType())</span><br><span class="line">                        .error(err)</span><br><span class="line">                        .build();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isNative</span><span class="params">(RpcMethodRequest request)</span> </span>&#123;</span><br><span class="line">            String key = request.getOwnerName();</span><br><span class="line">            <span class="keyword">return</span> RPC_INFO_MANAGER.containRegisterInfo(key);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>ApplicationManager</code>类管理着本地被注册为<code>@RpcRegister</code>的方法以及所有的<code>@RpcRegister</code>以及<code>@RpcService</code>注解修饰类的信息，对所有RPC请求调用本地方法的处理都交由<code>Executor</code>类来执行</p>
+<h4 id="异步RPC调用，如何能够正确接收返回结果"><a href="#异步RPC调用，如何能够正确接收返回结果" class="headerlink" title="异步RPC调用，如何能够正确接收返回结果"></a>异步RPC调用，如何能够正确接收返回结果</h4><p>由于每一次<code>RPC</code>请求的发起都会创建一个请求id，以及<code>RPC</code>响应都会讲请求id回带到响应对象中，因此只需要根据请求id找到对应的future对象，complete下即可</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcResultPool</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ConcurrentHashMap&lt;String, RpcResult&gt; RESULT_FUTURE = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> RpcResult <span class="title">getFuture</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> RESULT_FUTURE.get(key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> RpcResult <span class="title">createFuture</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> createFuture(key, <span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> RpcResult <span class="title">createFuture</span><span class="params">(String key, <span class="keyword">boolean</span> isVoid)</span> </span>&#123;</span><br><span class="line">        RpcResult result = <span class="keyword">new</span> RpcResult(isVoid);</span><br><span class="line">        RESULT_FUTURE.put(key, result);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        RESULT_FUTURE.remove(key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcResult</span> <span class="keyword">extends</span> <span class="title">CompletableFuture</span>&lt;<span class="title">RpcMethodResponse</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> isVoid = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RpcResult</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RpcResult</span><span class="params">(<span class="keyword">boolean</span> isVoid)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.isVoid = isVoid;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">complete</span><span class="params">(RpcMethodResponse value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.complete(value);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">result</span><span class="params">()</span> <span class="keyword">throws</span> ExecutionException, InterruptedException, RpcTimeOutException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (isVoid) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        RpcMethodResponse response = <span class="keyword">null</span>;</span><br><span class="line">        response = get();</span><br><span class="line">        RpcResultPool.remove(response.getRespId());</span><br><span class="line">        Class cls = response.getReturnType();</span><br><span class="line">        String val = response.getReturnVal();</span><br><span class="line">        Throwable error = response.getError();</span><br><span class="line">        <span class="keyword">if</span> (error != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(error);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> GsonSerializer.decode(val, cls);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/22/leetcode-27/" rel="next" title="leetcode回顾——number-of-islands">
+                <i class="fa fa-chevron-left"></i> leetcode回顾——number-of-islands
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 commiter</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">103</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">20</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义注解"><span class="nav-number">1.</span> <span class="nav-text">自定义注解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#服务接口创建代理类"><span class="nav-number">2.</span> <span class="nav-text">服务接口创建代理类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何正确进行方法的调用"><span class="nav-number">3.</span> <span class="nav-text">如何正确进行方法的调用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#异步RPC调用，如何能够正确接收返回结果"><span class="nav-number">4.</span> <span class="nav-text">异步RPC调用，如何能够正确接收返回结果</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+<script>
+  	var _mtac = {};
+  	(function() {
+  		var mta = document.createElement("script");
+  		mta.src = "https://pingjs.qq.com/h5/stats.js?v2.0.4";
+  		mta.setAttribute("name", "MTAH5");
+  		mta.setAttribute("sid", "500687579");
+
+  		var s = document.getElementsByTagName("script")[0];
+  		s.parentNode.insertBefore(mta, s);
+  	})();
+</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=66419010";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/07/16/java-web-47/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

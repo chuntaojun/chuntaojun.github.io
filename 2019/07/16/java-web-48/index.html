@@ -108,26 +108,24 @@
 
 
 
-  <meta name="description" content="题目12345678910111213141516给定一个含有 M x N 个元素的矩阵（M 行，N 列），请以对角线遍历的顺序返回这个矩阵中的所有元素，对角线遍历如下图所示。 示例:输入:[ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ]]输出:  [1,2,4,7,5,3,6,8,9]解释:   1234说明:给定矩阵中的元素总数不会超过 100000 。 题解这一">
+  <meta name="description" content="地址服务模式nacos官方有一个环境隔离实践的博文，在那篇博文中，阿里巴巴给出的例子是采用nginx以及一个组件实现根据客户端的IP信息路由到不同的nacos集群中去 官方博文——阿里巴巴基于 Nacos 实现环境隔离的实践 源码解析地址服务器添加nacos-server节点根据官方的介绍，只需要发起一个http请求即可动态的添加nacos-server节点  # Add IP to nacos">
 <meta property="og:type" content="article">
-<meta property="og:title" content="leetcode回顾——Diagonal Traverse">
-<meta property="og:url" content="https://www.liaochuntao.cn/2018/12/26/leetcode-11/index.html">
+<meta property="og:title" content="Nacos的地址服务器功能源码浅析">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/07/16/java-web-48/index.html">
 <meta property="og:site_name" content="唉&#39;s Blog">
-<meta property="og:description" content="题目12345678910111213141516给定一个含有 M x N 个元素的矩阵（M 行，N 列），请以对角线遍历的顺序返回这个矩阵中的所有元素，对角线遍历如下图所示。 示例:输入:[ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ]]输出:  [1,2,4,7,5,3,6,8,9]解释:   1234说明:给定矩阵中的元素总数不会超过 100000 。 题解这一">
+<meta property="og:description" content="地址服务模式nacos官方有一个环境隔离实践的博文，在那篇博文中，阿里巴巴给出的例子是采用nginx以及一个组件实现根据客户端的IP信息路由到不同的nacos集群中去 官方博文——阿里巴巴基于 Nacos 实现环境隔离的实践 源码解析地址服务器添加nacos-server节点根据官方的介绍，只需要发起一个http请求即可动态的添加nacos-server节点  # Add IP to nacos">
 <meta property="og:locale" content="default">
-<meta property="og:image" content="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/12/diagonal_traverse.png">
-<meta property="og:updated_time" content="2018-12-26T15:18:53.000Z">
+<meta property="og:updated_time" content="2019-07-26T09:55:13.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="leetcode回顾——Diagonal Traverse">
-<meta name="twitter:description" content="题目12345678910111213141516给定一个含有 M x N 个元素的矩阵（M 行，N 列），请以对角线遍历的顺序返回这个矩阵中的所有元素，对角线遍历如下图所示。 示例:输入:[ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ]]输出:  [1,2,4,7,5,3,6,8,9]解释:   1234说明:给定矩阵中的元素总数不会超过 100000 。 题解这一">
-<meta name="twitter:image" content="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/12/diagonal_traverse.png">
+<meta name="twitter:title" content="Nacos的地址服务器功能源码浅析">
+<meta name="twitter:description" content="地址服务模式nacos官方有一个环境隔离实践的博文，在那篇博文中，阿里巴巴给出的例子是采用nginx以及一个组件实现根据客户端的IP信息路由到不同的nacos集群中去 官方博文——阿里巴巴基于 Nacos 实现环境隔离的实践 源码解析地址服务器添加nacos-server节点根据官方的介绍，只需要发起一个http请求即可动态的添加nacos-server节点  # Add IP to nacos">
 
 
 
 
 
 
-  <link rel="canonical" href="https://www.liaochuntao.cn/2018/12/26/leetcode-11/"/>
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/07/16/java-web-48/"/>
 
 
 
@@ -137,7 +135,7 @@
   };
 </script>
 
-  <title>leetcode回顾——Diagonal Traverse | 唉's Blog</title>
+  <title>Nacos的地址服务器功能源码浅析 | 唉's Blog</title>
   
 
 
@@ -307,7 +305,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/12/26/leetcode-11/">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/07/16/java-web-48/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="liaochuntao">
@@ -324,7 +322,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">leetcode回顾——Diagonal Traverse
+          <h1 class="post-title" itemprop="name headline">Nacos的地址服务器功能源码浅析
               
             
           </h1>
@@ -349,12 +347,24 @@
                 
               
 
-              <time title="Created: 2018-12-26 23:04:09 / Modified: 23:18:53" itemprop="dateCreated datePublished" datetime="2018-12-26T23:04:09+08:00">2018-12-26</time>
+              <time title="Created: 2019-07-16 12:50:07" itemprop="dateCreated datePublished" datetime="2019-07-16T12:50:07+08:00">2019-07-16</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-26 17:55:13" itemprop="dateModified" datetime="2019-07-26T17:55:13+08:00">2019-07-26</time>
               
             
           </span>
@@ -371,7 +381,7 @@
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/nacos/" itemprop="url" rel="index"><span itemprop="name">nacos</span></a></span>
 
                 
                 
@@ -385,7 +395,7 @@
 
           
           
-             <span id="/2018/12/26/leetcode-11/" class="leancloud_visitors" data-flag-title="leetcode回顾——Diagonal Traverse">
+             <span id="/2019/07/16/java-web-48/" class="leancloud_visitors" data-flag-title="Nacos的地址服务器功能源码浅析">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -416,16 +426,25 @@
       
 
       
-        <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">给定一个含有 M x N 个元素的矩阵（M 行，N 列），请以对角线遍历的顺序返回这个矩阵中的所有元素，对角线遍历如下图所示。</span><br><span class="line"></span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">输入:</span><br><span class="line">[</span><br><span class="line"> [ 1, 2, 3 ],</span><br><span class="line"> [ 4, 5, 6 ],</span><br><span class="line"> [ 7, 8, 9 ]</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">输出:  [1,2,4,7,5,3,6,8,9]</span><br><span class="line"></span><br><span class="line">解释:</span><br></pre></td></tr></table></figure>
-<p> <img src="https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/12/diagonal_traverse.png" alt="s"></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">说明:</span><br><span class="line"></span><br><span class="line">给定矩阵中的元素总数不会超过 100000 。</span><br></pre></td></tr></table></figure>
-<h4 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h4><p>这一道题其实可以这样想，将这个二维数组变为一维的，然后呢，结合这个图，虚线部分不管，就只单单看实线连接起来的（1和9就不看了，并且忽略箭头），先看2—&gt;4这条线，如果在一维数组情况下，2所在的index为1，4所在的index为3，他们之间的差距为2；再看3-&gt;5-&gt;7，3所在的index为2，5所在的index为4，7所在的index为6，这三个数相邻之间的差距也为2，6-&gt;8同理，这个时候，我们来看看这个差距2，会发现，这个差距2，就是在原二维数组下，行的最大index值（数组的index下表起始为0），因此，就可以想到，其实就是寻找等间距的数字，而每组的起始数组index，就是这个矩阵的最上一行和最右一列的在一维数组下所对应的index值，而他们所对应的最大寻找位置，是这个矩阵的最左一列和最下一行在一维数组下所对应的index值</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[[1, 2, 3], </span><br><span class="line"> [4, 5, 6],       二维  ==&gt;  一维       [1, 2, 3, 4, 5, 6, 7, 8, 9]</span><br><span class="line"> [7, 8, 9]]</span><br></pre></td></tr></table></figure>
-<p>起始数字的index值列表</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[0, 1, 2, 5, 8]</span><br></pre></td></tr></table></figure>
-<p>所对应的最大寻找位置的index值列表</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[0, 3, 6, 7, 8]</span><br></pre></td></tr></table></figure>
-<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">findDiagonalOrder</span><span class="params">(self, matrix)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type matrix: List[List[int]]</span></span><br><span class="line"><span class="string">        :rtype: List[int]</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> len(matrix) == <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> []</span><br><span class="line">        width = len(matrix[<span class="number">0</span>])</span><br><span class="line">        height = len(matrix)</span><br><span class="line">        <span class="keyword">if</span> width == <span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span> [matrix[i][<span class="number">0</span>] <span class="keyword">for</span> i <span class="keyword">in</span> range(len(matrix))]</span><br><span class="line">        edge = [i <span class="keyword">for</span> i <span class="keyword">in</span> range(width)]</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">2</span>, height + <span class="number">1</span>):</span><br><span class="line">            edge.append((width) * i - <span class="number">1</span>)</span><br><span class="line">        edge_2 = [width * i <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, height)]</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(width):</span><br><span class="line">            edge_2.append(edge_2[<span class="number">-1</span>] + <span class="number">1</span>)</span><br><span class="line">        print(edge_2)</span><br><span class="line">        ans = [matrix[<span class="number">0</span>][<span class="number">0</span>]]</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, len(edge) - <span class="number">1</span>):</span><br><span class="line">            tmp = []</span><br><span class="line">            <span class="keyword">for</span> j <span class="keyword">in</span> range(edge[i], edge_2[i] + <span class="number">1</span>, width - <span class="number">1</span>):</span><br><span class="line">                x, y = self.getLoc(n=j, width=width, height=height)</span><br><span class="line">                <span class="keyword">if</span> x &lt; width <span class="keyword">and</span> y &lt; height:</span><br><span class="line">                    tmp.append(matrix[y][x])</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">            <span class="keyword">if</span> int(i % <span class="number">2</span>) == <span class="number">0</span>:</span><br><span class="line">                tmp.reverse()</span><br><span class="line">            ans.extend(tmp)</span><br><span class="line">        ans.append(matrix[<span class="number">-1</span>][<span class="number">-1</span>])</span><br><span class="line">        <span class="keyword">return</span> ans</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">getLoc</span><span class="params">(self, n, width, height)</span>:</span></span><br><span class="line">        x = int(n % width)</span><br><span class="line">        y = int(n / width)</span><br><span class="line">        <span class="keyword">return</span> x, y</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    s = Solution()</span><br><span class="line">    t_1 = [[<span class="number">2</span>,<span class="number">5</span>],[<span class="number">8</span>,<span class="number">4</span>],[<span class="number">0</span>,<span class="number">-1</span>]]</span><br><span class="line">    t = [[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>],</span><br><span class="line">         [<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>,<span class="number">11</span>,<span class="number">12</span>,<span class="number">13</span>,<span class="number">14</span>],</span><br><span class="line">         [<span class="number">15</span>,<span class="number">16</span>,<span class="number">17</span>,<span class="number">18</span>,<span class="number">19</span>,<span class="number">20</span>,<span class="number">21</span>]]</span><br><span class="line">    print(s.findDiagonalOrder(matrix=t_1))</span><br></pre></td></tr></table></figure>
+        <h4 id="地址服务模式"><a href="#地址服务模式" class="headerlink" title="地址服务模式"></a>地址服务模式</h4><p><code>nacos</code>官方有一个环境隔离实践的博文，在那篇博文中，阿里巴巴给出的例子是采用<code>nginx</code>以及一个组件实现根据客户端的<code>IP</code>信息路由到不同的<code>nacos</code>集群中去</p>
+<p><a href="https://nacos.io/zh-cn/blog/address-server.html" target="_blank" rel="noopener">官方博文——阿里巴巴基于 Nacos 实现环境隔离的实践</a></p>
+<h4 id="源码解析"><a href="#源码解析" class="headerlink" title="源码解析"></a>源码解析</h4><h5 id="地址服务器添加nacos-server节点"><a href="#地址服务器添加nacos-server节点" class="headerlink" title="地址服务器添加nacos-server节点"></a>地址服务器添加<code>nacos-server</code>节点</h5><p>根据官方的介绍，只需要发起一个<code>http</code>请求即可动态的添加<code>nacos-server</code>节点</p>
+<blockquote>
+<p><em># Add IP to nacos cluster:</em><br>curl -X POST ‘$ADDRESS_SERVER:8080/nacos/v1/as/nodes?ips=1.1.1.1:8848,2.2.2.2:8848,3.3.3.3:8848’</p>
+<p><em># Remove IP from nacos cluster:</em></p>
+<p>curl -X DELETE ‘$ADDRESS_SERVER:8080/nacos/v1/as/nodes?ips=1.1.1.1:8848,2.2.2.2:8848,3.3.3.3:8848’</p>
+</blockquote>
+<p>这里巧妙的复用了<code>nacos</code>中服务发现的功能，将<code>nacos-server</code>也作为一个服务注册到<code>nacos-server</code>上，这样就可以实现动态的管理<code>nacos</code>节点</p>
+<blockquote>
+<p>节点添加、删除源码</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">""</span>, method = RequestMethod.POST)</span><br><span class="line"><span class="function"><span class="keyword">public</span> ResponseEntity <span class="title">postCluster</span><span class="params">(@RequestParam(required = <span class="keyword">false</span>)</span> String product,</span></span><br><span class="line"><span class="function">                                  @<span class="title">RequestParam</span><span class="params">(required = <span class="keyword">false</span>)</span> String cluster,</span></span><br><span class="line"><span class="function">                                  @<span class="title">RequestParam</span><span class="params">(name = <span class="string">"ips"</span>)</span> String ips) </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//1. prepare the storage name for product and cluster</span></span><br><span class="line">	String productName = addressServerGeneratorManager.generateProductName(product);</span><br><span class="line">	String clusterName = addressServerManager.getDefaultClusterNameIfEmpty(cluster);</span><br><span class="line"></span><br><span class="line">	<span class="comment">//2. prepare the response name for product and cluster to client</span></span><br><span class="line">	String rawProductName = addressServerManager.getRawProductName(product);</span><br><span class="line">	String rawClusterName = addressServerManager.getRawClusterName(cluster);</span><br><span class="line">	Loggers.addressLogger.info(<span class="string">"put cluster node,the cluster name is "</span> + cluster + <span class="string">"; the product name="</span> + product + <span class="string">"; the ip list="</span> + ips);</span><br><span class="line">	ResponseEntity responseEntity;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		String serviceName = addressServerGeneratorManager.generateNacosServiceName(productName);</span><br><span class="line"></span><br><span class="line">		Cluster clusterObj = <span class="keyword">new</span> Cluster();</span><br><span class="line">		clusterObj.setName(clusterName);</span><br><span class="line">		clusterObj.setHealthChecker(<span class="keyword">new</span> AbstractHealthChecker.None());</span><br><span class="line">		serviceManager.createServiceIfAbsent(Constants.DEFAULT_NAMESPACE_ID, serviceName, <span class="keyword">false</span>, clusterObj);</span><br><span class="line">		String[] ipArray = addressServerManager.splitIps(ips);</span><br><span class="line">		String checkResult = AddressServerParamCheckUtil.checkIps(ipArray);</span><br><span class="line">		<span class="keyword">if</span> (AddressServerParamCheckUtil.CHECK_OK.equals(checkResult)) &#123;</span><br><span class="line">			List&lt;Instance&gt; instanceList = addressServerGeneratorManager.generateInstancesByIps(serviceName, rawProductName, clusterName, ipArray);</span><br><span class="line">			<span class="keyword">for</span> (Instance instance : instanceList) &#123;</span><br><span class="line">				serviceManager.registerInstance(Constants.DEFAULT_NAMESPACE_ID, serviceName, instance);</span><br><span class="line">			&#125;</span><br><span class="line">			responseEntity = ResponseEntity.ok(<span class="string">"product="</span> + rawProductName + <span class="string">",cluster="</span> + rawClusterName + <span class="string">"; put success with size="</span> + instanceList.size());</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			responseEntity = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(checkResult);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">		responseEntity = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> responseEntity;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过上面这种操作以及<code>nacos</code>的服务数据同步，就可以将新增的<code>nacos-server</code>节点同步到所有的<code>nacos-server</code>节点上，并且依托<code>nacos</code>自带的健康检查功能，自动的判断不健康的<code>nacos-server</code>实例信息，这样，<code>nacos-client</code>只需要通过向地址服务器请求<code>nacos-server</code>这个服务，就可以自动的得知<code>nacos-server</code>节点变化的动态感知</p>
+<h5 id="客户端请求nacos-server服务信息"><a href="#客户端请求nacos-server服务信息" class="headerlink" title="客户端请求nacos-server服务信息"></a>客户端请求<code>nacos-server</code>服务信息</h5><blockquote>
+<p>请求源码</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/&#123;product&#125;/&#123;cluster&#125;"</span>, method = RequestMethod.GET)</span><br><span class="line"><span class="function"><span class="keyword">public</span> ResponseEntity <span class="title">getCluster</span><span class="params">(@PathVariable String product,</span></span></span><br><span class="line"><span class="function"><span class="params">                                     @PathVariable String cluster)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	String productName = addressServerBuilderManager.generateProductName(product);</span><br><span class="line">	String serviceName = addressServerBuilderManager.generateNacosServiceName(productName);</span><br><span class="line">	Service service = serviceManager.getService(Constants.DEFAULT_NAMESPACE_ID, serviceName);</span><br><span class="line">	<span class="keyword">if</span> (service == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> ResponseEntity.status(HttpStatus.NOT_FOUND).body(<span class="string">"product="</span> + product + <span class="string">" not found."</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!service.getClusterMap().containsKey(cluster)) &#123;</span><br><span class="line">		<span class="keyword">return</span> ResponseEntity.status(HttpStatus.NOT_FOUND).body(<span class="string">"product="</span> + product + <span class="string">",cluster="</span> + cluster + <span class="string">" not found."</span>);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	Cluster clusterObj = service.getClusterMap().get(cluster);</span><br><span class="line">	<span class="keyword">return</span> ResponseEntity.status(HttpStatus.OK).body(addressServerBuilderManager.generateResponseIps(clusterObj.allIPs(<span class="keyword">false</span>)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的实现非常简单，客户端仅仅需要像请求服务一样去请求<code>nacos-server</code>服务即可</p>
 
       
     </div>
@@ -453,8 +472,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/12/24/leetcode-10/" rel="next" title="leetcode回顾——Open the Lock">
-                <i class="fa fa-chevron-left"></i> leetcode回顾——Open the Lock
+              <a href="/2019/06/22/leetcode-27/" rel="next" title="leetcode回顾——number-of-islands">
+                <i class="fa fa-chevron-left"></i> leetcode回顾——number-of-islands
               </a>
             
           </div>
@@ -463,8 +482,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2018/12/29/leetcode-12/" rel="prev" title="leeetcode回顾——Merge k Sorted Lists">
-                leeetcode回顾——Merge k Sorted Lists <i class="fa fa-chevron-right"></i>
+              <a href="/2019/07/16/java-web-47/" rel="prev" title="手动实现一个简单的RPC框架">
+                手动实现一个简单的RPC框架 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -672,7 +691,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#题目"><span class="nav-number">1.</span> <span class="nav-text">题目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#题解"><span class="nav-number">2.</span> <span class="nav-text">题解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AC代码"><span class="nav-number">3.</span> <span class="nav-text">AC代码</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#地址服务模式"><span class="nav-number">1.</span> <span class="nav-text">地址服务模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#源码解析"><span class="nav-number">2.</span> <span class="nav-text">源码解析</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#地址服务器添加nacos-server节点"><span class="nav-number">2.1.</span> <span class="nav-text">地址服务器添加nacos-server节点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#客户端请求nacos-server服务信息"><span class="nav-number">2.2.</span> <span class="nav-text">客户端请求nacos-server服务信息</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -849,7 +868,7 @@
   
     <script type="text/javascript">
       window.livereOptions = {
-        refer: '2018/12/26/leetcode-11/'
+        refer: '2019/07/16/java-web-48/'
       };
       (function(d, s) {
         var j, e = d.getElementsByTagName(s)[0];

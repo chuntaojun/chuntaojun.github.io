@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="JRaftJRaft是蚂蚁金服开源的一个Raft协议的实现 JRatf 新节点如何追上旧节点官方wiki说明 当一个 raft 节点重启的时候，内存中的状态机的状态将会丢失，在启动过程中将重放日志存储中的所有日志，重建整个状态机实例。这就导致两个问题：  如果任务提交比较频繁，比如消息中间件这个场景，那么会导致整个重建过程很长，启动缓慢。 如果日志很多，节点需要存储所有的日志，这对存储是一个资源占">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JRaft 新节点加入后，如何追上旧节点的数据">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/07/30/java-web-50/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="JRaftJRaft是蚂蚁金服开源的一个Raft协议的实现 JRatf 新节点如何追上旧节点官方wiki说明 当一个 raft 节点重启的时候，内存中的状态机的状态将会丢失，在启动过程中将重放日志存储中的所有日志，重建整个状态机实例。这就导致两个问题：  如果任务提交比较频繁，比如消息中间件这个场景，那么会导致整个重建过程很长，启动缓慢。 如果日志很多，节点需要存储所有的日志，这对存储是一个资源占">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-08-16T13:21:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JRaft 新节点加入后，如何追上旧节点的数据">
+<meta name="twitter:description" content="JRaftJRaft是蚂蚁金服开源的一个Raft协议的实现 JRatf 新节点如何追上旧节点官方wiki说明 当一个 raft 节点重启的时候，内存中的状态机的状态将会丢失，在启动过程中将重放日志存储中的所有日志，重建整个状态机实例。这就导致两个问题：  如果任务提交比较频繁，比如消息中间件这个场景，那么会导致整个重建过程很长，启动缓慢。 如果日志很多，节点需要存储所有的日志，这对存储是一个资源占">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/07/30/java-web-50/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>JRaft 新节点加入后，如何追上旧节点的数据 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/07/30/java-web-50/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 commiter">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">JRaft 新节点加入后，如何追上旧节点的数据
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-07-30 18:33:09" itemprop="dateCreated datePublished" datetime="2019-07-30T18:33:09+08:00">2019-07-30</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-08-16 21:21:22" itemprop="dateModified" datetime="2019-08-16T21:21:22+08:00">2019-08-16</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/jraft/" itemprop="url" rel="index"><span itemprop="name">jraft</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/07/30/java-web-50/" class="leancloud_visitors" data-flag-title="JRaft 新节点加入后，如何追上旧节点的数据">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="JRaft"><a href="#JRaft" class="headerlink" title="JRaft"></a>JRaft</h4><p><code>JRaft</code>是蚂蚁金服开源的一个<code>Raft</code>协议的实现</p>
+<p><a href="https://github.com/sofastack/sofa-jraft" target="_blank" rel="noopener">JRatf</a></p>
+<h4 id="新节点如何追上旧节点"><a href="#新节点如何追上旧节点" class="headerlink" title="新节点如何追上旧节点"></a>新节点如何追上旧节点</h4><h5 id="官方wiki说明"><a href="#官方wiki说明" class="headerlink" title="官方wiki说明"></a>官方wiki说明</h5><blockquote>
+<p>当一个 raft 节点重启的时候，内存中的状态机的状态将会丢失，在启动过程中将重放日志存储中的所有日志，重建整个状态机实例。这就导致两个问题：</p>
+<ul>
+<li>如果任务提交比较频繁，比如消息中间件这个场景，那么会导致整个重建过程很长，启动缓慢。</li>
+<li>如果日志很多，节点需要存储所有的日志，这对存储是一个资源占用，不可持续。</li>
+<li>如果增加一个节点，新节点需要从 leader 获取所有的日志重放到状态机，这对 leader 和网络带宽都是不小的负担。</li>
+</ul>
+<p>因此，通过引入 snapshot 机制来解决这 3 个问题，所谓 snapshot 就是为当前状态机的最新状态打一个”镜像“单独保存，在保存成功后，在这个时刻之前的日志就可以删除，减少了日志存储占用；启动的时候，可以直接加载最新的 snapshot 镜像，然后重放在此之后的日志即可，如果 snapshot 间隔合理，那么整个重放过程会比较快，加快了启动过程。最后，新节点的加入，可以先从 leader 拷贝最新的 snapshot 安装到本地状态机，然后只要拷贝后续的日志即可，可以快速跟上整个 raft group 的进度。</p>
+</blockquote>
+<h5 id="代码浅析"><a href="#代码浅析" class="headerlink" title="代码浅析"></a>代码浅析</h5><blockquote>
+<p>Leader节点发送快照</p>
+</blockquote>
+<p>代码实现</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">sendEntries</span><span class="params">(<span class="keyword">final</span> <span class="keyword">long</span> nextSendingIndex)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">final</span> AppendEntriesRequest.Builder rb = AppendEntriesRequest.newBuilder();</span><br><span class="line">  <span class="comment">// 进行判断，Leader节点在logIndex为&#123;nextSendingIndex - 1&#125;时是否日志做过了snaphot</span></span><br><span class="line">	<span class="keyword">if</span> (!fillCommonFields(rb, nextSendingIndex - <span class="number">1</span>, <span class="keyword">false</span>)) &#123;</span><br><span class="line">		<span class="comment">// unlock id in installSnapshot</span></span><br><span class="line">    <span class="comment">// 发起安装快照的请求</span></span><br><span class="line">		installSnapshot();</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	ByteBufferCollector dataBuf = <span class="keyword">null</span>;</span><br><span class="line">	<span class="keyword">final</span> <span class="keyword">int</span> maxEntriesSize = <span class="keyword">this</span>.raftOptions.getMaxEntriesSize();</span><br><span class="line">	<span class="keyword">final</span> RecyclableByteBufferList byteBufList = RecyclableByteBufferList.newInstance();</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// Leader将自己的日志发送给Follower节点</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; maxEntriesSize; i++) &#123;</span><br><span class="line">			<span class="keyword">final</span> RaftOutter.EntryMeta.Builder emb = RaftOutter.EntryMeta.newBuilder();</span><br><span class="line">			<span class="keyword">if</span> (!prepareEntry(nextSendingIndex, i, emb, byteBufList)) &#123;</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			rb.addEntries(emb.build());</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (rb.getEntriesCount() == <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="comment">// 如果出现日志断节，则直接发送快照</span></span><br><span class="line">			<span class="keyword">if</span> (nextSendingIndex &lt; <span class="keyword">this</span>.options.getLogManager().getFirstLogIndex()) &#123;</span><br><span class="line">				installSnapshot();</span><br><span class="line">				<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">// _id is unlock in _wait_more</span></span><br><span class="line">			waitMoreEntries(nextSendingIndex);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (byteBufList.getCapacity() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">			dataBuf = ByteBufferCollector.allocateByRecyclers(byteBufList.getCapacity());</span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">final</span> ByteBuffer b : byteBufList) &#123;</span><br><span class="line">				dataBuf.put(b);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">final</span> ByteBuffer buf = dataBuf.getBuffer();</span><br><span class="line">			buf.flip();</span><br><span class="line">			rb.setData(ZeroByteStringHelper.wrap(buf));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="comment">// 回收对象到对象池</span></span><br><span class="line">		RecycleUtil.recycle(byteBufList);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 构建 AppendEntries RPC 的请求体信息</span></span><br><span class="line">	<span class="keyword">final</span> AppendEntriesRequest request = rb.build();</span><br><span class="line">	<span class="keyword">if</span> (LOG.isDebugEnabled()) &#123;</span><br><span class="line">		LOG.debug(<span class="string">"Node &#123;&#125; send AppendEntriesRequest to &#123;&#125; term &#123;&#125; lastCommittedIndex &#123;&#125; prevLogIndex &#123;&#125; prevLogTerm &#123;&#125; logIndex &#123;&#125; count &#123;&#125;"</span>, <span class="keyword">this</span>.options.getNode().getNodeId(), <span class="keyword">this</span>.options.getPeerId(), <span class="keyword">this</span>.options.getTerm(), request.getCommittedIndex(), request.getPrevLogIndex(), request.getPrevLogTerm(), nextSendingIndex, request.getEntriesCount());</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="comment">// 设置该 Node 节点的状态标识</span></span><br><span class="line">	<span class="keyword">this</span>.statInfo.runningState = RunningState.APPENDING_ENTRIES;</span><br><span class="line">  <span class="comment">// 设置当前节点的 LogIndex信息</span></span><br><span class="line">	<span class="keyword">this</span>.statInfo.firstLogIndex = rb.getPrevLogIndex() + <span class="number">1</span>;</span><br><span class="line">	<span class="keyword">this</span>.statInfo.lastLogIndex = rb.getPrevLogIndex() + rb.getEntriesCount();</span><br><span class="line"></span><br><span class="line">	<span class="keyword">final</span> Recyclable recyclable = dataBuf;</span><br><span class="line">	<span class="keyword">final</span> <span class="keyword">int</span> v = <span class="keyword">this</span>.version;</span><br><span class="line">	<span class="keyword">final</span> <span class="keyword">long</span> monotonicSendTimeMs = Utils.monotonicMs();</span><br><span class="line">	<span class="keyword">final</span> <span class="keyword">int</span> seq = getAndIncrementReqSeq();</span><br><span class="line">  <span class="comment">// 发送 RPC 请求给 Follower 节点</span></span><br><span class="line">	<span class="keyword">final</span> Future&lt;Message&gt; rpcFuture = <span class="keyword">this</span>.rpcService.appendEntries(<span class="keyword">this</span>.options.getPeerId().getEndpoint(),</span><br><span class="line">            request, -<span class="number">1</span>, <span class="keyword">new</span> RpcResponseClosureAdapter&lt;AppendEntriesResponse&gt;() &#123;</span><br><span class="line"></span><br><span class="line">			<span class="meta">@Override</span></span><br><span class="line">			<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">(<span class="keyword">final</span> Status status)</span> </span>&#123;</span><br><span class="line">					RecycleUtil.recycle(recyclable);</span><br><span class="line">					onRpcReturned(Replicator.<span class="keyword">this</span>.id, RequestType.AppendEntries, status, request, getResponse(), seq, v, monotonicSendTimeMs);</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">	&#125;);</span><br><span class="line">	addInflight(RequestType.AppendEntries, nextSendingIndex, request.getEntriesCount(), request.getData().size(), seq, rpcFuture);</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>装填请求参数信息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">fillCommonFields</span><span class="params">(<span class="keyword">final</span> AppendEntriesRequest.Builder rb, <span class="keyword">long</span> prevLogIndex, <span class="keyword">final</span> <span class="keyword">boolean</span> isHeartbeat)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">final</span> <span class="keyword">long</span> prevLogTerm = <span class="keyword">this</span>.options.getLogManager().getTerm(prevLogIndex);</span><br><span class="line">	 <span class="comment">// 如果出现 preLogTerm == 0 的情况，说明执行过 snapshot 操作</span></span><br><span class="line">	<span class="keyword">if</span> (prevLogTerm == <span class="number">0</span> &amp;&amp; prevLogIndex != <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="keyword">if</span> (!isHeartbeat) &#123;</span><br><span class="line">			Requires.requireTrue(prevLogIndex &lt; <span class="keyword">this</span>.options.getLogManager().getFirstLogIndex());</span><br><span class="line">			LOG.debug(<span class="string">"logIndex=&#123;&#125; was compacted"</span>, prevLogIndex);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			<span class="comment">// The log at prev_log_index has been compacted, which indicates</span></span><br><span class="line">			<span class="comment">// we is or is going to install snapshot to the follower. So we let</span></span><br><span class="line">			<span class="comment">// both prev_log_index and prev_log_term be 0 in the heartbeat</span></span><br><span class="line">			<span class="comment">// request so that follower would do nothing besides updating its</span></span><br><span class="line">			<span class="comment">// leader timestamp.</span></span><br><span class="line">			prevLogIndex = <span class="number">0</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="comment">// 设置请求属性信息</span></span><br><span class="line">	rb.setTerm(<span class="keyword">this</span>.options.getTerm());</span><br><span class="line">	rb.setGroupId(<span class="keyword">this</span>.options.getGroupId());</span><br><span class="line">	rb.setServerId(<span class="keyword">this</span>.options.getServerId().toString());</span><br><span class="line">	rb.setPeerId(<span class="keyword">this</span>.options.getPeerId().toString());</span><br><span class="line">	rb.setPrevLogIndex(prevLogIndex);</span><br><span class="line">	rb.setPrevLogTerm(prevLogTerm);</span><br><span class="line">	rb.setCommittedIndex(<span class="keyword">this</span>.options.getBallotBox().getLastCommittedIndex());</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接着就是<code>Leader</code>节点将发起<code>AppendEntries RPC</code>请求了</p>
+<blockquote>
+<p>Follower节点接收快照</p>
+</blockquote>
+<p><em><code>NodeImpl</code>重要实现方法——<code>InstallSnapshotRequestProcessor</code></em></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Message <span class="title">handleInstallSnapshot</span><span class="params">(<span class="keyword">final</span> InstallSnapshotRequest request, <span class="keyword">final</span> RpcRequestClosure done)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 如果快照安装执行器不存在，则抛出异常不支持快照操作</span></span><br><span class="line">	<span class="keyword">if</span> (<span class="keyword">this</span>.snapshotExecutor == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span> RpcResponseFactory.newResponse(RaftError.EINVAL, <span class="string">"Not supported snapshot"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">final</span> PeerId serverId = <span class="keyword">new</span> PeerId();</span><br><span class="line">  <span class="comment">// 根据请求携带的 serverId 序列化 PeerId</span></span><br><span class="line">	<span class="keyword">if</span> (!serverId.parse(request.getServerId())) &#123;</span><br><span class="line">		LOG.warn(<span class="string">"Node &#123;&#125; ignore InstallSnapshotRequest from &#123;&#125; bad server id."</span>, getNodeId(), request.getServerId());</span><br><span class="line">		<span class="keyword">return</span> RpcResponseFactory.newResponse(RaftError.EINVAL, <span class="string">"Parse serverId failed: %s"</span>, request.getServerId());</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">this</span>.writeLock.lock();</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 判断当前节点的状态</span></span><br><span class="line">		<span class="keyword">if</span> (!<span class="keyword">this</span>.state.isActive()) &#123;</span><br><span class="line">			LOG.warn(<span class="string">"Node &#123;&#125; ignore InstallSnapshotRequest as it is not in active state &#123;&#125;."</span>, getNodeId(), <span class="keyword">this</span>.state);</span><br><span class="line">			<span class="keyword">return</span> RpcResponseFactory.newResponse(RaftError.EINVAL, <span class="string">"Node %s:%s is not in active state, state %s."</span>, <span class="keyword">this</span>.groupId, <span class="keyword">this</span>.serverId, <span class="keyword">this</span>.state.name());</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 判断 request 携带的 term 比当前节点的 trem，比较 term 的合法性</span></span><br><span class="line">		<span class="keyword">if</span> (request.getTerm() &lt; <span class="keyword">this</span>.currTerm) &#123;</span><br><span class="line">			LOG.warn(<span class="string">"Node &#123;&#125; ignore stale InstallSnapshotRequest from &#123;&#125;, term=&#123;&#125;, currTerm=&#123;&#125;."</span>, getNodeId(), request.getPeerId(), request.getTerm(), <span class="keyword">this</span>.currTerm);</span><br><span class="line">			<span class="keyword">return</span> InstallSnapshotResponse.newBuilder() <span class="comment">//</span></span><br><span class="line">                    .setTerm(<span class="keyword">this</span>.currTerm) <span class="comment">//</span></span><br><span class="line">                    .setSuccess(<span class="keyword">false</span>) <span class="comment">//</span></span><br><span class="line">                    .build();</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 做相关的检查处理</span></span><br><span class="line">    <span class="comment">// Leader的设置、中断之前的快照下载任务...</span></span><br><span class="line">		checkStepDown(request.getTerm(), serverId);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (!serverId.equals(<span class="keyword">this</span>.leaderId)) &#123;</span><br><span class="line">			LOG.error(<span class="string">"Another peer &#123;&#125; declares that it is the leader at term &#123;&#125; which was occupied by leader &#123;&#125;."</span>, serverId, <span class="keyword">this</span>.currTerm, <span class="keyword">this</span>.leaderId);</span><br><span class="line">			<span class="comment">// Increase the term by 1 and make both leaders step down to minimize the</span></span><br><span class="line">			<span class="comment">// loss of split brain</span></span><br><span class="line">			stepDown(request.getTerm() + <span class="number">1</span>, <span class="keyword">false</span>, <span class="keyword">new</span> Status(RaftError.ELEADERCONFLICT,  <span class="string">"More than one leader in the same term."</span>));</span><br><span class="line">			<span class="keyword">return</span> InstallSnapshotResponse.newBuilder() <span class="comment">//</span></span><br><span class="line">                    .setTerm(request.getTerm() + <span class="number">1</span>) <span class="comment">//</span></span><br><span class="line">                    .setSuccess(<span class="keyword">false</span>) <span class="comment">//</span></span><br><span class="line">                    .build();</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">		<span class="keyword">this</span>.writeLock.unlock();</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">final</span> <span class="keyword">long</span> startMs = Utils.monotonicMs();</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (LOG.isInfoEnabled()) &#123;</span><br><span class="line">			LOG.info(</span><br><span class="line">                    <span class="string">"Node &#123;&#125; received InstallSnapshotRequest from &#123;&#125;, lastIncludedLogIndex=&#123;&#125;, lastIncludedLogTerm=&#123;&#125;, lastLogId=&#123;&#125;."</span>,</span><br><span class="line">                    getNodeId(), request.getServerId(), request.getMeta().getLastIncludedIndex(), request.getMeta()</span><br><span class="line">                        .getLastIncludedTerm(), <span class="keyword">this</span>.logManager.getLastLogId(<span class="keyword">false</span>));</span><br><span class="line">		&#125;</span><br><span class="line">    <span class="comment">// 执行快照安装</span></span><br><span class="line">		<span class="keyword">this</span>.snapshotExecutor.installSnapshot(request, InstallSnapshotResponse.newBuilder(), done);</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">	&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">		<span class="keyword">this</span>.metrics.recordLatency(<span class="string">"install-snapshot"</span>, Utils.monotonicMs() - startMs);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下载快照文件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">installSnapshot</span><span class="params">(<span class="keyword">final</span> InstallSnapshotRequest request, <span class="keyword">final</span> InstallSnapshotResponse.Builder response, <span class="keyword">final</span> RpcRequestClosure done)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">final</span> SnapshotMeta meta = request.getMeta();</span><br><span class="line">  <span class="comment">// 创建一个下载快照的任务对象</span></span><br><span class="line">	<span class="keyword">final</span> DownloadingSnapshot ds = <span class="keyword">new</span> DownloadingSnapshot(request, response, done);</span><br><span class="line">	<span class="comment">//DON'T access request, response, and done after this point</span></span><br><span class="line">	<span class="comment">//as the retry snapshot will replace this one.</span></span><br><span class="line">  <span class="comment">// 将下载快照任务进行注册，同时会设置 this.curCopier 为 Future对象</span></span><br><span class="line">	<span class="keyword">if</span> (!registerDownloadingSnapshot(ds)) &#123;</span><br><span class="line">		LOG.warn(<span class="string">"Fail to register downloading snapshot"</span>);</span><br><span class="line">		<span class="comment">// This RPC will be responded by the previous session</span></span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	Requires.requireNonNull(<span class="keyword">this</span>.curCopier, <span class="string">"curCopier"</span>);</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 阻塞等待 copy 任务完成</span></span><br><span class="line">		<span class="keyword">this</span>.curCopier.join();</span><br><span class="line">	&#125; <span class="keyword">catch</span> (<span class="keyword">final</span> InterruptedException e) &#123;</span><br><span class="line">    <span class="comment">// 中断补偿，如果 curCopier 任务被中断过，表明有更新的 snapshot 在接受了，旧的 snapshot 被停止下载</span></span><br><span class="line">		Thread.currentThread().interrupt();</span><br><span class="line">		LOG.warn(<span class="string">"Install snapshot copy job was canceled."</span>);</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="comment">// 装载下载好的 snapshot 文件</span></span><br><span class="line">	loadDownloadingSnapshot(ds, meta);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>加载下载好的 snapshot 文件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">loadDownloadingSnapshot</span><span class="params">(<span class="keyword">final</span> DownloadingSnapshot ds, <span class="keyword">final</span> SnapshotMeta meta)</span> </span>&#123;</span><br><span class="line">	SnapshotReader reader;</span><br><span class="line">	<span class="keyword">this</span>.lock.lock();</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 获取快照任务的结果，如果不相等则表示新的 snapshot 在接收</span></span><br><span class="line">		<span class="keyword">if</span> (ds != <span class="keyword">this</span>.downloadingSnapshot.get()) &#123;</span><br><span class="line">			<span class="comment">//It is interrupted and response by other request,just return</span></span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		Requires.requireNonNull(<span class="keyword">this</span>.curCopier, <span class="string">"curCopier"</span>);</span><br><span class="line">		reader = <span class="keyword">this</span>.curCopier.getReader();</span><br><span class="line">		<span class="keyword">if</span> (!<span class="keyword">this</span>.curCopier.isOk()) &#123;</span><br><span class="line">			<span class="keyword">if</span> (<span class="keyword">this</span>.curCopier.getCode() == RaftError.EIO.getNumber()) &#123;</span><br><span class="line">				reportError(<span class="keyword">this</span>.curCopier.getCode(), <span class="keyword">this</span>.curCopier.getErrorMsg());</span><br><span class="line">			&#125;</span><br><span class="line">			Utils.closeQuietly(reader);</span><br><span class="line">			ds.done.run(<span class="keyword">this</span>.curCopier);</span><br><span class="line">			Utils.closeQuietly(<span class="keyword">this</span>.curCopier);</span><br><span class="line">			<span class="keyword">this</span>.curCopier = <span class="keyword">null</span>;</span><br><span class="line">			<span class="keyword">this</span>.downloadingSnapshot.set(<span class="keyword">null</span>);</span><br><span class="line">			<span class="keyword">this</span>.runningJobs.countDown();</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		Utils.closeQuietly(<span class="keyword">this</span>.curCopier);</span><br><span class="line">		<span class="keyword">this</span>.curCopier = <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">if</span> (reader == <span class="keyword">null</span> || !reader.isOk()) &#123;</span><br><span class="line">			Utils.closeQuietly(reader);</span><br><span class="line">			<span class="keyword">this</span>.downloadingSnapshot.set(<span class="keyword">null</span>);</span><br><span class="line">			ds.done.sendResponse(RpcResponseFactory.newResponse(RaftError.EINTERNAL, <span class="string">"Fail to copy snapshot from %s"</span>, ds.request.getUri()));</span><br><span class="line">			<span class="keyword">this</span>.runningJobs.countDown();</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">this</span>.loadingSnapshot = <span class="keyword">true</span>;</span><br><span class="line">		<span class="keyword">this</span>.loadingSnapshotMeta = meta;</span><br><span class="line">	&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">		<span class="keyword">this</span>.lock.unlock();</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="comment">// 下载 snapshot 成功，进入状态机进行 snapshot 安装</span></span><br><span class="line">	<span class="keyword">final</span> InstallSnapshotDone installSnapshotDone = <span class="keyword">new</span> InstallSnapshotDone(reader);</span><br><span class="line">  <span class="comment">// 送入状态机执行快照安装事件</span></span><br><span class="line">	<span class="keyword">if</span> (!<span class="keyword">this</span>.fsmCaller.onSnapshotLoad(installSnapshotDone)) &#123;</span><br><span class="line">		LOG.warn(<span class="string">"Fail to  call fsm onSnapshotLoad"</span>);</span><br><span class="line">		installSnapshotDone.run(<span class="keyword">new</span> Status(RaftError.EHOSTDOWN, <span class="string">"This raft node is down"</span>));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>发布、接收快照安装事件</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onSnapshotLoad</span><span class="params">(<span class="keyword">final</span> LoadSnapshotClosure done)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 这里是用了 disruptor 队列来异步化 snapshot 快照事件操作</span></span><br><span class="line">	<span class="keyword">return</span> enqueueTask((task, sequence) -&gt; &#123;</span><br><span class="line">					task.type = TaskType.SNAPSHOT_LOAD;</span><br><span class="line">					task.done = done;</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 应用事件处理器</span></span><br><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">ApplyTaskHandler</span> <span class="keyword">implements</span> <span class="title">EventHandler</span>&lt;<span class="title">ApplyTask</span>&gt; </span>&#123;</span><br><span class="line">	<span class="comment">// max committed index in current batch, reset to -1 every batch</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">long</span> maxCommittedIndex = -<span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onEvent</span><span class="params">(<span class="keyword">final</span> ApplyTask event, <span class="keyword">final</span> <span class="keyword">long</span> sequence, <span class="keyword">final</span> <span class="keyword">boolean</span> endOfBatch)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="comment">// 每次 apply task 时都更新最大提交索引记录</span></span><br><span class="line">		<span class="keyword">this</span>.maxCommittedIndex = runApplyTask(event, <span class="keyword">this</span>.maxCommittedIndex, endOfBatch);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>应用到状态机处理 snapshot load task 任务</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">long</span> <span class="title">runApplyTask</span><span class="params">(<span class="keyword">final</span> ApplyTask task, <span class="keyword">long</span> maxCommittedIndex, <span class="keyword">final</span> <span class="keyword">boolean</span> endOfBatch)</span> </span>&#123;</span><br><span class="line">	CountDownLatch shutdown = <span class="keyword">null</span>;</span><br><span class="line">  <span class="comment">// 判断任务类型</span></span><br><span class="line">	<span class="keyword">if</span> (task.type == TaskType.COMMITTED) &#123;</span><br><span class="line">		<span class="keyword">if</span> (task.committedIndex &gt; maxCommittedIndex) &#123;</span><br><span class="line">			maxCommittedIndex = task.committedIndex;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 快照任务</span></span><br><span class="line">		<span class="keyword">if</span> (maxCommittedIndex &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">this</span>.currTask = TaskType.COMMITTED;</span><br><span class="line">			<span class="comment">// 回放 snapshot 中不存在的 log， apply 到状态机</span></span><br><span class="line">			doCommitted(maxCommittedIndex);</span><br><span class="line">      <span class="comment">// 重置最大已提交索引，避免日志被重复回放</span></span><br><span class="line">			maxCommittedIndex = -<span class="number">1L</span>; <span class="comment">// reset maxCommittedIndex</span></span><br><span class="line">		&#125;</span><br><span class="line">    ...</span><br><span class="line">      <span class="keyword">case</span> SNAPSHOT_LOAD:</span><br><span class="line">				<span class="keyword">this</span>.currTask = TaskType.SNAPSHOT_LOAD;</span><br><span class="line">    		<span class="comment">// 预先判断状态机的状态信息</span></span><br><span class="line">				<span class="keyword">if</span> (passByStatus(task.done)) &#123;</span><br><span class="line">          <span class="comment">// 执行 snapshot load</span></span><br><span class="line">					doSnapshotLoad((LoadSnapshotClosure) task.done);</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">    ...</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 同上，做日志回放的动作</span></span><br><span class="line">		<span class="keyword">if</span> (endOfBatch &amp;&amp; maxCommittedIndex &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">			<span class="keyword">this</span>.currTask = TaskType.COMMITTED;</span><br><span class="line">			doCommitted(maxCommittedIndex);</span><br><span class="line">			maxCommittedIndex = -<span class="number">1L</span>; <span class="comment">// reset maxCommittedIndex</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">this</span>.currTask = TaskType.IDLE;</span><br><span class="line">		<span class="keyword">return</span> maxCommittedIndex;</span><br><span class="line">	&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (shutdown != <span class="keyword">null</span>) &#123;</span><br><span class="line">			shutdown.countDown();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>执行 snapshot load 操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doSnapshotLoad</span><span class="params">(<span class="keyword">final</span> LoadSnapshotClosure done)</span> </span>&#123;</span><br><span class="line">	Requires.requireNonNull(done, <span class="string">"LoadSnapshotClosure is null"</span>);</span><br><span class="line">	<span class="keyword">final</span> SnapshotReader reader = done.start();</span><br><span class="line">	<span class="keyword">if</span> (reader == <span class="keyword">null</span>) &#123;</span><br><span class="line">		done.run(<span class="keyword">new</span> Status(RaftError.EINVAL, <span class="string">"open SnapshotReader failed"</span>));</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="comment">// 读取 snapshot 元数据信息</span></span><br><span class="line">	<span class="keyword">final</span> RaftOutter.SnapshotMeta meta = reader.load();</span><br><span class="line">	<span class="keyword">if</span> (meta == <span class="keyword">null</span>) &#123;</span><br><span class="line">		done.run(<span class="keyword">new</span> Status(RaftError.EINVAL, <span class="string">"SnapshotReader load meta failed"</span>));</span><br><span class="line">		<span class="keyword">if</span> (reader.getRaftError() == RaftError.EIO) &#123;</span><br><span class="line">			<span class="keyword">final</span> RaftException err = <span class="keyword">new</span> RaftException(EnumOutter.ErrorType.ERROR_TYPE_SNAPSHOT, RaftError.EIO, <span class="string">"Fail to load snapshot meta"</span>);</span><br><span class="line">			setError(err);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="comment">// 获取最后一次 appliedId 信息</span></span><br><span class="line">	<span class="keyword">final</span> LogId lastAppliedId = <span class="keyword">new</span> LogId(<span class="keyword">this</span>.lastAppliedIndex.get(), <span class="keyword">this</span>.lastAppliedTerm);</span><br><span class="line">  <span class="comment">// 获取快照的 appliedId 信息</span></span><br><span class="line">	<span class="keyword">final</span> LogId snapshotId = <span class="keyword">new</span> LogId(meta.getLastIncludedIndex(), meta.getLastIncludedTerm());</span><br><span class="line">  <span class="comment">// 两个 id 信息进行比较，如果 apply id 大于 snapshot id，则该snapshot不合法，不会被使用</span></span><br><span class="line">	<span class="keyword">if</span> (lastAppliedId.compareTo(snapshotId) &gt; <span class="number">0</span>) &#123;</span><br><span class="line">		done.run(<span class="keyword">new</span> Status(RaftError.ESTALE, <span class="string">"Loading a stale snapshot last_applied_index=%d last_applied_term=%d snapshot_index=%d snapshot_term=%d"</span>, lastAppliedId.getIndex(), lastAppliedId.getTerm(), snapshotId.getIndex(), snapshotId.getTerm()));</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="comment">// 由用户实现的状态机执行 snapshot load</span></span><br><span class="line">	<span class="keyword">if</span> (!<span class="keyword">this</span>.fsm.onSnapshotLoad(reader)) &#123;</span><br><span class="line">		done.run(<span class="keyword">new</span> Status(-<span class="number">1</span>, <span class="string">"StateMachine onSnapshotLoad failed"</span>));</span><br><span class="line">		<span class="keyword">final</span> RaftException e = <span class="keyword">new</span> RaftException(EnumOutter.ErrorType.ERROR_TYPE_STATE_MACHINE, RaftError.ESTATEMACHINE, <span class="string">"StateMachine onSnapshotLoad failed"</span>);</span><br><span class="line">		setError(e);</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (meta.getOldPeersCount() == <span class="number">0</span>) &#123;</span><br><span class="line">		<span class="comment">// Joint stage is not supposed to be noticeable by end users.</span></span><br><span class="line">		<span class="keyword">final</span> Configuration conf = <span class="keyword">new</span> Configuration();</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>, size = meta.getPeersCount(); i &lt; size; i++) &#123;</span><br><span class="line">			<span class="keyword">final</span> PeerId peer = <span class="keyword">new</span> PeerId();</span><br><span class="line">			Requires.requireTrue(peer.parse(meta.getPeers(i)), <span class="string">"Parse peer failed"</span>);</span><br><span class="line">			conf.addPeer(peer);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">this</span>.fsm.onConfigurationCommitted(conf);</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="comment">// 设置最新的提交索引，以便日志回放时对不存在日志执行 apply 操作</span></span><br><span class="line">	<span class="keyword">this</span>.lastAppliedIndex.set(meta.getLastIncludedIndex());</span><br><span class="line">  <span class="comment">// 设置新的节点所在任期</span></span><br><span class="line">	<span class="keyword">this</span>.lastAppliedTerm = meta.getLastIncludedTerm();</span><br><span class="line">	done.run(Status.OK());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>snapshot load操作完成后</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">onSnapshotLoadDone</span><span class="params">(<span class="keyword">final</span> Status st)</span> </span>&#123;</span><br><span class="line">	DownloadingSnapshot m;</span><br><span class="line">	<span class="keyword">boolean</span> doUnlock = <span class="keyword">true</span>;</span><br><span class="line">	<span class="keyword">this</span>.lock.lock();</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		Requires.requireTrue(<span class="keyword">this</span>.loadingSnapshot, <span class="string">"Not loading snapshot"</span>);</span><br><span class="line">		m = <span class="keyword">this</span>.downloadingSnapshot.get();</span><br><span class="line">		<span class="keyword">if</span> (st.isOk()) &#123;</span><br><span class="line">      <span class="comment">// 更改最新一次快照的index信息</span></span><br><span class="line">			<span class="keyword">this</span>.lastSnapshotIndex = <span class="keyword">this</span>.loadingSnapshotMeta.getLastIncludedIndex();</span><br><span class="line">      <span class="comment">// 记录最新一次快照的任期</span></span><br><span class="line">			<span class="keyword">this</span>.lastSnapshotTerm = <span class="keyword">this</span>.loadingSnapshotMeta.getLastIncludedTerm();</span><br><span class="line">			doUnlock = <span class="keyword">false</span>;</span><br><span class="line">			<span class="keyword">this</span>.lock.unlock();</span><br><span class="line">      <span class="comment">// logManager 设置 snapshot 元数据信息</span></span><br><span class="line">			<span class="keyword">this</span>.logManager.setSnapshot(<span class="keyword">this</span>.loadingSnapshotMeta); <span class="comment">//should be out of lock</span></span><br><span class="line">			doUnlock = <span class="keyword">true</span>;</span><br><span class="line">			<span class="keyword">this</span>.lock.lock();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">final</span> StringBuilder sb = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.node != <span class="keyword">null</span>) &#123;</span><br><span class="line">			sb.append(<span class="string">"Node "</span>).append(<span class="keyword">this</span>.node.getNodeId()).append(<span class="string">" "</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		sb.append(<span class="string">"onSnapshotLoadDone, "</span>).append(<span class="keyword">this</span>.loadingSnapshotMeta);</span><br><span class="line">		LOG.info(sb.toString());</span><br><span class="line">		doUnlock = <span class="keyword">false</span>;</span><br><span class="line">		<span class="keyword">this</span>.lock.unlock();</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.node != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="comment">// 在安装完 snapshot 后更新整个节点的配置信息</span></span><br><span class="line">			<span class="keyword">this</span>.node.updateConfigurationAfterInstallingSnapshot();</span><br><span class="line">		&#125;</span><br><span class="line">		doUnlock = <span class="keyword">true</span>;</span><br><span class="line">		<span class="keyword">this</span>.lock.lock();</span><br><span class="line">    <span class="comment">// 快照任务状态设置结束</span></span><br><span class="line">		<span class="keyword">this</span>.loadingSnapshot = <span class="keyword">false</span>;</span><br><span class="line">    <span class="comment">// 快照下载任务置为null，标识任务成功</span></span><br><span class="line">		<span class="keyword">this</span>.downloadingSnapshot.set(<span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">	&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (doUnlock) &#123;</span><br><span class="line">			<span class="keyword">this</span>.lock.unlock();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> (m != <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="comment">// Respond RPC</span></span><br><span class="line">		<span class="keyword">if</span> (!st.isOk()) &#123;</span><br><span class="line">			m.done.run(st);</span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      m.responseBuilder.setSuccess(<span class="keyword">true</span>);</span><br><span class="line">			m.done.sendResponse(m.responseBuilder.build());</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">this</span>.runningJobs.countDown();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>实现日志回放操作（如果接受快照的节点，存在日志缺省的情况，通过日志回放操作补全 logEntry）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doCommitted</span><span class="params">(<span class="keyword">final</span> <span class="keyword">long</span> committedIndex)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (!<span class="keyword">this</span>.error.getStatus().isOk()) &#123;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">  <span class="comment">// 获取最后一次的 apply id</span></span><br><span class="line">	<span class="keyword">final</span> <span class="keyword">long</span> lastAppliedIndex = <span class="keyword">this</span>.lastAppliedIndex.get();</span><br><span class="line">	<span class="comment">// We can tolerate the disorder of committed_index</span></span><br><span class="line">  <span class="comment">// 不存在日志缺省</span></span><br><span class="line">	<span class="keyword">if</span> (lastAppliedIndex &gt;= committedIndex) &#123;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">final</span> <span class="keyword">long</span> startMs = Utils.monotonicMs();</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">final</span> List&lt;Closure&gt; closures = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">		<span class="keyword">final</span> List&lt;TaskClosure&gt; taskClosures = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">		<span class="keyword">final</span> <span class="keyword">long</span> firstClosureIndex = <span class="keyword">this</span>.closureQueue.popClosureUntil(committedIndex, closures, taskClosures);</span><br><span class="line">		<span class="comment">// Calls TaskClosure#onCommitted if necessary</span></span><br><span class="line">		onTaskCommitted(taskClosures);</span><br><span class="line"></span><br><span class="line">		Requires.requireTrue(firstClosureIndex &gt;= <span class="number">0</span>, <span class="string">"Invalid firstClosureIndex"</span>);</span><br><span class="line">    <span class="comment">// 创建 LogEntry 迭代器，从 lastAppliedIndex 到 committedIndex之间缺省的日志会被重新回放</span></span><br><span class="line">		<span class="keyword">final</span> IteratorImpl iterImpl = <span class="keyword">new</span> IteratorImpl(<span class="keyword">this</span>.fsm, <span class="keyword">this</span>.logManager, closures, firstClosureIndex, lastAppliedIndex, committedIndex, <span class="keyword">this</span>.applyingIndex);</span><br><span class="line">    <span class="comment">// 是否可以继续</span></span><br><span class="line">		<span class="keyword">while</span> (iterImpl.isGood()) &#123;</span><br><span class="line">			<span class="keyword">final</span> LogEntry logEntry = iterImpl.entry();</span><br><span class="line">			<span class="keyword">if</span> (logEntry.getType() != EnumOutter.EntryType.ENTRY_TYPE_DATA) &#123;</span><br><span class="line">				<span class="keyword">if</span> (logEntry.getType() == EnumOutter.EntryType.ENTRY_TYPE_CONFIGURATION) &#123;</span><br><span class="line">					<span class="keyword">if</span> (logEntry.getOldPeers() != <span class="keyword">null</span> &amp;&amp; !logEntry.getOldPeers().isEmpty()) &#123;</span><br><span class="line">						<span class="comment">// Joint stage is not supposed to be noticeable by end users.</span></span><br><span class="line">						<span class="keyword">this</span>.fsm.onConfigurationCommitted(<span class="keyword">new</span> Configuration(iterImpl.entry().getPeers()));</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">if</span> (iterImpl.done() != <span class="keyword">null</span>) &#123;</span><br><span class="line">					<span class="comment">// For other entries, we have nothing to do besides flush the</span></span><br><span class="line">					<span class="comment">// pending tasks and run this closure to notify the caller that the</span></span><br><span class="line">					<span class="comment">// entries before this one were successfully committed and applied.</span></span><br><span class="line">					iterImpl.done().run(Status.OK());</span><br><span class="line">				&#125;</span><br><span class="line">				iterImpl.next();</span><br><span class="line">				<span class="keyword">continue</span>;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">// 用户态数据，转交给用户态的状态机去 apply LogEntry</span></span><br><span class="line">			<span class="comment">// Apply data task to user state machine</span></span><br><span class="line">			doApplyTasks(iterImpl);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (iterImpl.hasError()) &#123;</span><br><span class="line">			setError(iterImpl.getError());</span><br><span class="line">			iterImpl.runTheRestClosureWithError();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">final</span> <span class="keyword">long</span> lastIndex = iterImpl.getIndex() - <span class="number">1</span>;</span><br><span class="line">		<span class="keyword">final</span> <span class="keyword">long</span> lastTerm = <span class="keyword">this</span>.logManager.getTerm(lastIndex);</span><br><span class="line">		<span class="keyword">final</span> LogId lastAppliedId = <span class="keyword">new</span> LogId(lastIndex, lastTerm);</span><br><span class="line">    <span class="comment">// 重新设置最新 apply id 信息</span></span><br><span class="line">		<span class="keyword">this</span>.lastAppliedIndex.set(committedIndex);</span><br><span class="line">    <span class="comment">// 更新最新任期信息</span></span><br><span class="line">		<span class="keyword">this</span>.lastAppliedTerm = lastTerm;</span><br><span class="line">		<span class="keyword">this</span>.logManager.setAppliedId(lastAppliedId);</span><br><span class="line">		notifyLastAppliedIndexUpdated(committedIndex);</span><br><span class="line">	&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">		<span class="keyword">this</span>.nodeMetrics.recordLatency(<span class="string">"fsm-commit"</span>, Utils.monotonicMs() - startMs);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/28/java-web-49/" rel="next" title="ScheduledThreadPoolExecutor 源码浅析">
+                <i class="fa fa-chevron-left"></i> ScheduledThreadPoolExecutor 源码浅析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/03/leetcode-28/" rel="prev" title="leetcode-28">
+                leetcode-28 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 commiter</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">107</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">20</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#JRaft"><span class="nav-number">1.</span> <span class="nav-text">JRaft</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#新节点如何追上旧节点"><span class="nav-number">2.</span> <span class="nav-text">新节点如何追上旧节点</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#官方wiki说明"><span class="nav-number">2.1.</span> <span class="nav-text">官方wiki说明</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#代码浅析"><span class="nav-number">2.2.</span> <span class="nav-text">代码浅析</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+<script>
+  	var _mtac = {};
+  	(function() {
+  		var mta = document.createElement("script");
+  		mta.src = "https://pingjs.qq.com/h5/stats.js?v2.0.4";
+  		mta.setAttribute("name", "MTAH5");
+  		mta.setAttribute("sid", "500687579");
+
+  		var s = document.getElementsByTagName("script")[0];
+  		s.parentNode.insertBefore(mta, s);
+  	})();
+</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=66419010";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/07/30/java-web-50/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

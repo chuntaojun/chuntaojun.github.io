@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="参与的起因其实早在4月底五月初我就参与到了nacos这个开源项目中，阿里巴巴编程之夏是我在管理nacos issue时偶然根据issue label筛选发现的，而此时我已经是nacos的准commiter以及nacos-spring-project以及nacos-springboot-project`的维护者了 参与的过程最崩溃的瞬间在解决任务期间，有一个feature的实现涉及nacos的一致性">
+<meta property="og:type" content="article">
+<meta property="og:title" content="我的阿里巴巴编程之夏">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/08/26/my-life-1/index.html">
+<meta property="og:site_name" content="唉&#39;s Blog">
+<meta property="og:description" content="参与的起因其实早在4月底五月初我就参与到了nacos这个开源项目中，阿里巴巴编程之夏是我在管理nacos issue时偶然根据issue label筛选发现的，而此时我已经是nacos的准commiter以及nacos-spring-project以及nacos-springboot-project`的维护者了 参与的过程最崩溃的瞬间在解决任务期间，有一个feature的实现涉及nacos的一致性">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-08-26T14:11:31.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="我的阿里巴巴编程之夏">
+<meta name="twitter:description" content="参与的起因其实早在4月底五月初我就参与到了nacos这个开源项目中，阿里巴巴编程之夏是我在管理nacos issue时偶然根据issue label筛选发现的，而此时我已经是nacos的准commiter以及nacos-spring-project以及nacos-springboot-project`的维护者了 参与的过程最崩溃的瞬间在解决任务期间，有一个feature的实现涉及nacos的一致性">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/08/26/my-life-1/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>我的阿里巴巴编程之夏 | 唉's Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">唉's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/08/26/my-life-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 commiter">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="唉's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">我的阿里巴巴编程之夏
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-08-26 21:35:59 / Modified: 22:11:31" itemprop="dateCreated datePublished" datetime="2019-08-26T21:35:59+08:00">2019-08-26</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/my-life/" itemprop="url" rel="index"><span itemprop="name">my-life</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/08/26/my-life-1/" class="leancloud_visitors" data-flag-title="我的阿里巴巴编程之夏">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="参与的起因"><a href="#参与的起因" class="headerlink" title="参与的起因"></a>参与的起因</h4><p>其实早在4月底五月初我就参与到了<code>nacos</code>这个开源项目中，<em>阿里巴巴编程之夏</em>是我在管理<code>nacos issue</code>时偶然根据<code>issue label</code>筛选发现的，而此时我已经是<code>nacos</code>的准<code>commiter以及</code>nacos-spring-project<code>以及</code>nacos-springboot-project`的维护者了</p>
+<h4 id="参与的过程"><a href="#参与的过程" class="headerlink" title="参与的过程"></a>参与的过程</h4><h5 id="最崩溃的瞬间"><a href="#最崩溃的瞬间" class="headerlink" title="最崩溃的瞬间"></a>最崩溃的瞬间</h5><p>在解决任务期间，有一个<code>feature</code>的实现涉及<code>nacos</code>的一致性协议层的重构、<code>raft</code>协议的选型（这一块有一位社区的同学对比了两个成熟的<code>Java Raft</code>的工业实现，因此我只是说进行工业实现，然后进了<code>JRaft</code>的源码研究），而整个重构这一块，太多的地方需要调整以及模块划分，每次在模块以及接口设计时，不断打翻自己之前的设计，不断的设计调整，同时还因为一致性协议层面实现改动的过大，导致单元测试的基础类需要大量调整，当时把自己搞的有点头大了，不过最终，还是暂时设计了一个较为好的一致性协议功能使用的抽象层，以及将大部分的一致性功能调通并且正常运行；目前的因为和上游分支差距过大，需要跟上上游代码，这时候就存在太多的冲突需要去手动调整</p>
+<h5 id="顿悟的瞬间"><a href="#顿悟的瞬间" class="headerlink" title="顿悟的瞬间"></a>顿悟的瞬间</h5><p>其实这个顿悟的问题，是在参与比赛之前的问题，当时这个问题的话，涉及到了<code>spring-cloud</code>以及<code>zipkin</code>，最开始以为是<code>spring-cloud</code>的自动服务注册的时机以及采用的事件存在一些问题，和官方进行了沟通，但是由于自己当时对于<code>spring-cloud</code>的整体设计理念不太清楚，导致自己的观点并不合适，但是当时是自己给出了相应的解决方案的；然后在暑假期间，再次调试这个问题时，发现当初的解决方案不奏效了，于是自己从新开始找问题，从<code>debug</code>源码入手，跟踪<code>zipkin</code>组件的启动流程，最终发现是<code>spring-cloud-seluth</code>的<em>bug</em>，最终我也向<code>spring-cloud</code>组织上报此问题并提交了代码进行解决，目前已合并到主分支了</p>
+<h4 id="收获"><a href="#收获" class="headerlink" title="收获"></a>收获</h4><h5 id="编程能力、工程能力"><a href="#编程能力、工程能力" class="headerlink" title="编程能力、工程能力"></a>编程能力、工程能力</h5><p>怎么说呢，大学三年来，感觉只有大三这一年充实吧，大一大二自己都玩过去；在参与<code>nacos</code>期间，从一位入门的萌新、learner，到社区的<code>contributor</code>，再到最终的<code>commiter</code>，期间的付出也算是不少的吧，从自己的编码能力，到代码的设计、底层实现的理解都有了很大的进步，同时，由于<code>nacos</code>又是一个面向开发者，面向生产的<em>开源组件</em>，其功能的稳定、<code>api</code>的易用性，与技术的选型都需要进行权衡的；没有最好的东西，只有最合适的东西</p>
+<h5 id="开源协作"><a href="#开源协作" class="headerlink" title="开源协作"></a>开源协作</h5><p>在参与<code>nacos</code>期间，其实还和<code>spring-cloud-alibaba</code>的<em>洛夜</em>学长也有过沟通、交流，主要是关于<code>nacos-spring</code>生态组件的维护这一块的，关于组件的用户体验、功能使用方便性上都进行了交流与讨论，有些东西不是自己一拍脑门就可以定下来的，自己想的有时候只是自己觉得这样不错，但是对于大多数人来说，可能并不接受这种设计，这个时候就需要把自己的<code>idea</code>进行社区讨论。</p>
+<p>另一方面就是对自己的代码质量吧，毕竟这是一个开源的、面向生产的组件，容不得半点差错，对于自己提交的代码，每次都要进行全面的测试、代码<code>review</code>才可以进行<code>pull request</code></p>
+<h5 id="导师的帮助"><a href="#导师的帮助" class="headerlink" title="导师的帮助"></a>导师的帮助</h5><p><code>nacos</code>的PMC——<em>敦谷</em>前辈是我的导师，从学习<code>nacos</code>到成为<code>commiter</code>期间，<em>敦谷</em>前辈给我的映像就是很平易近人，有时会自己会问一些比较白痴的问题，导师也没有嫌弃我，而点出问题所在以及为什么会导致这个问题，有时遇到一些技术方向的问题时，前辈也会给出具有指导性的意见，使得我没有走什么弯路，因此在这里感谢<em>敦谷</em>前辈的耐心指导，同时也感谢<code>洛夜</code>大佬、<code>风卿</code>大佬、<code>何煦</code>大佬在我的编程之夏之旅中提供的帮助</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/20/leetcode-29/" rel="next" title="有赞202校招——编程题AC代码">
+                <i class="fa fa-chevron-left"></i> 有赞202校招——编程题AC代码
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 commiter</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">110</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">20</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#参与的起因"><span class="nav-number">1.</span> <span class="nav-text">参与的起因</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#参与的过程"><span class="nav-number">2.</span> <span class="nav-text">参与的过程</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#最崩溃的瞬间"><span class="nav-number">2.1.</span> <span class="nav-text">最崩溃的瞬间</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#顿悟的瞬间"><span class="nav-number">2.2.</span> <span class="nav-text">顿悟的瞬间</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#收获"><span class="nav-number">3.</span> <span class="nav-text">收获</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#编程能力、工程能力"><span class="nav-number">3.1.</span> <span class="nav-text">编程能力、工程能力</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#开源协作"><span class="nav-number">3.2.</span> <span class="nav-text">开源协作</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#导师的帮助"><span class="nav-number">3.3.</span> <span class="nav-text">导师的帮助</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+<script>
+  	var _mtac = {};
+  	(function() {
+  		var mta = document.createElement("script");
+  		mta.src = "https://pingjs.qq.com/h5/stats.js?v2.0.4";
+  		mta.setAttribute("name", "MTAH5");
+  		mta.setAttribute("sid", "500687579");
+
+  		var s = document.getElementsByTagName("script")[0];
+  		s.parentNode.insertBefore(mta, s);
+  	})();
+</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=66419010";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/08/26/my-life-1/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

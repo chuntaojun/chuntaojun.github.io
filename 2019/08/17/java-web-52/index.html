@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="JRaft 中的事务提交Apply Task123456789101112131415161718192021222324252627282930313233343536373839@Overridepublic void apply(final Task task) &amp;#123;    if (this.shutdownLatch != null) &amp;#123;        Utils.run">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jraft中节点提交一个任务源码浅析">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/08/17/java-web-52/index.html">
+<meta property="og:site_name" content="YWW的饲养员 Blog">
+<meta property="og:description" content="JRaft 中的事务提交Apply Task123456789101112131415161718192021222324252627282930313233343536373839@Overridepublic void apply(final Task task) &amp;#123;    if (this.shutdownLatch != null) &amp;#123;        Utils.run">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-09-05T02:02:38.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Jraft中节点提交一个任务源码浅析">
+<meta name="twitter:description" content="JRaft 中的事务提交Apply Task123456789101112131415161718192021222324252627282930313233343536373839@Overridepublic void apply(final Task task) &amp;#123;    if (this.shutdownLatch != null) &amp;#123;        Utils.run">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/08/17/java-web-52/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Jraft中节点提交一个任务源码浅析 | YWW的饲养员 Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">YWW的饲养员 Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/08/17/java-web-52/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 PMC">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YWW的饲养员 Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Jraft中节点提交一个任务源码浅析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-08-17 16:54:52" itemprop="dateCreated datePublished" datetime="2019-08-17T16:54:52+08:00">2019-08-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-09-05 10:02:38" itemprop="dateModified" datetime="2019-09-05T10:02:38+08:00">2019-09-05</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Jraft/" itemprop="url" rel="index"><span itemprop="name">Jraft</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/08/17/java-web-52/" class="leancloud_visitors" data-flag-title="Jraft中节点提交一个任务源码浅析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="JRaft-中的事务提交"><a href="#JRaft-中的事务提交" class="headerlink" title="JRaft 中的事务提交"></a>JRaft 中的事务提交</h4><h5 id="Apply-Task"><a href="#Apply-Task" class="headerlink" title="Apply Task"></a>Apply Task</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">apply</span><span class="params">(<span class="keyword">final</span> Task task)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.shutdownLatch != <span class="keyword">null</span>) &#123;</span><br><span class="line">        Utils.runClosureInThread(task.getDone(), <span class="keyword">new</span> Status(RaftError.ENODESHUTDOWN, <span class="string">"Node is shutting down."</span>));</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Node is shutting down"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    Requires.requireNonNull(task, <span class="string">"Null task"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个 LogEntry 对象用于承载日志数据</span></span><br><span class="line">    <span class="keyword">final</span> LogEntry entry = <span class="keyword">new</span> LogEntry();</span><br><span class="line">    entry.setData(task.getData());</span><br><span class="line">    <span class="keyword">int</span> retryTimes = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> EventTranslator&lt;LogEntryAndClosure&gt; translator = (event, sequence) -&gt; &#123;</span><br><span class="line">            event.reset();</span><br><span class="line">            event.done = task.getDone();</span><br><span class="line">            event.entry = entry;</span><br><span class="line">            event.expectedTerm = task.getExpectedTerm();</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">          <span class="comment">// 异步化发送日志</span></span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.applyQueue.tryPublishEvent(translator)) &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                retryTimes++;</span><br><span class="line">                <span class="keyword">if</span> (retryTimes &gt; MAX_APPLY_RETRY_TIMES) &#123;</span><br><span class="line">                    Utils.runClosureInThread(task.getDone(), <span class="keyword">new</span> Status(RaftError.EBUSY, <span class="string">"Node is busy, has too many tasks."</span>));</span><br><span class="line">                    LOG.warn(<span class="string">"Node &#123;&#125; applyQueue is overload."</span>, getNodeId());</span><br><span class="line">                    <span class="keyword">this</span>.metrics.recordTimes(<span class="string">"apply-task-overload-times"</span>, <span class="number">1</span>);</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                ThreadHelper.onSpinWait();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> Exception e) &#123;</span><br><span class="line">        Utils.runClosureInThread(task.getDone(), <span class="keyword">new</span> Status(RaftError.EPERM, <span class="string">"Node is down."</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里采用了异步任务的方式，通过<code>publishEvent</code>进行事件发布<code>LogEntryAndClosure</code>任务，随后由对应的事件处理器进行处理</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">LogEntryAndClosureHandler</span> <span class="keyword">implements</span> <span class="title">EventHandler</span>&lt;<span class="title">LogEntryAndClosure</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// task list for batch</span></span><br><span class="line">  	<span class="comment">// 暂存任务队列</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> List&lt;LogEntryAndClosure&gt; tasks = <span class="keyword">new</span> ArrayList&lt;&gt;(NodeImpl.<span class="keyword">this</span>.raftOptions.getApplyBatch());</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onEvent</span><span class="params">(<span class="keyword">final</span> LogEntryAndClosure event, <span class="keyword">final</span> <span class="keyword">long</span> sequence, <span class="keyword">final</span> <span class="keyword">boolean</span> endOfBatch)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">      	<span class="comment">// 如果出现了Node的shutdown事件，则尽量将未提交的任务进行apply</span></span><br><span class="line">        <span class="keyword">if</span> (event.shutdownLatch != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!<span class="keyword">this</span>.tasks.isEmpty()) &#123;</span><br><span class="line">                executeApplyingTasks(<span class="keyword">this</span>.tasks);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> num = GLOBAL_NUM_NODES.decrementAndGet();</span><br><span class="line">            LOG.info(<span class="string">"The number of active nodes decrement to &#123;&#125;."</span>, num);</span><br><span class="line">            event.shutdownLatch.countDown();</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">this</span>.tasks.add(event);</span><br><span class="line">      	<span class="comment">// jraft 采用了任务批量提交的形式，将多个LogEntry缓存在一个List数组中，然后通过判断是否</span></span><br><span class="line">      	<span class="comment">// 到达了批次值以及是否是消息队列批次的最后一个，进行任务的批量提交</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.tasks.size() &gt;= NodeImpl.<span class="keyword">this</span>.raftOptions.getApplyBatch() || endOfBatch) &#123;</span><br><span class="line">            executeApplyingTasks(<span class="keyword">this</span>.tasks);</span><br><span class="line">            <span class="keyword">this</span>.tasks.clear();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="处理任务"><a href="#处理任务" class="headerlink" title="处理任务"></a>处理任务</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">executeApplyingTasks</span><span class="params">(<span class="keyword">final</span> List&lt;LogEntryAndClosure&gt; tasks)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.writeLock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> size = tasks.size();</span><br><span class="line">      	<span class="comment">// 当前节点类型判断，如果不是Leader节点，则拒绝任务执行</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.state != State.STATE_LEADER) &#123;</span><br><span class="line">            <span class="keyword">final</span> Status st = <span class="keyword">new</span> Status();</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.state != State.STATE_TRANSFERRING) &#123;</span><br><span class="line">                st.setError(RaftError.EPERM, <span class="string">"Is not leader."</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                st.setError(RaftError.EBUSY, <span class="string">"Is transferring leadership."</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            LOG.debug(<span class="string">"Node &#123;&#125; can't apply, status=&#123;&#125;."</span>, getNodeId(), st);</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">                Utils.runClosureInThread(tasks.get(i).done, st);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      	<span class="comment">// 创建一个 LogEntry 列表</span></span><br><span class="line">        <span class="keyword">final</span> List&lt;LogEntry&gt; entries = <span class="keyword">new</span> ArrayList&lt;&gt;(size);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">          	<span class="comment">// 从中获取一个任务对象</span></span><br><span class="line">            <span class="keyword">final</span> LogEntryAndClosure task = tasks.get(i);</span><br><span class="line">          	<span class="comment">// 任务的期望任期与当前节点的任期进行比对</span></span><br><span class="line">          	<span class="comment">// 如果不满足条件，拒绝任务提交</span></span><br><span class="line">            <span class="keyword">if</span> (task.expectedTerm != -<span class="number">1</span> &amp;&amp; task.expectedTerm != <span class="keyword">this</span>.currTerm) &#123;</span><br><span class="line">                LOG.debug(<span class="string">"Node &#123;&#125; can't apply task whose expectedTerm=&#123;&#125; doesn't match currTerm=&#123;&#125;."</span>, getNodeId(), task.expectedTerm, <span class="keyword">this</span>.currTerm);</span><br><span class="line">                <span class="keyword">if</span> (task.done != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">final</span> Status st = <span class="keyword">new</span> Status(RaftError.EPERM, <span class="string">"expected_term=%d doesn't match current_term=%d"</span>, task.expectedTerm, <span class="keyword">this</span>.currTerm);</span><br><span class="line">                    Utils.runClosureInThread(task.done, st);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 添加本次日志同步的投票器</span></span><br><span class="line">            <span class="keyword">if</span> (!<span class="keyword">this</span>.ballotBox.appendPendingTask(<span class="keyword">this</span>.conf.getConf(), <span class="keyword">this</span>.conf.isStable() ? <span class="keyword">null</span> : <span class="keyword">this</span>.conf.getOldConf(), task.done)) &#123;</span><br><span class="line">                Utils.runClosureInThread(task.done, <span class="keyword">new</span> Status(RaftError.EINTERNAL, <span class="string">"Fail to append task."</span>));</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// set task entry info before adding to list.</span></span><br><span class="line">            task.entry.getId().setTerm(<span class="keyword">this</span>.currTerm);</span><br><span class="line">            task.entry.setType(EnumOutter.EntryType.ENTRY_TYPE_DATA);</span><br><span class="line">            entries.add(task.entry);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.logManager.appendEntries(entries, <span class="keyword">new</span> LeaderStableClosure(entries));</span><br><span class="line">        <span class="comment">// update conf.first</span></span><br><span class="line">        <span class="keyword">this</span>.conf = <span class="keyword">this</span>.logManager.checkAndSetConfiguration(<span class="keyword">this</span>.conf);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.writeLock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里看到，在预提交<code>LogEntry</code>的时候，创建了一个<code>new LeaderStableClosure(entries)</code>对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LeaderStableClosure</span> <span class="keyword">extends</span> <span class="title">LogManager</span>.<span class="title">StableClosure</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LeaderStableClosure</span><span class="params">(<span class="keyword">final</span> List&lt;LogEntry&gt; entries)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(entries);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">(<span class="keyword">final</span> Status status)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (status.isOk()) &#123;</span><br><span class="line">            <span class="comment">// 进行日志提交（内部存在半数同意机制）</span></span><br><span class="line">            NodeImpl.<span class="keyword">this</span>.ballotBox.commitAt(<span class="keyword">this</span>.firstLogIndex, <span class="keyword">this</span>.firstLogIndex + <span class="keyword">this</span>.nEntries - <span class="number">1</span>, NodeImpl.<span class="keyword">this</span>.serverId);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            LOG.error(<span class="string">"Node &#123;&#125; append [&#123;&#125;, &#123;&#125;] failed."</span>, getNodeId(), <span class="keyword">this</span>.firstLogIndex, <span class="keyword">this</span>.firstLogIndex + <span class="keyword">this</span>.nEntries - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里直接使用了<code>LogManagerImpl</code>这个<code>LogManager</code>的实现类提交本批次的<code>LogEntries</code>日志队列，然后进入<code>appendEntries</code>方法中</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">appendEntries</span><span class="params">(<span class="keyword">final</span> List&lt;LogEntry&gt; entries, <span class="keyword">final</span> StableClosure done)</span> </span>&#123;</span><br><span class="line">    Requires.requireNonNull(done, <span class="string">"done"</span>);</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.hasError) &#123;</span><br><span class="line">        entries.clear();</span><br><span class="line">        Utils.runClosureInThread(done, <span class="keyword">new</span> Status(RaftError.EIO, <span class="string">"Corrupted LogStorage"</span>));</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">boolean</span> doUnlock = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">this</span>.writeLock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 对 entries 进行检查冲突</span></span><br><span class="line">        <span class="keyword">if</span> (!entries.isEmpty() &amp;&amp; !checkAndResolveConflict(entries, done)) &#123;</span><br><span class="line">            entries.clear();</span><br><span class="line">            Utils.runClosureInThread(done, <span class="keyword">new</span> Status(RaftError.EINTERNAL, <span class="string">"Fail to checkAndResolveConflict."</span>));</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; entries.size(); i++) &#123;</span><br><span class="line">            <span class="keyword">final</span> LogEntry entry = entries.get(i);</span><br><span class="line">            <span class="comment">// Set checksum after checkAndResolveConflict</span></span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.raftOptions.isEnableLogEntryChecksum()) &#123;</span><br><span class="line">                entry.setChecksum(entry.checksum());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 元数据的日志数据，需要执行额外的操作</span></span><br><span class="line">            <span class="keyword">if</span> (entry.getType() == EntryType.ENTRY_TYPE_CONFIGURATION) &#123;</span><br><span class="line">                Configuration oldConf = <span class="keyword">new</span> Configuration();</span><br><span class="line">                <span class="keyword">if</span> (entry.getOldPeers() != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    oldConf = <span class="keyword">new</span> Configuration(entry.getOldPeers());</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">final</span> ConfigurationEntry conf = <span class="keyword">new</span> ConfigurationEntry(entry.getId(), <span class="keyword">new</span> Configuration(entry.getPeers()), oldConf);</span><br><span class="line">                <span class="keyword">this</span>.configManager.add(conf);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!entries.isEmpty()) &#123;</span><br><span class="line">            <span class="comment">// 设置待提交日志列表中的第一个待提交的日志id信息</span></span><br><span class="line">            done.setFirstLogIndex(entries.get(<span class="number">0</span>).getId().getIndex());</span><br><span class="line">            <span class="keyword">this</span>.logsInMemory.addAll(entries);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 设置 entries 信息</span></span><br><span class="line">        done.setEntries(entries);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> retryTimes = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">final</span> EventTranslator&lt;StableClosureEvent&gt; translator = (event, sequence) -&gt; &#123;</span><br><span class="line">            event.reset();</span><br><span class="line">            event.type = EventType.OTHER;</span><br><span class="line">            event.done = done;</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="comment">// 尝试发布一个 StableClosure 事件</span></span><br><span class="line">            <span class="keyword">if</span> (tryOfferEvent(done, translator)) &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                retryTimes++;</span><br><span class="line">                <span class="keyword">if</span> (retryTimes &gt; APPEND_LOG_RETRY_TIMES) &#123;</span><br><span class="line">                    reportError(RaftError.EBUSY.getNumber(), <span class="string">"LogManager is busy, disk queue overload."</span>);</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                ThreadHelper.onSpinWait();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        doUnlock = <span class="keyword">false</span>;</span><br><span class="line">      	<span class="comment">// 此处就是将LogEntries进行通知Follower的关键步奏</span></span><br><span class="line">        <span class="keyword">if</span> (!wakeupAllWaiter(<span class="keyword">this</span>.writeLock)) &#123;</span><br><span class="line">            notifyLastLogIndexListeners();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (doUnlock) &#123;</span><br><span class="line">            <span class="keyword">this</span>.writeLock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>StableClosureEvent</code>事件的处理器如下，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">StableClosureEventHandler</span> <span class="keyword">implements</span> <span class="title">EventHandler</span>&lt;<span class="title">StableClosureEvent</span>&gt; </span>&#123;</span><br><span class="line">        LogId               lastId  = LogManagerImpl.<span class="keyword">this</span>.diskId;</span><br><span class="line">        List&lt;StableClosure&gt; storage = <span class="keyword">new</span> ArrayList&lt;&gt;(<span class="number">256</span>);</span><br><span class="line">        AppendBatcher       ab      = <span class="keyword">new</span> AppendBatcher(<span class="keyword">this</span>.storage, <span class="number">256</span>, <span class="keyword">new</span> ArrayList&lt;&gt;(),</span><br><span class="line">                                        LogManagerImpl.<span class="keyword">this</span>.diskId);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onEvent</span><span class="params">(<span class="keyword">final</span> StableClosureEvent event, <span class="keyword">final</span> <span class="keyword">long</span> sequence, <span class="keyword">final</span> <span class="keyword">boolean</span> endOfBatch)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (event.type == EventType.SHUTDOWN) &#123;</span><br><span class="line">            <span class="keyword">this</span>.lastId = <span class="keyword">this</span>.ab.flush();</span><br><span class="line">            setDiskId(<span class="keyword">this</span>.lastId);</span><br><span class="line">            LogManagerImpl.<span class="keyword">this</span>.shutDownLatch.countDown();</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">final</span> StableClosure done = event.done;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 如果异步回调的 StableClosure 存在日志信息，则进行暂存</span></span><br><span class="line">        <span class="comment">// 而上面的方法中，entries有可能为empty的话，因此这里</span></span><br><span class="line">        <span class="keyword">if</span> (done.getEntries() != <span class="keyword">null</span> &amp;&amp; !done.getEntries().isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">this</span>.ab.append(done);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 由于上面一步中，设置为了 type=other，因此switch case中的都没有匹配的条件</span></span><br><span class="line">            <span class="comment">// 强制flush日志信息，返回最新的日志条目id信息</span></span><br><span class="line">            <span class="keyword">this</span>.lastId = <span class="keyword">this</span>.ab.flush();</span><br><span class="line">            <span class="keyword">boolean</span> ret = <span class="keyword">true</span>;</span><br><span class="line">            <span class="keyword">switch</span> (event.type) &#123;</span><br><span class="line">                <span class="keyword">case</span> LAST_LOG_ID:</span><br><span class="line">                    ((LastLogIdClosure) done).setLastLogId(<span class="keyword">this</span>.lastId.copy());</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="comment">// 与快照有关</span></span><br><span class="line">                <span class="keyword">case</span> TRUNCATE_PREFIX:</span><br><span class="line">                    <span class="keyword">long</span> startMs = Utils.monotonicMs();</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="keyword">final</span> TruncatePrefixClosure tpc = (TruncatePrefixClosure) done;</span><br><span class="line">                        LOG.debug(<span class="string">"Truncating storage to firstIndexKept=&#123;&#125;"</span>, tpc.firstIndexKept);</span><br><span class="line">                        ret = LogManagerImpl.<span class="keyword">this</span>.logStorage.truncatePrefix(tpc.firstIndexKept);</span><br><span class="line">                    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                         LogManagerImpl.<span class="keyword">this</span>.nodeMetrics.recordLatency(<span class="string">"truncate-log-prefix"</span>, Utils.monotonicMs()</span><br><span class="line">                                                                                                 - startMs);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="comment">// 与日志条目检查与解决冲突有关</span></span><br><span class="line">                <span class="keyword">case</span> TRUNCATE_SUFFIX:</span><br><span class="line">                    startMs = Utils.monotonicMs();</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="keyword">final</span> TruncateSuffixClosure tsc = (TruncateSuffixClosure) done;</span><br><span class="line">                        LOG.warn(<span class="string">"Truncating storage to lastIndexKept=&#123;&#125;"</span>, tsc.lastIndexKept);</span><br><span class="line">                            ret = LogManagerImpl.<span class="keyword">this</span>.logStorage.truncateSuffix(tsc.lastIndexKept);</span><br><span class="line">                        <span class="keyword">if</span> (ret) &#123;</span><br><span class="line">                            <span class="keyword">this</span>.lastId.setIndex(tsc.lastIndexKept);</span><br><span class="line">                            <span class="keyword">this</span>.lastId.setTerm(tsc.lastTermKept);</span><br><span class="line">                            Requires.requireTrue(<span class="keyword">this</span>.lastId.getIndex() == <span class="number">0</span> || <span class="keyword">this</span>.lastId.getTerm() != <span class="number">0</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                        LogManagerImpl.<span class="keyword">this</span>.nodeMetrics.recordLatency(<span class="string">"truncate-log-suffix"</span>, Utils.monotonicMs()</span><br><span class="line">                                                                                                 - startMs);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">case</span> RESET:</span><br><span class="line">                    <span class="keyword">final</span> ResetClosure rc = (ResetClosure) done;</span><br><span class="line">                    LOG.info(<span class="string">"Reseting storage to nextLogIndex=&#123;&#125;"</span>, rc.nextLogIndex);</span><br><span class="line">                    ret = LogManagerImpl.<span class="keyword">this</span>.logStorage.reset(rc.nextLogIndex);</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                <span class="keyword">default</span>:</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!ret) &#123;</span><br><span class="line">                reportError(RaftError.EIO.getNumber(), <span class="string">"Failed operation in LogStorage"</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                done.run(Status.OK());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (endOfBatch) &#123;</span><br><span class="line">            <span class="keyword">this</span>.lastId = <span class="keyword">this</span>.ab.flush();</span><br><span class="line">            setDiskId(<span class="keyword">this</span>.lastId);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>唤醒所有的等待者——也就是<code>Leader</code>需要发数据到<code>Follower</code>，而<code>JRaft</code>采取了等待策略，如果当前没有需要同步的的<code>LogEntry</code>，会创建一个<code>onNewLogCallback</code>回调接口，等待当有新的<code>LogEntry</code>进来时，异步通知调用此接口完成<code>LogEntries</code>与<code>Follower</code>的同步，关于创建此接口的位置，就是<code>Replicator</code>——<code>Follower</code>在<code>Leader</code>中的对应处理对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">waitMoreEntries</span><span class="params">(<span class="keyword">final</span> <span class="keyword">long</span> nextWaitIndex)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        LOG.debug(<span class="string">"Node &#123;&#125; waits more entries"</span>, <span class="keyword">this</span>.options.getNode().getNodeId());</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.waitId &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.waitId = <span class="keyword">this</span>.options.getLogManager().wait(nextWaitIndex - <span class="number">1</span>,</span><br><span class="line">                (arg, errorCode) -&gt; continueSending((ThreadId) arg, errorCode), <span class="keyword">this</span>.id);</span><br><span class="line">        <span class="keyword">this</span>.statInfo.runningState = RunningState.IDLE;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.id.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接着回到<code>LogManager</code>回调触发<code>onNewLogCallback</code>接口</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">wakeupAllWaiter</span><span class="params">(<span class="keyword">final</span> Lock lock)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.waitMap.isEmpty()) &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  	<span class="comment">// 拷贝一份 WaitMeta 列表，然后将原有的数据 clear</span></span><br><span class="line">    <span class="keyword">final</span> List&lt;WaitMeta&gt; wms = <span class="keyword">new</span> ArrayList&lt;&gt;(<span class="keyword">this</span>.waitMap.values());</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> errCode = <span class="keyword">this</span>.stopped ? RaftError.ESTOP.getNumber() : RaftError.SUCCESS.getNumber();</span><br><span class="line">    <span class="keyword">this</span>.waitMap.clear();</span><br><span class="line">    lock.unlock();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> waiterCount = wms.size();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; waiterCount; i++) &#123;</span><br><span class="line">      	<span class="comment">// 获取 WaitMeta 实例信息</span></span><br><span class="line">        <span class="keyword">final</span> WaitMeta wm = wms.get(i);</span><br><span class="line">        wm.errorCode = errCode;</span><br><span class="line">      	<span class="comment">// 异步执行此回调接口</span></span><br><span class="line">        Utils.runInThread(() -&gt; runOnNewLog(wm));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接着来看看这个异步接口做的事情是什么</p>
+<h5 id="日志传输给Follower"><a href="#日志传输给Follower" class="headerlink" title="日志传输给Follower"></a>日志传输给<code>Follower</code></h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.waitId = <span class="keyword">this</span>.options.getLogManager().wait(nextWaitIndex - <span class="number">1</span>,</span><br><span class="line">                (arg, errorCode) -&gt; continueSending((ThreadId) arg, errorCode), <span class="keyword">this</span>.id);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">continueSending</span><span class="params">(<span class="keyword">final</span> ThreadId id, <span class="keyword">final</span> <span class="keyword">int</span> errCode)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (id == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">//It was destroyed already</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> Replicator r = (Replicator) id.lock();</span><br><span class="line">    <span class="keyword">if</span> (r == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    r.waitId = -<span class="number">1</span>;</span><br><span class="line">  	<span class="comment">// 如果`Leader`自身出现了错误，则本次发送一个空的日志且非心跳请求</span></span><br><span class="line">    <span class="keyword">if</span> (errCode == RaftError.ETIMEDOUT.getNumber()) &#123;</span><br><span class="line">        <span class="comment">// Send empty entries after block timeout to check the correct</span></span><br><span class="line">        <span class="comment">// _next_index otherwise the replicator is likely waits in            executor.shutdown();</span></span><br><span class="line">        <span class="comment">// _wait_more_entries and no further logs would be replicated even if the</span></span><br><span class="line">        <span class="comment">// last_index of this followers is less than |next_index - 1|</span></span><br><span class="line">        r.sendEmptyEntries(<span class="keyword">false</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (errCode != RaftError.ESTOP.getNumber()) &#123;</span><br><span class="line">        <span class="comment">// id is unlock in _send_entries</span></span><br><span class="line">        r.sendEntries();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        LOG.warn(<span class="string">"Replicator &#123;&#125; stops sending entries."</span>, id);</span><br><span class="line">        id.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">sendEntries</span><span class="params">(<span class="keyword">final</span> <span class="keyword">long</span> nextSendingIndex)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 使用 RPC 异步提交日志请求——`appendEnrties request`</span></span><br><span class="line">    <span class="keyword">final</span> Future&lt;Message&gt; rpcFuture = <span class="keyword">this</span>.rpcService.appendEntries(<span class="keyword">this</span>.options.getPeerId().getEndpoint(),</span><br><span class="line">            request, -<span class="number">1</span>, <span class="keyword">new</span> RpcResponseClosureAdapter&lt;AppendEntriesResponse&gt;() &#123;</span><br><span class="line"></span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">(<span class="keyword">final</span> Status status)</span> </span>&#123;</span><br><span class="line">                    RecycleUtil.recycle(recyclable);</span><br><span class="line">                    <span class="comment">// 当请求接收到回复时，触发`onRpcReturned`回调方法做事务判断</span></span><br><span class="line">                    onRpcReturned(Replicator.<span class="keyword">this</span>.id, RequestType.AppendEntries, status, request, getResponse(), seq,</span><br><span class="line">                        v, monotonicSendTimeMs);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;);</span><br><span class="line">    <span class="comment">// 将本次异步请求的`Future`保存在一个`Inflight`队列中</span></span><br><span class="line">    addInflight(RequestType.AppendEntries, nextSendingIndex, request.getEntriesCount(), request.getData().size(), seq, rpcFuture);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接着看当触发<code>onRpcReturned</code>回调函数时做了什么事情</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">onRpcReturned</span><span class="params">(<span class="keyword">final</span> ThreadId id, <span class="keyword">final</span> RequestType reqType, <span class="keyword">final</span> Status status, <span class="keyword">final</span> Message request, <span class="keyword">final</span> Message response, <span class="keyword">final</span> <span class="keyword">int</span> seq, <span class="keyword">final</span> <span class="keyword">int</span> stateVersion, <span class="keyword">final</span> <span class="keyword">long</span> rpcSendTime)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (id == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 开启任务处理耗时计时</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> startTimeMs = Utils.nowMs();</span><br><span class="line">    Replicator r;</span><br><span class="line">    <span class="keyword">if</span> ((r = (Replicator) id.lock()) == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// version 判断</span></span><br><span class="line">    <span class="keyword">if</span> (stateVersion != r.version) &#123;</span><br><span class="line">        LOG.debug(</span><br><span class="line">            <span class="string">"Replicator &#123;&#125; ignored old version response &#123;&#125;, current version is &#123;&#125;, request is &#123;&#125;\n, and response is &#123;&#125;\n, status is &#123;&#125;."</span>,</span><br><span class="line">            r, stateVersion, r.version, request, response, status);</span><br><span class="line">        id.unlock();</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 一个根据请求 seq 排序的优先队列（seq是全局单调递增的）</span></span><br><span class="line">    <span class="keyword">final</span> PriorityQueue&lt;RpcResponse&gt; holdingQueue = r.pendingResponses;</span><br><span class="line">    holdingQueue.add(<span class="keyword">new</span> RpcResponse(reqType, seq, status, request, response, rpcSendTime));</span><br><span class="line">    <span class="comment">// hold 主的 Rpc返回结果太多了，该节点的未处理数量超出所能承受的范围</span></span><br><span class="line">    <span class="keyword">if</span> (holdingQueue.size() &gt; r.raftOptions.getMaxReplicatorInflightMsgs()) &#123;</span><br><span class="line">        LOG.warn(<span class="string">"Too many pending responses &#123;&#125; for replicator &#123;&#125;, maxReplicatorInflightMsgs=&#123;&#125;"</span>, holdingQueue.size(), r.options.getPeerId(), r.raftOptions.getMaxReplicatorInflightMsgs());</span><br><span class="line">        <span class="comment">// 重置节点的状态</span></span><br><span class="line">        r.resetInflights();</span><br><span class="line">        r.state = State.Probe;</span><br><span class="line">        r.sendEmptyEntries(<span class="keyword">false</span>);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">boolean</span> continueSendEntries = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> isLogDebugEnabled = LOG.isDebugEnabled();</span><br><span class="line">    StringBuilder sb = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (isLogDebugEnabled) &#123;</span><br><span class="line">        sb = <span class="keyword">new</span> StringBuilder(<span class="string">"Replicator "</span>).append(r).append(<span class="string">" is processing RPC responses,"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">int</span> processed = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 循环处理</span></span><br><span class="line">        <span class="keyword">while</span> (!holdingQueue.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">final</span> RpcResponse queuedPipelinedResponse = holdingQueue.peek();</span><br><span class="line"></span><br><span class="line">            <span class="comment">//sequence mismatch, waiting for next response.</span></span><br><span class="line">            <span class="comment">// 表明当前乱序了</span></span><br><span class="line">            <span class="keyword">if</span> (queuedPipelinedResponse.seq != r.requiredNextSeq) &#123;</span><br><span class="line">                <span class="comment">// 如果之前存在处理，则到此直接break循环</span></span><br><span class="line">                <span class="keyword">if</span> (processed &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (isLogDebugEnabled) &#123;</span><br><span class="line">                        sb.append(<span class="string">"has processed "</span>).append(processed).append(<span class="string">" responses,"</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">//Do not processed any responses, UNLOCK id and return.</span></span><br><span class="line">                    continueSendEntries = <span class="keyword">false</span>;</span><br><span class="line">                    id.unlock();</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            holdingQueue.remove();</span><br><span class="line">            processed++;</span><br><span class="line">            <span class="comment">// 获取最先一次任务的Inflight数据（本质是一个队列）</span></span><br><span class="line">            <span class="keyword">final</span> Inflight inflight = r.pollInflight();</span><br><span class="line">             <span class="keyword">if</span> (inflight == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// The previous in-flight requests were cleared.</span></span><br><span class="line">                <span class="keyword">if</span> (isLogDebugEnabled) &#123;</span><br><span class="line">                    sb.append(<span class="string">"ignore response because request not found:"</span>).append(queuedPipelinedResponse)</span><br><span class="line">                            .append(<span class="string">",\n"</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 序列不匹配，重置节点状态，阻止继续向该节点发送 LogEntries</span></span><br><span class="line">            <span class="keyword">if</span> (inflight.seq != queuedPipelinedResponse.seq) &#123;</span><br><span class="line">                <span class="comment">// reset state</span></span><br><span class="line">                LOG.warn(</span><br><span class="line">                    <span class="string">"Replicator &#123;&#125; response sequence out of order, expect &#123;&#125;, but it is &#123;&#125;, reset state to try again."</span>,</span><br><span class="line">                    r, inflight.seq, queuedPipelinedResponse.seq);</span><br><span class="line">                r.resetInflights();</span><br><span class="line">                r.state = State.Probe;</span><br><span class="line">                continueSendEntries = <span class="keyword">false</span>;</span><br><span class="line">                <span class="comment">// 锁住节点，根据错误类别等待一段时间</span></span><br><span class="line">                r.block(Utils.nowMs(), RaftError.EREQUEST.getNumber());</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 对请求类型进判断</span></span><br><span class="line">                <span class="keyword">switch</span> (queuedPipelinedResponse.requestType) &#123;</span><br><span class="line">                    <span class="comment">// 如果是 AppendEntriesRequest，则触发onAppendEntriesReturned回调</span></span><br><span class="line">                    <span class="keyword">case</span> AppendEntries:</span><br><span class="line">                        continueSendEntries = onAppendEntriesReturned(id, inflight, queuedPipelinedResponse.status,</span><br><span class="line">                            (AppendEntriesRequest) queuedPipelinedResponse.request,</span><br><span class="line">                            (AppendEntriesResponse) queuedPipelinedResponse.response, rpcSendTime, startTimeMs, r);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    <span class="comment">// 如果是 InstallSnapshotRequest，则触发onInstallSnapshotReturned回调</span></span><br><span class="line">                    <span class="keyword">case</span> Snapshot:</span><br><span class="line">                        continueSendEntries = onInstallSnapshotReturned(id, r, queuedPipelinedResponse.status,</span><br><span class="line">                            (InstallSnapshotRequest) queuedPipelinedResponse.request,</span><br><span class="line">                            (InstallSnapshotResponse) queuedPipelinedResponse.response);</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                <span class="comment">// 判断是否可以继续发送下一条日志</span></span><br><span class="line">                <span class="keyword">if</span> (continueSendEntries) &#123;</span><br><span class="line">                    <span class="comment">// Success, increase the response sequence.</span></span><br><span class="line">                    r.getAndIncrementRequiredNextSeq();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// The id is already unlocked in onAppendEntriesReturned/onInstallSnapshotReturned, we SHOULD break out.</span></span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (isLogDebugEnabled) &#123;</span><br><span class="line">            sb.append(<span class="string">", after processed, continue to send entries: "</span>).append(continueSendEntries);</span><br><span class="line">            LOG.debug(sb.toString());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (continueSendEntries) &#123;</span><br><span class="line">            <span class="comment">// unlock in sendEntries.</span></span><br><span class="line">            <span class="comment">// 继续发送日志</span></span><br><span class="line">            r.sendEntries();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里可以看到，当一切顺利时，会触发<code>onAppendEntriesReturned</code>函数回调</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">onAppendEntriesReturned</span><span class="params">(<span class="keyword">final</span> ThreadId id, <span class="keyword">final</span> Inflight inflight, <span class="keyword">final</span> Status status, <span class="keyword">final</span> AppendEntriesRequest request, <span class="keyword">final</span> AppendEntriesResponse response, <span class="keyword">final</span> <span class="keyword">long</span> rpcSendTime, <span class="keyword">final</span> <span class="keyword">long</span> startTimeMs, <span class="keyword">final</span> Replicator r)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (inflight.startIndex != request.getPrevLogIndex() + <span class="number">1</span>) &#123;</span><br><span class="line">        LOG.warn(</span><br><span class="line">            <span class="string">"Replicator &#123;&#125; received invalid AppendEntriesResponse, in-flight startIndex=&#123;&#125;, requset prevLogIndex=&#123;&#125;, reset the replicator state and probe again."</span>,</span><br><span class="line">            r, inflight.startIndex, request.getPrevLogIndex());</span><br><span class="line">        r.resetInflights();</span><br><span class="line">        r.state = State.Probe;</span><br><span class="line">        <span class="comment">//unlock id in sendEmptyEntries</span></span><br><span class="line">        r.sendEmptyEntries(<span class="keyword">false</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//record metrics</span></span><br><span class="line">    <span class="keyword">if</span> (request.getEntriesCount() &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        r.nodeMetrics.recordLatency(<span class="string">"replicate-entries"</span>, Utils.monotonicMs() - rpcSendTime);</span><br><span class="line">        r.nodeMetrics.recordSize(<span class="string">"replicate-entries-count"</span>, request.getEntriesCount());</span><br><span class="line">        r.nodeMetrics.recordSize(<span class="string">"replicate-entries-bytes"</span>, request.getData() != <span class="keyword">null</span> ? request.getData().size()</span><br><span class="line">            : <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">boolean</span> isLogDebugEnabled = LOG.isDebugEnabled();</span><br><span class="line">    StringBuilder sb = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (isLogDebugEnabled) &#123;</span><br><span class="line">        sb = <span class="keyword">new</span> StringBuilder(<span class="string">"Node "</span>). <span class="comment">//</span></span><br><span class="line">            append(r.options.getGroupId()).append(<span class="string">":"</span>).append(r.options.getServerId()). <span class="comment">//</span></span><br><span class="line">            append(<span class="string">" received AppendEntriesResponse from "</span>). <span class="comment">//</span></span><br><span class="line">            append(r.options.getPeerId()). <span class="comment">//</span></span><br><span class="line">            append(<span class="string">" prevLogIndex="</span>).append(request.getPrevLogIndex()). <span class="comment">//</span></span><br><span class="line">            append(<span class="string">" prevLogTerm="</span>).append(request.getPrevLogTerm()). <span class="comment">//</span></span><br><span class="line">            append(<span class="string">" count="</span>).append(request.getEntriesCount());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!status.isOk()) &#123;</span><br><span class="line">        <span class="comment">// If the follower crashes, any RPC to the follower fails immediately,</span></span><br><span class="line">        <span class="comment">// so we need to block the follower for a while instead of looping until</span></span><br><span class="line">        <span class="comment">// it comes back or be removed</span></span><br><span class="line">        <span class="comment">// dummy_id is unlock in block</span></span><br><span class="line">        <span class="keyword">if</span> (isLogDebugEnabled) &#123;</span><br><span class="line">            sb.append(<span class="string">" fail, sleep."</span>);</span><br><span class="line">            LOG.debug(sb.toString());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (++r.consecutiveErrorTimes % <span class="number">10</span> == <span class="number">0</span>) &#123;</span><br><span class="line">            LOG.warn(<span class="string">"Fail to issue RPC to &#123;&#125;, consecutiveErrorTimes=&#123;&#125;, error=&#123;&#125;"</span>, r.options.getPeerId(),</span><br><span class="line">                r.consecutiveErrorTimes, status);</span><br><span class="line">        &#125;</span><br><span class="line">        r.resetInflights();</span><br><span class="line">        r.state = State.Probe;</span><br><span class="line">        <span class="comment">//unlock in in block</span></span><br><span class="line">        r.block(startTimeMs, status.getCode());</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    r.consecutiveErrorTimes = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (!response.getSuccess()) &#123;</span><br><span class="line">        <span class="comment">// Leader 的切换，表明可能出现过一次网络分区，从新跟随新的 Leader</span></span><br><span class="line">        <span class="keyword">if</span> (response.getTerm() &gt; r.options.getTerm()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (isLogDebugEnabled) &#123;</span><br><span class="line">                sb.append(<span class="string">" fail, greater term "</span>).append(response.getTerm()).append(<span class="string">" expect term "</span>)</span><br><span class="line">                    .append(r.options.getTerm());</span><br><span class="line">                LOG.debug(sb.toString());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 获取当前本节点的表示对象——NodeImpl</span></span><br><span class="line">            <span class="keyword">final</span> NodeImpl node = r.options.getNode();</span><br><span class="line">            r.notifyOnCaughtUp(RaftError.EPERM.getNumber(), <span class="keyword">true</span>);</span><br><span class="line">            r.destroy();</span><br><span class="line">            <span class="comment">// 调整自己的 term 任期值</span></span><br><span class="line">            node.increaseTermTo(response.getTerm(), <span class="keyword">new</span> Status(RaftError.EHIGHERTERMRESPONSE,</span><br><span class="line">                <span class="string">"Leader receives higher term heartbeat_response from peer:%s"</span>, r.options.getPeerId()));</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (isLogDebugEnabled) &#123;</span><br><span class="line">            sb.append(<span class="string">" fail, find nextIndex remote lastLogIndex "</span>).append(response.getLastLogIndex())</span><br><span class="line">                .append(<span class="string">" local nextIndex "</span>).append(r.nextIndex);</span><br><span class="line">            LOG.debug(sb.toString());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (rpcSendTime &gt; r.lastRpcSendTimestamp) &#123;</span><br><span class="line">            r.lastRpcSendTimestamp = rpcSendTime;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//Fail, reset the state to try again from nextIndex.</span></span><br><span class="line">        r.resetInflights();</span><br><span class="line">        <span class="comment">// prev_log_index and prev_log_term doesn't match</span></span><br><span class="line">        <span class="keyword">if</span> (response.getLastLogIndex() + <span class="number">1</span> &lt; r.nextIndex) &#123;</span><br><span class="line">            LOG.debug(<span class="string">"LastLogIndex at peer=&#123;&#125; is &#123;&#125;"</span>, r.options.getPeerId(), response.getLastLogIndex());</span><br><span class="line">            <span class="comment">// The peer contains less logs than leader</span></span><br><span class="line">            r.nextIndex = response.getLastLogIndex() + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// The peer contains logs from old term which should be truncated,</span></span><br><span class="line">            <span class="comment">// decrease _last_log_at_peer by one to test the right index to keep</span></span><br><span class="line">            <span class="keyword">if</span> (r.nextIndex &gt; <span class="number">1</span>) &#123;</span><br><span class="line">                LOG.debug(<span class="string">"logIndex=&#123;&#125; dismatch"</span>, r.nextIndex);</span><br><span class="line">                r.nextIndex--;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                LOG.error(<span class="string">"Peer=&#123;&#125; declares that log at index=0 doesn't match, which is not supposed to happen"</span>,</span><br><span class="line">                    r.options.getPeerId());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// dummy_id is unlock in _send_heartbeat</span></span><br><span class="line">        r.sendEmptyEntries(<span class="keyword">false</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (isLogDebugEnabled) &#123;</span><br><span class="line">        sb.append(<span class="string">", success"</span>);</span><br><span class="line">        LOG.debug(sb.toString());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// success</span></span><br><span class="line">    <span class="keyword">if</span> (response.getTerm() != r.options.getTerm()) &#123;</span><br><span class="line">        r.resetInflights();</span><br><span class="line">        r.state = State.Probe;</span><br><span class="line">        LOG.error(<span class="string">"Fail, response term &#123;&#125; dismatch, expect term &#123;&#125;"</span>, response.getTerm(), r.options.getTerm());</span><br><span class="line">        id.unlock();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (rpcSendTime &gt; r.lastRpcSendTimestamp) &#123;</span><br><span class="line">        r.lastRpcSendTimestamp = rpcSendTime;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 本次提交的日志数量</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> entriesSize = request.getEntriesCount();</span><br><span class="line">    <span class="keyword">if</span> (entriesSize &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// 节点确认提交</span></span><br><span class="line">        r.options.getBallotBox().commitAt(r.nextIndex, r.nextIndex + entriesSize - <span class="number">1</span>, r.options.getPeerId());</span><br><span class="line">        <span class="keyword">if</span> (LOG.isDebugEnabled()) &#123;</span><br><span class="line">            LOG.debug(<span class="string">"Replicated logs in [&#123;&#125;, &#123;&#125;] to peer &#123;&#125;"</span>, r.nextIndex, r.nextIndex + entriesSize - <span class="number">1</span>,</span><br><span class="line">                r.options.getPeerId());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">//The request is probe request, change the state into Replicate.</span></span><br><span class="line">        r.state = State.Replicate;</span><br><span class="line">    &#125;</span><br><span class="line">    r.nextIndex += entriesSize;</span><br><span class="line">    r.hasSucceeded = <span class="keyword">true</span>;</span><br><span class="line">    r.notifyOnCaughtUp(<span class="number">0</span>, <span class="keyword">false</span>);</span><br><span class="line">    <span class="comment">// dummy_id is unlock in _send_entries</span></span><br><span class="line">    <span class="keyword">if</span> (r.timeoutNowIndex &gt; <span class="number">0</span> &amp;&amp; r.timeoutNowIndex &lt; r.nextIndex) &#123;</span><br><span class="line">        r.sendTimeoutNow(<span class="keyword">false</span>, <span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后会触发<code>NodeImpl</code>中的<code>BallotBox</code>成员的<code>commitAt</code>方法来确认本次日志同步的结果</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">commitAt</span><span class="params">(<span class="keyword">long</span> firstLogIndex, <span class="keyword">long</span> lastLogIndex, PeerId peer)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//TODO  use lock-free algorithm here?</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> stamp = stampedLock.writeLock();</span><br><span class="line">    <span class="keyword">long</span> lastCommittedIndex = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (pendingIndex == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (lastLogIndex &lt; pendingIndex) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (lastLogIndex &gt;= pendingIndex + pendingMetaQueue.size()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ArrayIndexOutOfBoundsException();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 日志开始位置</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">long</span> startAt = Math.max(pendingIndex, firstLogIndex);</span><br><span class="line">        <span class="comment">// 位置指针</span></span><br><span class="line">        Ballot.PosHint hint = <span class="keyword">new</span> Ballot.PosHint();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">long</span> logIndex = startAt; logIndex &lt;= lastLogIndex; logIndex++) &#123;</span><br><span class="line">            <span class="keyword">final</span> Ballot bl = <span class="keyword">this</span>.pendingMetaQueue.get((<span class="keyword">int</span>) (logIndex - pendingIndex));</span><br><span class="line">            <span class="comment">// 进行投票统计</span></span><br><span class="line">            hint = bl.grant(peer, hint);</span><br><span class="line">            <span class="comment">// 如果半数同意了，则设置最新的日志索引条目</span></span><br><span class="line">            <span class="keyword">if</span> (bl.isGranted()) &#123;</span><br><span class="line">                lastCommittedIndex = logIndex;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (lastCommittedIndex == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// When removing a peer off the raft group which contains even number of</span></span><br><span class="line">        <span class="comment">// peers, the quorum would decrease by 1, e.g. 3 of 4 changes to 2 of 3. In</span></span><br><span class="line">        <span class="comment">// this case, the log after removal may be committed before some previous</span></span><br><span class="line">        <span class="comment">// logs, since we use the new configuration to deal the quorum of the</span></span><br><span class="line">        <span class="comment">// removal request, we think it's safe to commit all the uncommitted</span></span><br><span class="line">        <span class="comment">// previous logs, which is not well proved right now</span></span><br><span class="line">        pendingMetaQueue.removeRange(<span class="number">0</span>, (<span class="keyword">int</span>) (lastCommittedIndex - pendingIndex) + <span class="number">1</span>);</span><br><span class="line">        LOG.debug(<span class="string">"Committed log fromIndex=&#123;&#125;, toIndex=&#123;&#125;."</span>, pendingIndex, lastCommittedIndex);</span><br><span class="line">        pendingIndex = lastCommittedIndex + <span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 更新最新的日志提交位置索引</span></span><br><span class="line">        <span class="keyword">this</span>.lastCommittedIndex = lastCommittedIndex;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        stampedLock.unlockWrite(stamp);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 进行日志提交——交由状态会处理</span></span><br><span class="line">    <span class="keyword">this</span>.waiter.onCommitted(lastCommittedIndex);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/03/java-web-51/" rel="next" title="JRaft中的轻量级的对象池实现原理浅析">
+                <i class="fa fa-chevron-left"></i> JRaft中的轻量级的对象池实现原理浅析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/20/leetcode-29/" rel="prev" title="有赞2020校招——编程题AC代码">
+                有赞2020校招——编程题AC代码 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 PMC</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">111</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">20</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#JRaft-中的事务提交"><span class="nav-number">1.</span> <span class="nav-text">JRaft 中的事务提交</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Apply-Task"><span class="nav-number">1.1.</span> <span class="nav-text">Apply Task</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#处理任务"><span class="nav-number">1.2.</span> <span class="nav-text">处理任务</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#日志传输给Follower"><span class="nav-number">1.3.</span> <span class="nav-text">日志传输给Follower</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+<script>
+  	var _mtac = {};
+  	(function() {
+  		var mta = document.createElement("script");
+  		mta.src = "https://pingjs.qq.com/h5/stats.js?v2.0.4";
+  		mta.setAttribute("name", "MTAH5");
+  		mta.setAttribute("sid", "500687579");
+
+  		var s = document.getElementsByTagName("script")[0];
+  		s.parentNode.insertBefore(mta, s);
+  	})();
+</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=66419010";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/08/17/java-web-52/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

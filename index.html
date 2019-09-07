@@ -305,6 +305,195 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/09/04/java-web-53/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 PMC">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YWW的饲养员 Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/09/04/java-web-53/" itemprop="url">
+                  Nacos 出现大量线程创建的问题排查
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-09-04 16:12:59" itemprop="dateCreated datePublished" datetime="2019-09-04T16:12:59+08:00">2019-09-04</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-09-07 10:17:13" itemprop="dateModified" datetime="2019-09-07T10:17:13+08:00">2019-09-07</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/nacos/" itemprop="url" rel="index"><span itemprop="name">nacos</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/09/04/java-web-53/" class="leancloud_visitors" data-flag-title="Nacos 出现大量线程创建的问题排查">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          问题描述有用户反馈说在使用nacos时，随着程序的运行，Java线程在不断的创建，达到了两三千的情况，导致CPU的Load指标达到百分之百
+解决过程观察nacos发现，这些被大量创建的线程，最终挂钩的对象为NacosConfigService
+123456789101112public NacosC
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/09/04/java-web-53/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/08/26/my-life-1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1607,197 +1796,6 @@ JRatf
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/07/16/java-web-47/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为 Nacos 的 PMC">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="YWW的饲养员 Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/07/16/java-web-47/" itemprop="url">
-                  手动实现一个简单的RPC框架
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2019-07-16 12:50:07" itemprop="dateCreated datePublished" datetime="2019-07-16T12:50:07+08:00">2019-07-16</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2019-07-22 16:53:28" itemprop="dateModified" datetime="2019-07-22T16:53:28+08:00">2019-07-22</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/2019/07/16/java-web-47/" class="leancloud_visitors" data-flag-title="手动实现一个简单的RPC框架">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">Views: </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          自定义注解首先需要创建几个注解用于使用RPC
-EnableTensorRPC 开启RPC服务
-RpcRegister 将接口注册为一个服务
-RpcService 用于标注该接口是一个远程服务
-服务接口创建代理类为了方便，我直接和Spring进行了整合，这里使用了Spring的回调接口BeanPost
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2019/07/16/java-web-47/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/07/16/java-web-48/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1987,7 +1985,7 @@ RpcService 用于标注该接口是一个远程服务
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/06/22/leetcode-27/">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/07/16/java-web-47/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="liaochuntao">
@@ -2006,8 +2004,8 @@ RpcService 用于标注该接口是一个远程服务
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2019/06/22/leetcode-27/" itemprop="url">
-                  leetcode回顾——number-of-islands
+                <a class="post-title-link" href="/2019/07/16/java-web-47/" itemprop="url">
+                  手动实现一个简单的RPC框架
                 </a>
               
             
@@ -2033,12 +2031,24 @@ RpcService 用于标注该接口是一个远程服务
                 
               
 
-              <time title="Created: 2019-06-22 20:58:14 / Modified: 21:06:12" itemprop="dateCreated datePublished" datetime="2019-06-22T20:58:14+08:00">2019-06-22</time>
+              <time title="Created: 2019-07-16 12:50:07" itemprop="dateCreated datePublished" datetime="2019-07-16T12:50:07+08:00">2019-07-16</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-07-22 16:53:28" itemprop="dateModified" datetime="2019-07-22T16:53:28+08:00">2019-07-22</time>
               
             
           </span>
@@ -2055,7 +2065,7 @@ RpcService 用于标注该接口是一个远程服务
                 <span class="post-meta-item-text">In</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a></span>
 
                 
                 
@@ -2069,7 +2079,7 @@ RpcService 用于标注该接口是一个远程服务
 
           
           
-             <span id="/2019/06/22/leetcode-27/" class="leancloud_visitors" data-flag-title="leetcode回顾——number-of-islands">
+             <span id="/2019/07/16/java-web-47/" class="leancloud_visitors" data-flag-title="手动实现一个简单的RPC框架">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -2102,19 +2112,15 @@ RpcService 用于标注该接口是一个远程服务
       
         
           
-          题目给定一个由 ‘1’（陆地）和 ‘0’（水）组成的的二维网格，计算岛屿的数量。一个岛被水包围，并且它是通过水平方向或垂直方向上相邻的陆地连接而成的。你可以假设网格的四个边均被水包围。
-示例 1:输入:
-
-11110110101100000000
-
-输出: 1
-示例 2:输入:
-
-110001100
+          自定义注解首先需要创建几个注解用于使用RPC
+EnableTensorRPC 开启RPC服务
+RpcRegister 将接口注册为一个服务
+RpcService 用于标注该接口是一个远程服务
+服务接口创建代理类为了方便，我直接和Spring进行了整合，这里使用了Spring的回调接口BeanPost
           ...
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2019/06/22/leetcode-27/#more" rel="contents">
+            <a class="btn" href="/2019/07/16/java-web-47/#more" rel="contents">
               Read more &raquo;
             </a>
           </div>
@@ -2202,7 +2208,7 @@ RpcService 用于标注该接口是一个远程服务
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">111</span>
+                    <span class="site-state-item-count">112</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>

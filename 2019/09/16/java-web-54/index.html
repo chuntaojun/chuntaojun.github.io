@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Nacos Config 模块启动做的事情Nacos Config模块有一个特点，会将数据库中的配置信息，dump成文件，通过直接文件读取的方式，替代直接读取数据库，降低数据库的压力，是的数据库可以更好的处理写操作 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nacos 的配置文件 Dump 的操作">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/09/16/java-web-54/index.html">
+<meta property="og:site_name" content="YWW的饲养员 Blog">
+<meta property="og:description" content="Nacos Config 模块启动做的事情Nacos Config模块有一个特点，会将数据库中的配置信息，dump成文件，通过直接文件读取的方式，替代直接读取数据库，降低数据库的压力，是的数据库可以更好的处理写操作 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-09-16T05:49:49.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nacos 的配置文件 Dump 的操作">
+<meta name="twitter:description" content="Nacos Config 模块启动做的事情Nacos Config模块有一个特点，会将数据库中的配置信息，dump成文件，通过直接文件读取的方式，替代直接读取数据库，降低数据库的压力，是的数据库可以更好的处理写操作 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/09/16/java-web-54/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Nacos 的配置文件 Dump 的操作 | YWW的饲养员 Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">YWW的饲养员 Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/09/16/java-web-54/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 PMC">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YWW的饲养员 Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Nacos 的配置文件 Dump 的操作
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-09-16 00:16:54 / Modified: 13:49:49" itemprop="dateCreated datePublished" datetime="2019-09-16T00:16:54+08:00">2019-09-16</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/nacos/" itemprop="url" rel="index"><span itemprop="name">nacos</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/09/16/java-web-54/" class="leancloud_visitors" data-flag-title="Nacos 的配置文件 Dump 的操作">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="Nacos-Config-模块启动做的事情"><a href="#Nacos-Config-模块启动做的事情" class="headerlink" title="Nacos Config 模块启动做的事情"></a>Nacos Config 模块启动做的事情</h4><p><code>Nacos Config</code>模块有一个特点，会将数据库中的配置信息，<code>dump</code>成文件，通过直接文件读取的方式，替代直接读取数据库，降低数据库的压力，是的数据库可以更好的处理写操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DumpService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> Environment env;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    PersistService persistService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        LogUtil.defaultLog.warn(<span class="string">"DumpService start"</span>);</span><br><span class="line">        <span class="comment">// 构建单配置文件Dump处理器</span></span><br><span class="line">        DumpProcessor processor = <span class="keyword">new</span> DumpProcessor(<span class="keyword">this</span>);</span><br><span class="line">        <span class="comment">// 构建全部配置文件Dump处理器</span></span><br><span class="line">        DumpAllProcessor dumpAllProcessor = <span class="keyword">new</span> DumpAllProcessor(<span class="keyword">this</span>);</span><br><span class="line">        <span class="comment">// 构建全部灰度配置文件Dump处理器</span></span><br><span class="line">        DumpAllBetaProcessor dumpAllBetaProcessor = <span class="keyword">new</span> DumpAllBetaProcessor(<span class="keyword">this</span>);</span><br><span class="line">        <span class="comment">// 构建全部Tag配置文件Dump处理器</span></span><br><span class="line">        DumpAllTagProcessor dumpAllTagProcessor = <span class="keyword">new</span> DumpAllTagProcessor(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 构建单配置文件任务管理器</span></span><br><span class="line">        dumpTaskMgr = <span class="keyword">new</span> TaskManager(<span class="string">"com.alibaba.nacos.server.DumpTaskManager"</span>);</span><br><span class="line">        dumpTaskMgr.setDefaultTaskProcessor(processor);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 构建全配置文件任务管理器</span></span><br><span class="line">        dumpAllTaskMgr = <span class="keyword">new</span> TaskManager(<span class="string">"com.alibaba.nacos.server.DumpAllTaskManager"</span>);</span><br><span class="line">        dumpAllTaskMgr.setDefaultTaskProcessor(dumpAllProcessor);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 任务添加</span></span><br><span class="line">        Runnable dumpAll = () -&gt; dumpAllTaskMgr.addTask(DumpAllTask.TASK_ID, <span class="keyword">new</span> DumpAllTask());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 任务添加</span></span><br><span class="line">        Runnable dumpAllBeta = () -&gt; dumpAllTaskMgr.addTask(DumpAllBetaTask.TASK_ID, <span class="keyword">new</span> DumpAllBetaTask());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 清除历史配置文件信息（xx天之前的历史配置信息全部删除）</span></span><br><span class="line">        Runnable clearConfigHistory = () -&gt; &#123;</span><br><span class="line">            log.warn(<span class="string">"clearConfigHistory start"</span>);</span><br><span class="line">            <span class="comment">// 只有集群的第一IP节点可以执行此任务</span></span><br><span class="line">            <span class="keyword">if</span> (ServerListService.isFirstIp()) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    Timestamp startTime = getBeforeStamp(TimeUtils.getCurrentTime(), <span class="number">24</span> * getRetentionDays());</span><br><span class="line">                    <span class="keyword">int</span> totalCount = persistService.findConfigHistoryCountByTime(startTime);</span><br><span class="line">                    <span class="keyword">if</span> (totalCount &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                        <span class="comment">// 分页删除历史记录</span></span><br><span class="line">                        <span class="comment">// 之所以要采用分页的方式，一个是为了降低数据库删除数据时的压力，另一方面考虑数据库集群的主从同步延迟的问题（bin-log）</span></span><br><span class="line">                        <span class="keyword">int</span> pageSize = <span class="number">1000</span>;</span><br><span class="line">                        <span class="keyword">int</span> removeTime = (totalCount + pageSize - <span class="number">1</span>) / pageSize;</span><br><span class="line">                        log.warn(<span class="string">"clearConfigHistory, getBeforeStamp:&#123;&#125;, totalCount:&#123;&#125;, pageSize:&#123;&#125;, removeTime:&#123;&#125;"</span>,</span><br><span class="line">                            startTime, totalCount, pageSize, removeTime);</span><br><span class="line">                        <span class="keyword">while</span> (removeTime &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                            <span class="comment">// 分页删除，以免批量太大报错</span></span><br><span class="line">                            persistService.removeConfigHistory(startTime, pageSize);</span><br><span class="line">                            removeTime--;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">                    log.error(<span class="string">"clearConfigHistory error"</span>, e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// dump出全部的配置信息到文件中</span></span><br><span class="line">            dumpConfigInfo(dumpAllProcessor);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 更新beta缓存</span></span><br><span class="line">            LogUtil.defaultLog.info(<span class="string">"start clear all config-info-beta."</span>);</span><br><span class="line">            <span class="comment">// 清除所有的灰度配置文件信息</span></span><br><span class="line">            DiskUtil.clearAllBeta();</span><br><span class="line">            <span class="comment">// 如果存在灰度配置文件信息得的表</span></span><br><span class="line">            <span class="keyword">if</span> (persistService.isExistTable(BETA_TABLE_NAME)) &#123;</span><br><span class="line">                <span class="comment">// 执行dump全部灰度配置文件的任务</span></span><br><span class="line">                dumpAllBetaProcessor.process(DumpAllBetaTask.TASK_ID, <span class="keyword">new</span> DumpAllBetaTask());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 更新Tag缓存</span></span><br><span class="line">            LogUtil.defaultLog.info(<span class="string">"start clear all config-info-tag."</span>);</span><br><span class="line">            DiskUtil.clearAllTag();</span><br><span class="line">            <span class="keyword">if</span> (persistService.isExistTable(TAG_TABLE_NAME)) &#123;</span><br><span class="line">                dumpAllTagProcessor.process(DumpAllTagTask.TASK_ID, <span class="keyword">new</span> DumpAllTagTask());</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// add to dump aggr</span></span><br><span class="line">            List&lt;ConfigInfoChanged&gt; configList = persistService.findAllAggrGroup();</span><br><span class="line">            <span class="keyword">if</span> (configList != <span class="keyword">null</span> &amp;&amp; !configList.isEmpty()) &#123;</span><br><span class="line">                total = configList.size();</span><br><span class="line">                List&lt;List&lt;ConfigInfoChanged&gt;&gt; splitList = splitList(configList, INIT_THREAD_COUNT);</span><br><span class="line">                <span class="keyword">for</span> (List&lt;ConfigInfoChanged&gt; list : splitList) &#123;</span><br><span class="line">                    MergeAllDataWorker work = <span class="keyword">new</span> MergeAllDataWorker(list);</span><br><span class="line">                    work.start();</span><br><span class="line">                &#125;</span><br><span class="line">                log.info(<span class="string">"server start, schedule merge end."</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            LogUtil.fatalLog.error(</span><br><span class="line">                <span class="string">"Nacos Server did not start because dumpservice bean construction failure :\n"</span> + e.getMessage(),</span><br><span class="line">                e.getCause());</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</span><br><span class="line">                <span class="string">"Nacos Server did not start because dumpservice bean construction failure :\n"</span> + e.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果非单机模式，则Nacos Config存在一个dump文件的心跳记录，可以减少dump文件的开销以及任务耗时</span></span><br><span class="line">        <span class="keyword">if</span> (!STANDALONE_MODE) &#123;</span><br><span class="line">            Runnable heartbeat = () -&gt; &#123;</span><br><span class="line">                <span class="comment">// 记录当前的时间</span></span><br><span class="line">                String heartBeatTime = TimeUtils.getCurrentTime().toString();</span><br><span class="line">                <span class="comment">// write disk</span></span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">// 时间信息持久化</span></span><br><span class="line">                    DiskUtil.saveHeartBeatToDisk(heartBeatTime);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                    LogUtil.fatalLog.error(<span class="string">"save heartbeat fail"</span> + e.getMessage());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 周期性执行任务</span></span><br><span class="line">            TimerTaskService.scheduleWithFixedDelay(heartbeat, <span class="number">0</span>, <span class="number">10</span>, TimeUnit.SECONDS);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 随机的任务延迟时间</span></span><br><span class="line">            <span class="keyword">long</span> initialDelay = <span class="keyword">new</span> Random().nextInt(INITIAL_DELAY_IN_MINUTE) + <span class="number">10</span>;</span><br><span class="line">            LogUtil.defaultLog.warn(<span class="string">"initialDelay:&#123;&#125;"</span>, initialDelay);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 周期性执行dump全部配置文件的操作</span></span><br><span class="line">            TimerTaskService.scheduleWithFixedDelay(dumpAll, initialDelay, DUMP_ALL_INTERVAL_IN_MINUTE,</span><br><span class="line">                TimeUnit.MINUTES);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 周期性执行dump全部灰度配置文件的操作</span></span><br><span class="line">            TimerTaskService.scheduleWithFixedDelay(dumpAllBeta, initialDelay, DUMP_ALL_INTERVAL_IN_MINUTE,</span><br><span class="line">                TimeUnit.MINUTES);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 周期性执行清除往期历史配置信息记录</span></span><br><span class="line">        TimerTaskService.scheduleWithFixedDelay(clearConfigHistory, <span class="number">10</span>, <span class="number">10</span>, TimeUnit.MINUTES);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="举一个Dump操作的任务——dumpConfigInfo-dumpAllProcessor"><a href="#举一个Dump操作的任务——dumpConfigInfo-dumpAllProcessor" class="headerlink" title="举一个Dump操作的任务——dumpConfigInfo(dumpAllProcessor)"></a>举一个<code>Dump</code>操作的任务——<em>dumpConfigInfo(dumpAllProcessor)</em></h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">dumpConfigInfo</span><span class="params">(DumpAllProcessor dumpAllProcessor)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> timeStep = <span class="number">6</span>;</span><br><span class="line">    Boolean isAllDump = <span class="keyword">true</span>;</span><br><span class="line">    <span class="comment">// initial dump all</span></span><br><span class="line">    FileInputStream fis = <span class="keyword">null</span>;</span><br><span class="line">    Timestamp heartheatLastStamp = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 是否开启了快速启动模式（即根据前面的 heartbeat file 记录的时间信息进行快速dump出配置文件信息）</span></span><br><span class="line">        <span class="keyword">if</span> (isQuickStart()) &#123;</span><br><span class="line">            File heartbeatFile = DiskUtil.heartBeatFile();</span><br><span class="line">            <span class="keyword">if</span> (heartbeatFile.exists()) &#123;</span><br><span class="line">                <span class="comment">// 打开文件流</span></span><br><span class="line">                fis = <span class="keyword">new</span> FileInputStream(heartbeatFile);</span><br><span class="line">                String heartheatTempLast = IOUtils.toString(fis, Constants.ENCODE);</span><br><span class="line">                heartheatLastStamp = Timestamp.valueOf(heartheatTempLast);</span><br><span class="line">                <span class="comment">// 计算时间差是否满足小于36小时</span></span><br><span class="line">                <span class="keyword">if</span> (TimeUtils.getCurrentTime().getTime()</span><br><span class="line">                    - heartheatLastStamp.getTime() &lt; timeStep * <span class="number">60</span> * <span class="number">60</span> * <span class="number">1000</span>) &#123;</span><br><span class="line">                        <span class="comment">// 超过时间，直接采取全部配置信息执行dump出文件的操作</span></span><br><span class="line">                    isAllDump = <span class="keyword">false</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 是否进行全部配置信息的dump成文件操作</span></span><br><span class="line">        <span class="keyword">if</span> (isAllDump) &#123;</span><br><span class="line">            LogUtil.defaultLog.info(<span class="string">"start clear all config-info."</span>);</span><br><span class="line">            <span class="comment">// 删除所有的配置文件信息</span></span><br><span class="line">            DiskUtil.clearAll();</span><br><span class="line">            dumpAllProcessor.process(DumpAllTask.TASK_ID, <span class="keyword">new</span> DumpAllTask());</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// 此处为快速启动逻辑的操作</span></span><br><span class="line">            Timestamp beforeTimeStamp = getBeforeStamp(heartheatLastStamp,</span><br><span class="line">                timeStep);</span><br><span class="line">            <span class="comment">// 数据变更 dump 处理器</span></span><br><span class="line">            DumpChangeProcessor dumpChangeProcessor = <span class="keyword">new</span> DumpChangeProcessor(</span><br><span class="line">                <span class="keyword">this</span>, beforeTimeStamp, TimeUtils.getCurrentTime());</span><br><span class="line">            <span class="comment">// 执行操作</span></span><br><span class="line">            dumpChangeProcessor.process(DumpChangeTask.TASK_ID, <span class="keyword">new</span> DumpChangeTask());</span><br><span class="line">            <span class="comment">// 文件的 MD5 检查任务</span></span><br><span class="line">            Runnable checkMd5Task = () -&gt; &#123;</span><br><span class="line">                LogUtil.defaultLog.error(<span class="string">"start checkMd5Task"</span>);</span><br><span class="line">                <span class="comment">// 直接根据内存缓存中的配置信息的数据，进行快速检查每个配置文件信息的变更情况</span></span><br><span class="line">                List&lt;String&gt; diffList = ConfigService.checkMd5();</span><br><span class="line">                <span class="keyword">for</span> (String groupKey : diffList) &#123;</span><br><span class="line">                    <span class="comment">// 将对应格式的数据进行解析</span></span><br><span class="line">                    String[] dg = GroupKey.parseKey(groupKey);</span><br><span class="line">                    String dataId = dg[<span class="number">0</span>];</span><br><span class="line">                    String group = dg[<span class="number">1</span>];</span><br><span class="line">                    String tenant = dg[<span class="number">2</span>];</span><br><span class="line">                    <span class="comment">// 直接查找对应的配置文件信息</span></span><br><span class="line">                    ConfigInfoWrapper configInfo = persistService.queryConfigInfo(dataId, group, tenant);</span><br><span class="line">                    <span class="comment">// 进行变更判断并dump出文件</span></span><br><span class="line">                    ConfigService.dumpChange(dataId, group, tenant, configInfo.getContent(),</span><br><span class="line">                            configInfo.getLastModified());</span><br><span class="line">                &#125;</span><br><span class="line">                LogUtil.defaultLog.error(<span class="string">"end checkMd5Task"</span>);</span><br><span class="line">            &#125;;</span><br><span class="line">            <span class="comment">// 进行周期任务调度执行</span></span><br><span class="line">            TimerTaskService.scheduleWithFixedDelay(checkMd5Task, <span class="number">0</span>, <span class="number">12</span>,</span><br><span class="line">                    TimeUnit.HOURS);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        LogUtil.fatalLog.error(<span class="string">"dump config fail"</span> + e.getMessage());</span><br><span class="line">        <span class="keyword">throw</span> e;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">null</span> != fis) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 文件流关闭</span></span><br><span class="line">                fis.close();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                LogUtil.defaultLog.warn(<span class="string">"close file failed"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在上面的代码中，看到了这段代码</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">DumpChangeProcessor dumpChangeProcessor = <span class="keyword">new</span> DumpChangeProcessor(<span class="keyword">this</span>, beforeTimeStamp, TimeUtils.getCurrentTime());</span><br><span class="line"><span class="comment">// 执行操作</span></span><br><span class="line">dumpChangeProcessor.process(DumpChangeTask.TASK_ID, <span class="keyword">new</span> DumpChangeTask());</span><br></pre></td></tr></table></figure>
+<p>这段代码和<code>nacos config</code>模块的快速启动机制有关，来看下这个处理器具体做了什么</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">process</span><span class="params">(String taskType, AbstractTask task)</span> </span>&#123;</span><br><span class="line">    LogUtil.defaultLog.warn(<span class="string">"quick start; startTime:&#123;&#125;,endTime:&#123;&#125;"</span>,</span><br><span class="line">            startTime, endTime);</span><br><span class="line">    LogUtil.defaultLog.warn(<span class="string">"updateMd5 start"</span>);</span><br><span class="line">    <span class="comment">// 开始更新文件信息的时间</span></span><br><span class="line">    <span class="keyword">long</span> startUpdateMd5 = System.currentTimeMillis();</span><br><span class="line">    <span class="comment">// 从数据库查出所有的配置文件的MD5值信息</span></span><br><span class="line">    List&lt;ConfigInfoWrapper&gt; updateMd5List = persistService</span><br><span class="line">            .listAllGroupKeyMd5();</span><br><span class="line">    LogUtil.defaultLog.warn(<span class="string">"updateMd5 count:&#123;&#125;"</span>, updateMd5List.size());</span><br><span class="line">    <span class="comment">// 遍历列表进行更新本地的配置信息文件的 MD5 值信息</span></span><br><span class="line">    <span class="keyword">for</span> (ConfigInfoWrapper config : updateMd5List) &#123;</span><br><span class="line">        <span class="keyword">final</span> String groupKey = GroupKey2.getKey(config.getDataId(),</span><br><span class="line">                config.getGroup());</span><br><span class="line">        ConfigService.updateMd5(groupKey, config.getMd5(),</span><br><span class="line">                config.getLastModified());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 结束配置信息文件 MD5 更新任务的时间</span></span><br><span class="line">    <span class="keyword">long</span> endUpdateMd5 = System.currentTimeMillis();</span><br><span class="line">    LogUtil.defaultLog.warn(<span class="string">"updateMd5 done,cost:&#123;&#125;"</span>, endUpdateMd5</span><br><span class="line">            - startUpdateMd5);</span><br><span class="line"></span><br><span class="line">    LogUtil.defaultLog.warn(<span class="string">"deletedConfig start"</span>);</span><br><span class="line">    <span class="keyword">long</span> startDeletedConfigTime = System.currentTimeMillis();</span><br><span class="line">    <span class="comment">// 查找需要删除的配置历史记录信息</span></span><br><span class="line">    <span class="comment">// 对应的 SQL 语句："SELECT DISTINCT data_id, group_id, tenant_id FROM his_config_info WHERE op_type = 'D' AND gmt_modified &gt;=? AND gmt_modified &lt;= ?"</span></span><br><span class="line">    List&lt;ConfigInfo&gt; configDeleted = persistService.findDeletedConfig(</span><br><span class="line">            startTime, endTime);</span><br><span class="line">    LogUtil.defaultLog.warn(<span class="string">"deletedConfig count:&#123;&#125;"</span>, configDeleted.size());</span><br><span class="line">    <span class="comment">// 更新配置信息</span></span><br><span class="line">    <span class="keyword">for</span> (ConfigInfo configInfo : configDeleted) &#123;</span><br><span class="line">        <span class="keyword">if</span> (persistService.findConfigInfo(configInfo.getDataId(), configInfo.getGroup(),</span><br><span class="line">            configInfo.getTenant()) == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 移除对应的配置</span></span><br><span class="line">            ConfigService.remove(configInfo.getDataId(), configInfo.getGroup(), configInfo.getTenant());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">long</span> endDeletedConfigTime = System.currentTimeMillis();</span><br><span class="line">    LogUtil.defaultLog.warn(<span class="string">"deletedConfig done,cost:&#123;&#125;"</span>,</span><br><span class="line">            endDeletedConfigTime - startDeletedConfigTime);</span><br><span class="line"></span><br><span class="line">    LogUtil.defaultLog.warn(<span class="string">"changeConfig start"</span>);</span><br><span class="line">    <span class="keyword">long</span> startChangeConfigTime = System.currentTimeMillis();</span><br><span class="line">    <span class="comment">// 查找变更的配置信息</span></span><br><span class="line">    <span class="comment">// 对应的 SQL 语句：SELECT data_id, group_id, tenant_id, app_name, content, gmt_modified FROM config_info WHERE gmt_modified &gt;=? AND gmt_modified &lt;= ?"</span></span><br><span class="line">    List&lt;PersistService.ConfigInfoWrapper&gt; changeConfigs = persistService</span><br><span class="line">            .findChangeConfig(startTime, endTime);</span><br><span class="line">    LogUtil.defaultLog.warn(<span class="string">"changeConfig count:&#123;&#125;"</span>, changeConfigs.size());</span><br><span class="line">    <span class="keyword">for</span> (PersistService.ConfigInfoWrapper cf : changeConfigs) &#123;</span><br><span class="line">        <span class="keyword">boolean</span> result = ConfigService.dumpChange(cf.getDataId(), cf.getGroup(), cf.getTenant(), cf.getContent(), cf.getLastModified());</span><br><span class="line">        <span class="keyword">final</span> String content = cf.getContent();</span><br><span class="line">        <span class="keyword">final</span> String md5 = MD5.getInstance().getMD5String(content);</span><br><span class="line">        LogUtil.defaultLog.info(</span><br><span class="line">                <span class="string">"[dump-change-ok] &#123;&#125;, &#123;&#125;, length=&#123;&#125;, md5=&#123;&#125;"</span>,</span><br><span class="line">                <span class="keyword">new</span> Object[] &#123;</span><br><span class="line">                    GroupKey2.getKey(cf.getDataId(), cf.getGroup()),</span><br><span class="line">                    cf.getLastModified(), content.length(), md5&#125;);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 重新进行配置文件加载操作</span></span><br><span class="line">    ConfigService.reloadConfig();</span><br><span class="line">    <span class="keyword">long</span> endChangeConfigTime = System.currentTimeMillis();</span><br><span class="line">    LogUtil.defaultLog.warn(<span class="string">"changeConfig done,cost:&#123;&#125;"</span>,</span><br><span class="line">            endChangeConfigTime - startChangeConfigTime);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>来看看这个<code>dumpChange(...)做了什么事情</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">dumpChange</span><span class="params">(String dataId, String group, String tenant, String content, <span class="keyword">long</span> lastModifiedTs)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> String groupKey = GroupKey2.getKey(dataId, group, tenant);</span><br><span class="line"></span><br><span class="line">    makeSure(groupKey);</span><br><span class="line">    <span class="comment">// 针对CacheItem进行加锁操作</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> lockResult = tryWriteLock(groupKey);</span><br><span class="line">    <span class="keyword">assert</span> (lockResult != <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取锁失败</span></span><br><span class="line">    <span class="keyword">if</span> (lockResult &lt; <span class="number">0</span>) &#123;</span><br><span class="line">        dumpLog.warn(<span class="string">"[dump-error] write lock failed. &#123;&#125;"</span>, groupKey);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 计算当前配置文件内容的签名值</span></span><br><span class="line">        <span class="keyword">final</span> String md5 = MD5.getInstance().getMD5String(content);</span><br><span class="line">        <span class="comment">// 集群模式，采用Dump成文件的形式，将配置文件进行缓存</span></span><br><span class="line">        <span class="keyword">if</span> (!STANDALONE_MODE || PropertyUtil.isStandaloneUseMysql()) &#123;</span><br><span class="line">            <span class="comment">// 获取当前缓存文件的签名值</span></span><br><span class="line">            String loacalMd5 = DiskUtil.getLocalConfigMd5(dataId, group, tenant);</span><br><span class="line">            <span class="keyword">if</span> (md5.equals(loacalMd5)) &#123;</span><br><span class="line">                dumpLog.warn(</span><br><span class="line">                    <span class="string">"[dump-ignore] ignore to save cache file. groupKey=&#123;&#125;, md5=&#123;&#125;, lastModifiedOld=&#123;&#125;, "</span></span><br><span class="line">                            + <span class="string">"lastModifiedNew=&#123;&#125;"</span>,</span><br><span class="line">                    groupKey, md5, ConfigService.getLastModifiedTs(groupKey), lastModifiedTs);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// 如果签名不一致，则更新缓存文件</span></span><br><span class="line">                DiskUtil.saveToDisk(dataId, group, tenant, content);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 更新CacheItem的元数据信息</span></span><br><span class="line">        updateMd5(groupKey, md5, lastModifiedTs);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException ioe) &#123;</span><br><span class="line">        dumpLog.error(<span class="string">"[dump-exception] save disk error. "</span> + groupKey + <span class="string">", "</span> + ioe.toString(),</span><br><span class="line">                ioe);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        releaseWriteLock(groupKey);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">updateMd5</span><span class="params">(String groupKey, String md5, <span class="keyword">long</span> lastModifiedTs)</span> </span>&#123;</span><br><span class="line">    CacheItem cache = makeSure(groupKey);</span><br><span class="line">    <span class="keyword">if</span> (cache.md5 == <span class="keyword">null</span> || !cache.md5.equals(md5)) &#123;</span><br><span class="line">        cache.md5 = md5;</span><br><span class="line">        cache.lastModifiedTs = lastModifiedTs;</span><br><span class="line">        <span class="comment">// 发布数据变更事件</span></span><br><span class="line">        EventDispatcher.fireEvent(<span class="keyword">new</span> LocalDataChangeEvent(groupKey));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>为什么执行一次这个<code>ConfigService.reloadConfig()</code>操作？</p>
+<p>其实这一块，是<code>nacos config</code>模块自己采用配置管理的功能的体现，通过将一些配置进行管理，使得<code>nacos config</code>模块的内部一些功能可以根据用户设置的参数动态变化</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">public</span> <span class="keyword">void</span> <span class="title">reloadConfig</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    String aggreds = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (STANDALONE_MODE &amp;&amp; !PropertyUtil.isStandaloneUseMysql()) &#123;</span><br><span class="line">            <span class="comment">// 聚合白名单</span></span><br><span class="line">            ConfigInfoBase config = persistService.findConfigInfoBase(AggrWhitelist.AGGRIDS_METADATA, <span class="string">"DEFAULT_GROUP"</span>);</span><br><span class="line">            <span class="keyword">if</span> (config != <span class="keyword">null</span>) &#123;</span><br><span class="line">                aggreds = config.getContent();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            aggreds = DiskUtil.getConfig(AggrWhitelist.AGGRIDS_METADATA,</span><br><span class="line">                    <span class="string">"DEFAULT_GROUP"</span>, StringUtils.EMPTY);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (aggreds != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 聚合白名单列表重新加载</span></span><br><span class="line">            AggrWhitelist.load(aggreds);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        dumpLog.error(<span class="string">"reload fail:"</span> + AggrWhitelist.AGGRIDS_METADATA, e);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    String clientIpWhitelist = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 客户端白名单</span></span><br><span class="line">        <span class="keyword">if</span> (STANDALONE_MODE &amp;&amp; !PropertyUtil.isStandaloneUseMysql()) &#123;</span><br><span class="line">            ConfigInfoBase config = persistService.findConfigInfoBase(ClientIpWhiteList.CLIENT_IP_WHITELIST_METADATA, <span class="string">"DEFAULT_GROUP"</span>);</span><br><span class="line">            <span class="keyword">if</span> (config != <span class="keyword">null</span>) &#123;</span><br><span class="line">                clientIpWhitelist = config.getContent();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            clientIpWhitelist = DiskUtil.getConfig(ClientIpWhiteList.CLIENT_IP_WHITELIST_METADATA, <span class="string">"DEFAULT_GROUP"</span>,</span><br><span class="line">                    StringUtils.EMPTY);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (clientIpWhitelist != <span class="keyword">null</span>) &#123;</span><br><span class="line">            ClientIpWhiteList.load(clientIpWhitelist);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        dumpLog.error(<span class="string">"reload fail:"</span></span><br><span class="line">                + ClientIpWhiteList.CLIENT_IP_WHITELIST_METADATA, e);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    String switchContent = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// nacos 功能开关配置重新加载</span></span><br><span class="line">        <span class="keyword">if</span> (STANDALONE_MODE &amp;&amp; !PropertyUtil.isStandaloneUseMysql()) &#123;</span><br><span class="line">            ConfigInfoBase config = persistService.findConfigInfoBase(SwitchService.SWITCH_META_DATAID,</span><br><span class="line">                    <span class="string">"DEFAULT_GROUP"</span>);</span><br><span class="line">            <span class="keyword">if</span> (config != <span class="keyword">null</span>) &#123;</span><br><span class="line">                switchContent = config.getContent();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            switchContent = DiskUtil.getConfig(</span><br><span class="line">                    SwitchService.SWITCH_META_DATAID, <span class="string">"DEFAULT_GROUP"</span>, StringUtils.EMPTY);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (switchContent != <span class="keyword">null</span>) &#123;</span><br><span class="line">            SwitchService.load(switchContent);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        dumpLog.error(<span class="string">"reload fail:"</span> + SwitchService.SWITCH_META_DATAID, e);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="为什么要Dump配置成文件"><a href="#为什么要Dump配置成文件" class="headerlink" title="为什么要Dump配置成文件"></a>为什么要<code>Dump</code>配置成文件</h4><p>数据库其实是<code>config manager</code>组件的瓶颈，数据库最大并发程度，限制了配置管理组件能够承担的最大客户端查询配置并发度，因此，需要采取一定的缓存策略，降低查询直接打在数据库上，提高数据库的可用性</p>
+<h4 id="直接存在内存-Map-中可不可以？"><a href="#直接存在内存-Map-中可不可以？" class="headerlink" title="直接存在内存 Map 中可不可以？"></a>直接存在内存 Map 中可不可以？</h4><p>如果说配置文件信息很小以及配置文件数量很少的情况下，可以考虑直接缓存在内存的 Map 数据结构中，但是当配置文件信息内容太大时，这个时候，就不适合放在内存的 Map 中了，而是需要考虑采用外部存储来缓存起来，但是本着稳定的原则，能不依赖外部组件就不依赖外部组件，因此，<code>nacos</code>采取了磁盘文件缓存的方式，同时内存 Map 负责存储每个配置文件的元数据信息，</p>
+<h4 id="Apollo-的不足"><a href="#Apollo-的不足" class="headerlink" title="Apollo 的不足"></a>Apollo 的不足</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ConfigFileController</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="keyword">final</span> ConfigController configController,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="keyword">final</span> NamespaceUtil namespaceUtil,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="keyword">final</span> WatchKeysUtil watchKeysUtil,</span></span></span><br><span class="line"><span class="function"><span class="params">      <span class="keyword">final</span> GrayReleaseRulesHolder grayReleaseRulesHolder)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    localCache = CacheBuilder.newBuilder()</span><br><span class="line">        <span class="comment">// 设置缓存失效的时间</span></span><br><span class="line">        .expireAfterWrite(EXPIRE_AFTER_WRITE, TimeUnit.MINUTES)</span><br><span class="line">        <span class="comment">// 计算缓存容量</span></span><br><span class="line">        .weigher((Weigher&lt;String, String&gt;) (key, value) -&gt; value == <span class="keyword">null</span> ? <span class="number">0</span> : value.length())</span><br><span class="line">        <span class="comment">// 设定最大的缓存容量</span></span><br><span class="line">        .maximumWeight(MAX_CACHE_SIZE)</span><br><span class="line">        <span class="comment">// 缓存失效 or 被自动删除时的监听器需要做的操作</span></span><br><span class="line">        .removalListener(notification -&gt; &#123;</span><br><span class="line">          String cacheKey = notification.getKey();</span><br><span class="line">          logger.debug(<span class="string">"removing cache key: &#123;&#125;"</span>, cacheKey);</span><br><span class="line">          <span class="keyword">if</span> (!cacheKey2WatchedKeys.containsKey(cacheKey)) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="comment">//create a new list to avoid ConcurrentModificationException</span></span><br><span class="line">          List&lt;String&gt; watchedKeys = <span class="keyword">new</span> ArrayList&lt;&gt;(cacheKey2WatchedKeys.get(cacheKey));</span><br><span class="line">          <span class="keyword">for</span> (String watchedKey : watchedKeys) &#123;</span><br><span class="line">            watchedKeys2CacheKey.remove(watchedKey, cacheKey);</span><br><span class="line">          &#125;</span><br><span class="line">          cacheKey2WatchedKeys.removeAll(cacheKey);</span><br><span class="line">          logger.debug(<span class="string">"removed cache key: &#123;&#125;"</span>, cacheKey);</span><br><span class="line">        &#125;)</span><br><span class="line">        .build();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigServiceWithCache</span> <span class="keyword">extends</span> <span class="title">AbstractConfigService</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">initialize</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        configCache = CacheBuilder.newBuilder()</span><br><span class="line">            .expireAfterAccess(DEFAULT_EXPIRED_AFTER_ACCESS_IN_MINUTES, TimeUnit.MINUTES)</span><br><span class="line">            <span class="comment">// 构建可以自动加载不存在Key的value的缓存Map</span></span><br><span class="line">            .build(<span class="keyword">new</span> CacheLoader&lt;String, ConfigCacheEntry&gt;() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> ConfigCacheEntry <span class="title">load</span><span class="params">(String key)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                    List&lt;String&gt; namespaceInfo = STRING_SPLITTER.splitToList(key);</span><br><span class="line">                    <span class="keyword">if</span> (namespaceInfo.size() != <span class="number">3</span>) &#123;</span><br><span class="line">                        Tracer.logError(</span><br><span class="line">                            <span class="keyword">new</span> IllegalArgumentException(String.format(<span class="string">"Invalid cache load key %s"</span>, key)));</span><br><span class="line">                        <span class="keyword">return</span> nullConfigCacheEntry;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    Transaction transaction = Tracer.newTransaction(TRACER_EVENT_CACHE_LOAD, key);</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="comment">// 直接搜数据库</span></span><br><span class="line">                        ReleaseMessage latestReleaseMessage = releaseMessageService.findLatestReleaseMessageForMessages(Lists.newArrayList(key));</span><br><span class="line">                        Release latestRelease = releaseService.findLatestActiveRelease(namespaceInfo.get(<span class="number">0</span>), namespaceInfo.get(<span class="number">1</span>), namespaceInfo.get(<span class="number">2</span>));</span><br><span class="line"></span><br><span class="line">                        transaction.setStatus(Transaction.SUCCESS);</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">long</span> notificationId = latestReleaseMessage == <span class="keyword">null</span> ? ConfigConsts.NOTIFICATION_ID_PLACEHOLDER : latestReleaseMessage.getId();</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">if</span> (notificationId == ConfigConsts.NOTIFICATION_ID_PLACEHOLDER &amp;&amp; latestRelease == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">return</span> nullConfigCacheEntry;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 返回创建的新的缓存Value对象</span></span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">new</span> ConfigCacheEntry(notificationId, latestRelease);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">                    transaction.setStatus(ex);</span><br><span class="line">                    <span class="keyword">throw</span> ex;</span><br><span class="line">                &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                    transaction.complete();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>Apollo</code>的缓存策略，是采取了<code>guava</code>的<code>Cache</code>的实现，本质还是一个内存的<code>Map</code>，只是多了过期算法，使得缓存能够稳定在某个具体的内存占用上限，但是也有相应的缺陷，由于是采用内存过期存储<code>Map</code> + 数据库直查的方式，容易出现大量的缓存失效时，大量的数据查询操作直接打在数据库上，有可能</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/04/java-web-53/" rel="next" title="Nacos 出现大量线程创建的问题排查">
+                <i class="fa fa-chevron-left"></i> Nacos 出现大量线程创建的问题排查
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 PMC</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">113</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">20</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Nacos-Config-模块启动做的事情"><span class="nav-number">1.</span> <span class="nav-text">Nacos Config 模块启动做的事情</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#举一个Dump操作的任务——dumpConfigInfo-dumpAllProcessor"><span class="nav-number">1.1.</span> <span class="nav-text">举一个Dump操作的任务——dumpConfigInfo(dumpAllProcessor)</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么要Dump配置成文件"><span class="nav-number">2.</span> <span class="nav-text">为什么要Dump配置成文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#直接存在内存-Map-中可不可以？"><span class="nav-number">3.</span> <span class="nav-text">直接存在内存 Map 中可不可以？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Apollo-的不足"><span class="nav-number">4.</span> <span class="nav-text">Apollo 的不足</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+<script>
+  	var _mtac = {};
+  	(function() {
+  		var mta = document.createElement("script");
+  		mta.src = "https://pingjs.qq.com/h5/stats.js?v2.0.4";
+  		mta.setAttribute("name", "MTAH5");
+  		mta.setAttribute("sid", "500687579");
+
+  		var s = document.getElementsByTagName("script")[0];
+  		s.parentNode.insertBefore(mta, s);
+  	})();
+</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=66419010";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/09/16/java-web-54/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

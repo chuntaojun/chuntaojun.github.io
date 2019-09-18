@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.1" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.1" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.4.1',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前期导读Nacos 中的 DistroConsistencyServiceImpl 工作浅析 之前的文章说的很浅显，这次打算重头好好解析下Nacos中使用的alibaba自研的AP协议——Distro 核心代码实现Nacos Naming 模块启动做的时数据同步 DistroConsistencyServiceImpl  12345678910111213141516171819202122232">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nacos一致性协议实现之`Distro`协议浅析">
+<meta property="og:url" content="https://www.liaochuntao.cn/2019/09/16/java-web-55/index.html">
+<meta property="og:site_name" content="YWW的饲养员 Blog">
+<meta property="og:description" content="前期导读Nacos 中的 DistroConsistencyServiceImpl 工作浅析 之前的文章说的很浅显，这次打算重头好好解析下Nacos中使用的alibaba自研的AP协议——Distro 核心代码实现Nacos Naming 模块启动做的时数据同步 DistroConsistencyServiceImpl  12345678910111213141516171819202122232">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-09-18T06:13:08.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nacos一致性协议实现之`Distro`协议浅析">
+<meta name="twitter:description" content="前期导读Nacos 中的 DistroConsistencyServiceImpl 工作浅析 之前的文章说的很浅显，这次打算重头好好解析下Nacos中使用的alibaba自研的AP协议——Distro 核心代码实现Nacos Naming 模块启动做的时数据同步 DistroConsistencyServiceImpl  12345678910111213141516171819202122232">
+
+
+
+
+
+
+  <link rel="canonical" href="https://www.liaochuntao.cn/2019/09/16/java-web-55/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Nacos一致性协议实现之`Distro`协议浅析 | YWW的饲养员 Blog</title>
+  
+
+
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-112700003-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-112700003-1');
+</script>
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">YWW的饲养员 Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+    <a href="/categories/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-th"></i> <br />Categories</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/09/16/java-web-55/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为 Nacos 的 PMC">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="YWW的饲养员 Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Nacos一致性协议实现之`Distro`协议浅析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2019-09-16 08:18:07" itemprop="dateCreated datePublished" datetime="2019-09-16T08:18:07+08:00">2019-09-16</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2019-09-18 14:13:08" itemprop="dateModified" datetime="2019-09-18T14:13:08+08:00">2019-09-18</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/nacos/" itemprop="url" rel="index"><span itemprop="name">nacos</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2019/09/16/java-web-55/" class="leancloud_visitors" data-flag-title="Nacos一致性协议实现之`Distro`协议浅析">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">Views: </span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h4 id="前期导读"><a href="#前期导读" class="headerlink" title="前期导读"></a>前期导读</h4><p><a href="https://www.liaochuntao.cn/2019/05/09/java-web-32/">Nacos 中的 DistroConsistencyServiceImpl 工作浅析</a></p>
+<p>之前的文章说的很浅显，这次打算重头好好解析下<code>Nacos</code>中使用的<code>alibaba</code>自研的<code>AP</code>协议——<code>Distro</code></p>
+<h4 id="核心代码实现"><a href="#核心代码实现" class="headerlink" title="核心代码实现"></a>核心代码实现</h4><h5 id="Nacos-Naming-模块启动做的时数据同步"><a href="#Nacos-Naming-模块启动做的时数据同步" class="headerlink" title="Nacos Naming 模块启动做的时数据同步"></a>Nacos Naming 模块启动做的时数据同步</h5><blockquote>
+<p>DistroConsistencyServiceImpl</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">load</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (SystemUtils.STANDALONE_MODE) &#123;</span><br><span class="line">    initialized = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// size = 1 means only myself in the list, we need at least one another server alive:</span></span><br><span class="line">  <span class="comment">// 集群模式下，需要等待至少两个节点才可以将逻辑进行</span></span><br><span class="line">  <span class="keyword">while</span> (serverListManager.getHealthyServers().size() &lt;= <span class="number">1</span>) &#123;</span><br><span class="line">    Thread.sleep(<span class="number">1000L</span>);</span><br><span class="line">    Loggers.DISTRO.info(<span class="string">"waiting server list init..."</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 获取所有健康的集群节点</span></span><br><span class="line">  <span class="keyword">for</span> (Server server : serverListManager.getHealthyServers()) &#123;</span><br><span class="line">    <span class="comment">// 自己则不需要进行数据同步广播操作</span></span><br><span class="line">    <span class="keyword">if</span> (NetUtils.localServer().equals(server.getKey())) &#123;</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (Loggers.DISTRO.isDebugEnabled()) &#123;</span><br><span class="line">      Loggers.DISTRO.debug(<span class="string">"sync from "</span> + server);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 从别的服务器进行全量数据拉取操作，只需要执行一次即可，剩下的交由增量同步任务去完成</span></span><br><span class="line">    <span class="keyword">if</span> (syncAllDataFromRemote(server)) &#123;</span><br><span class="line">      initialized = <span class="keyword">true</span>;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接着来看下，这个全量数据拉取的动作</p>
+<blockquote>
+<p>数据拉取执行者的动作</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">syncAllDataFromRemote</span><span class="params">(Server server)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 获取数据</span></span><br><span class="line">    <span class="keyword">byte</span>[] data = NamingProxy.getAllData(server.getKey());</span><br><span class="line">    <span class="comment">// 接收到的数据进行处理</span></span><br><span class="line">    processData(data);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">    Loggers.DISTRO.error(<span class="string">"sync full data from "</span> + server + <span class="string">" failed!"</span>, e);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>数据提供者的响应</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/datums"</span>, method = RequestMethod.GET)</span><br><span class="line"><span class="function"><span class="keyword">public</span> ResponseEntity <span class="title">getAllDatums</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">  <span class="comment">// 直接将存储的数据容器——Map进行序列化传输</span></span><br><span class="line">  String content = <span class="keyword">new</span> String(serializer.serialize(dataStore.getDataMap()), StandardCharsets.UTF_8);</span><br><span class="line">  <span class="keyword">return</span> ResponseEntity.ok(content);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来，当从某一个<code>Server Node</code>拉取了全量数据后的操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">processData</span><span class="params">(<span class="keyword">byte</span>[] data)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (data.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// 先将数据进行反序列化</span></span><br><span class="line">            Map&lt;String, Datum&lt;Instances&gt;&gt; datumMap =</span><br><span class="line">                serializer.deserializeMap(data, Instances.class);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 对数据进行遍历处理</span></span><br><span class="line">            <span class="keyword">for</span> (Map.Entry&lt;String, Datum&lt;Instances&gt;&gt; entry : datumMap.entrySet()) &#123;</span><br><span class="line">                <span class="comment">// 数据放入数据存储容器——DataStore中</span></span><br><span class="line">                dataStore.put(entry.getKey(), entry.getValue());</span><br><span class="line">                <span class="comment">// 判断监听器是否包含了对这个Key的监听，如果没有，表明是一个新的数据</span></span><br><span class="line">                <span class="keyword">if</span> (!listeners.containsKey(entry.getKey())) &#123;</span><br><span class="line">                    <span class="comment">// pretty sure the service not exist:</span></span><br><span class="line">                    <span class="keyword">if</span> (switchDomain.isDefaultInstanceEphemeral()) &#123;</span><br><span class="line">                        <span class="comment">// create empty service</span></span><br><span class="line">                        Loggers.DISTRO.info(<span class="string">"creating service &#123;&#125;"</span>, entry.getKey());</span><br><span class="line">                        Service service = <span class="keyword">new</span> Service();</span><br><span class="line">                        String serviceName = KeyBuilder.getServiceName(entry.getKey());</span><br><span class="line">                        String namespaceId = KeyBuilder.getNamespace(entry.getKey());</span><br><span class="line">                        service.setName(serviceName);</span><br><span class="line">                        service.setNamespaceId(namespaceId);</span><br><span class="line">                        service.setGroupName(Constants.DEFAULT_GROUP);</span><br><span class="line">                        <span class="comment">// now validate the service. if failed, exception will be thrown</span></span><br><span class="line">                        service.setLastModifiedMillis(System.currentTimeMillis());</span><br><span class="line">                        service.recalculateChecksum();</span><br><span class="line">                        <span class="comment">// 回调 Listener 监听器，告知新的Service数据</span></span><br><span class="line">                        listeners.get(KeyBuilder.SERVICE_META_KEY_PREFIX).get(<span class="number">0</span>)</span><br><span class="line">                            .onChange(KeyBuilder.buildServiceMetaKey(namespaceId, serviceName), service);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 进行 Listener 的监听回调</span></span><br><span class="line">            <span class="keyword">for</span> (Map.Entry&lt;String, Datum&lt;Instances&gt;&gt; entry : datumMap.entrySet()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (!listeners.containsKey(entry.getKey())) &#123;</span><br><span class="line">                    <span class="comment">// Should not happen:</span></span><br><span class="line">                    Loggers.DISTRO.warn(<span class="string">"listener of &#123;&#125; not found."</span>, entry.getKey());</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="keyword">for</span> (RecordListener listener : listeners.get(entry.getKey())) &#123;</span><br><span class="line">                        listener.onChange(entry.getKey(), entry.getValue().value);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                    Loggers.DISTRO.error(<span class="string">"[NACOS-DISTRO] error while execute listener of key: &#123;&#125;"</span>, entry.getKey(), e);</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Update data store if listener executed successfully:</span></span><br><span class="line">                dataStore.put(entry.getKey(), entry.getValue());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>到这里，<code>Nacos Naming</code>模块的<code>Distro</code>协议的初次启动时的数据全量同步到这里就告一段落了，接下来就是数据的增量同步了，首先要介绍一个<code>Distro</code>协议的一个概念——权威<code>Server</code></p>
+<blockquote>
+<p>权威<code>Server</code>的判断器</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DistroMapper</span> <span class="keyword">implements</span> <span class="title">ServerChangeListener</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> List&lt;String&gt; healthyList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;String&gt; <span class="title">getHealthyList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> healthyList;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> SwitchDomain switchDomain;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> ServerListManager serverListManager;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * init server list</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        serverListManager.listen(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 判断该数据是否可以由本节点进行响应</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">responsible</span><span class="params">(Cluster cluster, Instance instance)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> switchDomain.isHealthCheckEnabled(cluster.getServiceName())</span><br><span class="line">            &amp;&amp; !cluster.getHealthCheckTask().isCancelled()</span><br><span class="line">            &amp;&amp; responsible(cluster.getServiceName())</span><br><span class="line">            &amp;&amp; cluster.contains(instance);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 根据 ServiceName 进行 Hash 计算，找到对应的权威节点的索引，判断是否是本节点，是的话表明该数据可以由本节点进行处理</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">responsible</span><span class="params">(String serviceName)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!switchDomain.isDistroEnabled() || SystemUtils.STANDALONE_MODE) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (CollectionUtils.isEmpty(healthyList)) &#123;</span><br><span class="line">            <span class="comment">// means distro config is not ready yet</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> index = healthyList.indexOf(NetUtils.localServer());</span><br><span class="line">        <span class="keyword">int</span> lastIndex = healthyList.lastIndexOf(NetUtils.localServer());</span><br><span class="line">        <span class="keyword">if</span> (lastIndex &lt; <span class="number">0</span> || index &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> target = distroHash(serviceName) % healthyList.size();</span><br><span class="line">        <span class="keyword">return</span> target &gt;= index &amp;&amp; target &lt;= lastIndex;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 根据 ServiceName 找到权威 Server 的地址</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">mapSrv</span><span class="params">(String serviceName)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (CollectionUtils.isEmpty(healthyList) || !switchDomain.isDistroEnabled()) &#123;</span><br><span class="line">            <span class="keyword">return</span> NetUtils.localServer();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> healthyList.get(distroHash(serviceName) % healthyList.size());</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            Loggers.SRV_LOG.warn(<span class="string">"distro mapper failed, return localhost: "</span> + NetUtils.localServer(), e);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">return</span> NetUtils.localServer();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">distroHash</span><span class="params">(String serviceName)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Math.abs(serviceName.hashCode() % Integer.MAX_VALUE);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onChangeServerList</span><span class="params">(List&lt;Server&gt; latestMembers)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onChangeHealthyServerList</span><span class="params">(List&lt;Server&gt; latestReachableMembers)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        List&lt;String&gt; newHealthyList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (Server server : latestReachableMembers) &#123;</span><br><span class="line">            newHealthyList.add(server.getKey());</span><br><span class="line">        &#125;</span><br><span class="line">        healthyList = newHealthyList;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的组件，就是<code>Distro</code>协议的一个重要部分，根据数据进行 Hash 计算查找集群节点列表中的权威节点</p>
+<p>现在来看看在集群运行期间，节点间的数据增量同步是如何做的</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TaskDispatcher</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> GlobalConfig partitionConfig;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> DataSyncer dataSyncer;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> List&lt;TaskScheduler&gt; taskSchedulerList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">int</span> cpuCoreCount = Runtime.getRuntime().availableProcessors();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 构建任务执行器</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; cpuCoreCount; i++) &#123;</span><br><span class="line">            TaskScheduler taskScheduler = <span class="keyword">new</span> TaskScheduler(i);</span><br><span class="line">            taskSchedulerList.add(taskScheduler);</span><br><span class="line">            <span class="comment">// 任务调度执行器提交</span></span><br><span class="line">            GlobalExecutor.submitTaskDispatch(taskScheduler);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addTask</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 根据 Key 进行 Hash 找到一个 TaskScheduler 进行任务提交</span></span><br><span class="line">        taskSchedulerList.get(UtilsAndCommons.shakeUp(key, cpuCoreCount)).addTask(key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TaskScheduler</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> index;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> dataSize = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">long</span> lastDispatchTime = <span class="number">0L</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> BlockingQueue&lt;String&gt; queue = <span class="keyword">new</span> LinkedBlockingQueue&lt;&gt;(<span class="number">128</span> * <span class="number">1024</span>);</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">TaskScheduler</span><span class="params">(<span class="keyword">int</span> index)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.index = index;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addTask</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">            queue.offer(key);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getIndex</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> index;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            List&lt;String&gt; keys = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">            <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">// 从任务缓存队列中获取一个任务（存在超时设置）</span></span><br><span class="line">                    String key = queue.poll(partitionConfig.getTaskDispatchPeriod(),</span><br><span class="line">                        TimeUnit.MILLISECONDS);</span><br><span class="line">                    <span class="keyword">if</span> (Loggers.DISTRO.isDebugEnabled() &amp;&amp; StringUtils.isNotBlank(key)) &#123;</span><br><span class="line">                        Loggers.DISTRO.debug(<span class="string">"got key: &#123;&#125;"</span>, key);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 如果不存在集群或者集群节点为空</span></span><br><span class="line">                    <span class="keyword">if</span> (dataSyncer.getServers() == <span class="keyword">null</span> || dataSyncer.getServers().isEmpty()) &#123;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (StringUtils.isBlank(key)) &#123;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (dataSize == <span class="number">0</span>) &#123;</span><br><span class="line">                        keys = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 进行批量任务处理，这里做一次暂存操作，为了避免</span></span><br><span class="line">                    keys.add(key);</span><br><span class="line">                    dataSize++;</span><br><span class="line">                    <span class="comment">// 如果此时的任务暂存数量达到了指定的批量，或者任务的时间达到了最大设定，进行数据同步任务</span></span><br><span class="line">                    <span class="keyword">if</span> (dataSize == partitionConfig.getBatchSyncKeyCount() ||</span><br><span class="line">                        (System.currentTimeMillis() - lastDispatchTime) &gt; partitionConfig.getTaskDispatchPeriod()) &#123;</span><br><span class="line">                        <span class="comment">// 为每一个server创建一个SyncTask任务</span></span><br><span class="line">                        <span class="keyword">for</span> (Server member : dataSyncer.getServers()) &#123;</span><br><span class="line">                            <span class="keyword">if</span> (NetUtils.localServer().equals(member.getKey())) &#123;</span><br><span class="line">                                <span class="keyword">continue</span>;</span><br><span class="line">                            &#125;</span><br><span class="line">                            SyncTask syncTask = <span class="keyword">new</span> SyncTask();</span><br><span class="line">                            syncTask.setKeys(keys);</span><br><span class="line">                            syncTask.setTargetServer(member.getKey());</span><br><span class="line">                            <span class="keyword">if</span> (Loggers.DISTRO.isDebugEnabled() &amp;&amp; StringUtils.isNotBlank(key)) &#123;</span><br><span class="line">                                Loggers.DISTRO.debug(<span class="string">"add sync task: &#123;&#125;"</span>, JSON.toJSONString(syncTask));</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="comment">// 进行任务提交，同时设置任务延迟执行时间，这里设置为立即执行</span></span><br><span class="line">                            dataSyncer.submit(syncTask, <span class="number">0</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                        lastDispatchTime = System.currentTimeMillis();</span><br><span class="line">                        dataSize = <span class="number">0</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                    Loggers.DISTRO.error(<span class="string">"dispatch sync task failed."</span>, e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>DataSyncer 数据同步任务的真正执行者</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataSyncer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 执行定期的数据同步任务（每五秒执行一次）</span></span><br><span class="line">        startTimedSync();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 任务提交</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">submit</span><span class="params">(SyncTask task, <span class="keyword">long</span> delay)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// If it's a new task:</span></span><br><span class="line">        <span class="keyword">if</span> (task.getRetryCount() == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">// 遍历所有的任务 Key</span></span><br><span class="line">            Iterator&lt;String&gt; iterator = task.getKeys().iterator();</span><br><span class="line">            <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">                String key = iterator.next();</span><br><span class="line">                <span class="comment">// 数据任务放入 Map 中，避免数据同步任务重复提交</span></span><br><span class="line">                <span class="keyword">if</span> (StringUtils.isNotBlank(taskMap.putIfAbsent(buildKey(key, task.getTargetServer()), key))) &#123;</span><br><span class="line">                    <span class="comment">// associated key already exist:</span></span><br><span class="line">                    <span class="keyword">if</span> (Loggers.DISTRO.isDebugEnabled()) &#123;</span><br><span class="line">                        Loggers.DISTRO.debug(<span class="string">"sync already in process, key: &#123;&#125;"</span>, key);</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 如果任务已经存在，则移除该任务的 Key</span></span><br><span class="line">                    iterator.remove();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果所有的任务都已经移除了，结束本次任务提交</span></span><br><span class="line">        <span class="keyword">if</span> (task.getKeys().isEmpty()) &#123;</span><br><span class="line">            <span class="comment">// all keys are removed:</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 异步任务执行数据同步</span></span><br><span class="line">        GlobalExecutor.submitDataSync(() -&gt; &#123;</span><br><span class="line">            <span class="comment">// 1. check the server</span></span><br><span class="line">            <span class="keyword">if</span> (getServers() == <span class="keyword">null</span> || getServers().isEmpty()) &#123;</span><br><span class="line">                Loggers.SRV_LOG.warn(<span class="string">"try to sync data but server list is empty."</span>);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 获取数据同步任务的实际同步数据</span></span><br><span class="line">            List&lt;String&gt; keys = task.getKeys();</span><br><span class="line">            <span class="keyword">if</span> (Loggers.SRV_LOG.isDebugEnabled()) &#123;</span><br><span class="line">                Loggers.SRV_LOG.debug(<span class="string">"try to sync data for this keys &#123;&#125;."</span>, keys);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 2. get the datums by keys and check the datum is empty or not</span></span><br><span class="line">            <span class="comment">// 通过key进行批量数据获取</span></span><br><span class="line">            Map&lt;String, Datum&gt; datumMap = dataStore.batchGet(keys);</span><br><span class="line">            <span class="comment">// 如果数据已经被移除了，取消本次任务</span></span><br><span class="line">            <span class="keyword">if</span> (datumMap == <span class="keyword">null</span> || datumMap.isEmpty()) &#123;</span><br><span class="line">                <span class="comment">// clear all flags of this task:</span></span><br><span class="line">                <span class="keyword">for</span> (String key : keys) &#123;</span><br><span class="line">                    taskMap.remove(buildKey(key, task.getTargetServer()));</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 数据序列化</span></span><br><span class="line">            <span class="keyword">byte</span>[] data = serializer.serialize(datumMap);</span><br><span class="line">            <span class="keyword">long</span> timestamp = System.currentTimeMillis();</span><br><span class="line">            <span class="comment">// 进行增量数据同步提交给其他节点</span></span><br><span class="line">            <span class="keyword">boolean</span> success = NamingProxy.syncData(data, task.getTargetServer());</span><br><span class="line">            <span class="comment">// 如果本次数据同步任务失败，则重新创建SyncTask，设置重试的次数信息</span></span><br><span class="line">            <span class="keyword">if</span> (!success) &#123;</span><br><span class="line">                SyncTask syncTask = <span class="keyword">new</span> SyncTask();</span><br><span class="line">                syncTask.setKeys(task.getKeys());</span><br><span class="line">                syncTask.setRetryCount(task.getRetryCount() + <span class="number">1</span>);</span><br><span class="line">                syncTask.setLastExecuteTime(timestamp);</span><br><span class="line">                syncTask.setTargetServer(task.getTargetServer());</span><br><span class="line">                retrySync(syncTask);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// clear all flags of this task:</span></span><br><span class="line">                <span class="keyword">for</span> (String key : task.getKeys()) &#123;</span><br><span class="line">                    taskMap.remove(buildKey(key, task.getTargetServer()));</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, delay);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 任务重试</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">retrySync</span><span class="params">(SyncTask syncTask)</span> </span>&#123;</span><br><span class="line">        Server server = <span class="keyword">new</span> Server();</span><br><span class="line">        server.setIp(syncTask.getTargetServer().split(<span class="string">":"</span>)[<span class="number">0</span>]);</span><br><span class="line">        server.setServePort(Integer.parseInt(syncTask.getTargetServer().split(<span class="string">":"</span>)[<span class="number">1</span>]));</span><br><span class="line">        <span class="keyword">if</span> (!getServers().contains(server)) &#123;</span><br><span class="line">            <span class="comment">// if server is no longer in healthy server list, ignore this task:</span></span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// TODO may choose other retry policy.</span></span><br><span class="line">        <span class="comment">// 自动延迟重试任务的下次执行时间</span></span><br><span class="line">        submit(syncTask, partitionConfig.getSyncRetryDelay());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startTimedSync</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        GlobalExecutor.schedulePartitionDataTimedSync(<span class="keyword">new</span> TimedSync());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行周期任务</span></span><br><span class="line">    <span class="comment">// 每次将自己负责的数据进行广播到其他的 Server 节点</span></span><br><span class="line">    <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimedSync</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (Loggers.DISTRO.isDebugEnabled()) &#123;</span><br><span class="line">                    Loggers.DISTRO.debug(<span class="string">"server list is: &#123;&#125;"</span>, getServers());</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// send local timestamps to other servers:</span></span><br><span class="line">                Map&lt;String, String&gt; keyChecksums = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">64</span>);</span><br><span class="line">                <span class="comment">// 对数据存储容器的</span></span><br><span class="line">                <span class="keyword">for</span> (String key : dataStore.keys()) &#123;</span><br><span class="line">                    <span class="comment">// 如果自己不是负责此数据的权威 Server，则无权对此数据做集群间的广播通知操作</span></span><br><span class="line">                    <span class="keyword">if</span> (!distroMapper.responsible(KeyBuilder.getServiceName(key))) &#123;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 获取数据操作，</span></span><br><span class="line">                    Datum datum = dataStore.get(key);</span><br><span class="line">                    <span class="keyword">if</span> (datum == <span class="keyword">null</span>) &#123;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 放入数据广播列表</span></span><br><span class="line">                    keyChecksums.put(key, datum.value.getChecksum());</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (keyChecksums.isEmpty()) &#123;</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (Loggers.DISTRO.isDebugEnabled()) &#123;</span><br><span class="line">                    Loggers.DISTRO.debug(<span class="string">"sync checksums: &#123;&#125;"</span>, keyChecksums);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 对集群的所有节点（除了自己），做数据广播操作</span></span><br><span class="line">                <span class="keyword">for</span> (Server member : getServers()) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (NetUtils.localServer().equals(member.getKey())) &#123;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="comment">// 集群间的数据广播操作</span></span><br><span class="line">                    NamingProxy.syncCheckSums(keyChecksums, member.getKey());</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                Loggers.DISTRO.error(<span class="string">"timed sync task failed."</span>, e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> List&lt;Server&gt; <span class="title">getServers</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> serverListManager.getHealthyServers();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">buildKey</span><span class="params">(String key, String targetServer)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> key + UtilsAndCommons.CACHE_KEY_SPLITER + targetServer;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>那么其他节点在接受到数据后的操作是什么</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(value = <span class="string">"/checksum"</span>, method = RequestMethod.PUT)</span><br><span class="line"><span class="function"><span class="keyword">public</span> ResponseEntity <span class="title">syncChecksum</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="comment">// 由那个节点传输而来的数据</span></span><br><span class="line">    String source = WebUtils.required(request, <span class="string">"source"</span>);</span><br><span class="line">    String entity = IOUtils.toString(request.getInputStream(), <span class="string">"UTF-8"</span>);</span><br><span class="line">    <span class="comment">// 数据序列化</span></span><br><span class="line">    Map&lt;String, String&gt; dataMap = serializer.deserialize(entity.getBytes(), <span class="keyword">new</span> TypeReference&lt;Map&lt;String, String&gt;&gt;() &#123;&#125;);</span><br><span class="line">    <span class="comment">// 数据接收操作</span></span><br><span class="line">    consistencyService.onReceiveChecksums(dataMap, source);</span><br><span class="line">    <span class="keyword">return</span> ResponseEntity.ok(<span class="string">"ok"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onReceiveChecksums</span><span class="params">(Map&lt;String, String&gt; checksumMap, String server)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (syncChecksumTasks.containsKey(server)) &#123;</span><br><span class="line">        <span class="comment">// Already in process of this server:</span></span><br><span class="line">        Loggers.DISTRO.warn(<span class="string">"sync checksum task already in process with &#123;&#125;"</span>, server);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 标记当前 Server 传来的数据正在处理</span></span><br><span class="line">    syncChecksumTasks.put(server, <span class="string">"1"</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 需要更新的 key</span></span><br><span class="line">        List&lt;String&gt; toUpdateKeys = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="comment">// 需要删除的 Key</span></span><br><span class="line">        List&lt;String&gt; toRemoveKeys = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="comment">// 对传来的数据进行遍历操作</span></span><br><span class="line">        <span class="keyword">for</span> (Map.Entry&lt;String, String&gt; entry : checksumMap.entrySet()) &#123;</span><br><span class="line">            <span class="comment">// 如果传来的数据存在由本节点负责的数据，则直接退出本次数据同步操作（违反了权威server的设定要求）</span></span><br><span class="line">            <span class="keyword">if</span> (distroMapper.responsible(KeyBuilder.getServiceName(entry.getKey()))) &#123;</span><br><span class="line">                <span class="comment">// this key should not be sent from remote server:</span></span><br><span class="line">                Loggers.DISTRO.error(<span class="string">"receive responsible key timestamp of "</span> + entry.getKey() + <span class="string">" from "</span> + server);</span><br><span class="line">                <span class="comment">// abort the procedure:</span></span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 如果当前数据存储容器不存在这个数据，或者校验值不一样，则进行数据更新操作</span></span><br><span class="line">            <span class="keyword">if</span> (!dataStore.contains(entry.getKey()) || </span><br><span class="line">            dataStore.get(entry.getKey()).value == <span class="keyword">null</span> || </span><br><span class="line">            !dataStore.get(entry.getKey()).value.getChecksum().equals(entry.getValue())) &#123;</span><br><span class="line">                toUpdateKeys.add(entry.getKey());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 直接遍历数据存储容器的所有数据</span></span><br><span class="line">        <span class="keyword">for</span> (String key : dataStore.keys()) &#123;</span><br><span class="line">            <span class="comment">// 如果数据不是 source server 负责的，则跳过</span></span><br><span class="line">            <span class="keyword">if</span> (!server.equals(distroMapper.mapSrv(KeyBuilder.getServiceName(key)))) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 如果同步的数据不包含这个key，表明这个key是需要被删除的</span></span><br><span class="line">            <span class="keyword">if</span> (!checksumMap.containsKey(key)) &#123;</span><br><span class="line">                toRemoveKeys.add(key);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (Loggers.DISTRO.isDebugEnabled()) &#123;</span><br><span class="line">            Loggers.DISTRO.info(<span class="string">"to remove keys: &#123;&#125;, to update keys: &#123;&#125;, source: &#123;&#125;"</span>, toRemoveKeys, toUpdateKeys, server);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 执行数据闪出去操作</span></span><br><span class="line">        <span class="keyword">for</span> (String key : toRemoveKeys) &#123;</span><br><span class="line">            onRemove(key);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (toUpdateKeys.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 根据需要更新的key进行数据拉取，然后对同步的数据进行操作，剩下的如同最开始的全量数据同步所做的操作</span></span><br><span class="line">            <span class="keyword">byte</span>[] result = NamingProxy.getData(toUpdateKeys, server);</span><br><span class="line">            processData(result);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            Loggers.DISTRO.error(<span class="string">"get data from "</span> + server + <span class="string">" failed!"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="comment">// Remove this 'in process' flag:</span></span><br><span class="line">        <span class="comment">// 移除本次 source server 的数据同步任务标识</span></span><br><span class="line">        syncChecksumTasks.remove(server);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/16/java-web-54/" rel="next" title="Nacos 的配置文件 Dump 的操作">
+                <i class="fa fa-chevron-left"></i> Nacos 的配置文件 Dump 的操作
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="lv-container" data-id="city" data-uid="MTAyMC8zMzM0OC85OTA0"></div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">liaochuntao</p>
+              <p class="site-description motion-element" itemprop="description">励志成为 Nacos 的 PMC</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">114</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">20</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/chuntaojun" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:liaochunyhm@live.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=507014930&auto=1&height=66"></iframe>
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前期导读"><span class="nav-number">1.</span> <span class="nav-text">前期导读</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#核心代码实现"><span class="nav-number">2.</span> <span class="nav-text">核心代码实现</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Nacos-Naming-模块启动做的时数据同步"><span class="nav-number">2.1.</span> <span class="nav-text">Nacos Naming 模块启动做的时数据同步</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Muse</a> v6.4.1</div>
+
+
+
+
+        
+
+
+
+<script>
+  	var _mtac = {};
+  	(function() {
+  		var mta = document.createElement("script");
+  		mta.src = "https://pingjs.qq.com/h5/stats.js?v2.0.4";
+  		mta.setAttribute("name", "MTAH5");
+  		mta.setAttribute("sid", "500687579");
+
+  		var s = document.getElementsByTagName("script")[0];
+  		s.parentNode.insertBefore(mta, s);
+  	})();
+</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=66419010";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.1"></script>
+
+
+
+  
+
+
+
+  
+    <script type="text/javascript">
+      window.livereOptions = {
+        refer: '2019/09/16/java-web-55/'
+      };
+      (function(d, s) {
+        var j, e = d.getElementsByTagName(s)[0];
+        if (typeof LivereTower === 'function') { return; }
+        j = d.createElement(s);
+        j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+        j.async = true;
+        e.parentNode.insertBefore(j, e);
+      })(document, 'script');
+    </script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            })
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1}))
+                .done(function () {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function () {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RJYe40AYRlVG3rVkOW1NWMSU-gzGzoHsz",
+                'X-LC-Key': "lgbjjYACunkrsKMnAnqxOA43",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

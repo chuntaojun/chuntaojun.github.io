@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.7.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.liaochuntao.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Gossip 协议Gossip协议，也叫做流言算法，或者疫情传播协议，在这个协议当中，所有的节点的角色地位都是一样的，节点间的数据怎么同步呢？大致的步骤如下  随机选取周边的k个节点 向这k个节点进行数据广播同步 这k个节点再次重复刚刚的操作  因此，最终一个消息经过多轮广播之后，所有的节点都同步了此数据。 gossip协议存在三种数据同步方式  Push : 节点 A 将数据 (key,valu">
+<meta name="keywords" content="gossip">
+<meta property="og:type" content="article">
+<meta property="og:title" content="memberlist 的 gossip 实现">
+<meta property="og:url" content="https://www.liaochuntao.cn/2020/02/11/java-web-58/index.html">
+<meta property="og:site_name" content="春少 Blog">
+<meta property="og:description" content="Gossip 协议Gossip协议，也叫做流言算法，或者疫情传播协议，在这个协议当中，所有的节点的角色地位都是一样的，节点间的数据怎么同步呢？大致的步骤如下  随机选取周边的k个节点 向这k个节点进行数据广播同步 这k个节点再次重复刚刚的操作  因此，最终一个消息经过多轮广播之后，所有的节点都同步了此数据。 gossip协议存在三种数据同步方式  Push : 节点 A 将数据 (key,valu">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-05-21T08:23:40.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="memberlist 的 gossip 实现">
+<meta name="twitter:description" content="Gossip 协议Gossip协议，也叫做流言算法，或者疫情传播协议，在这个协议当中，所有的节点的角色地位都是一样的，节点间的数据怎么同步呢？大致的步骤如下  随机选取周边的k个节点 向这k个节点进行数据广播同步 这k个节点再次重复刚刚的操作  因此，最终一个消息经过多轮广播之后，所有的节点都同步了此数据。 gossip协议存在三种数据同步方式  Push : 节点 A 将数据 (key,valu">
+
+<link rel="canonical" href="https://www.liaochuntao.cn/2020/02/11/java-web-58/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'default'
+  };
+</script>
+
+  <title>memberlist 的 gossip 实现 | 春少 Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">春少 Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
+    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2020/02/11/java-web-58/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="liaochuntao">
+      <meta itemprop="description" content="励志成为一位大佬">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="春少 Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          memberlist 的 gossip 实现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2020-02-11 22:30:41" itemprop="dateCreated datePublished" datetime="2020-02-11T22:30:41+08:00">2020-02-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2020-05-21 16:23:40" itemprop="dateModified" datetime="2020-05-21T16:23:40+08:00">2020-05-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Consistency/" itemprop="url" rel="index"><span itemprop="name">Consistency</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Gossip-协议"><a href="#Gossip-协议" class="headerlink" title="Gossip 协议"></a>Gossip 协议</h2><p><code>Gossip</code>协议，也叫做流言算法，或者疫情传播协议，在这个协议当中，所有的节点的角色地位都是一样的，节点间的数据怎么同步呢？大致的步骤如下</p>
+<ul>
+<li>随机选取周边的k个节点</li>
+<li>向这k个节点进行数据广播同步</li>
+<li>这k个节点再次重复刚刚的操作</li>
+</ul>
+<p>因此，最终一个消息经过多轮广播之后，所有的节点都同步了此数据。</p>
+<p><code>gossip</code>协议存在三种数据同步方式</p>
+<ul>
+<li><strong>Push</strong> : 节点 A 将数据 (key,value,version) 及对应的版本号推送给 B 节点，B 节点更新 A 中比自己新的数据</li>
+<li><strong>Pull</strong> : A 仅将数据 key, version 推送给 B，B 将本地比 A 新的数据（Key, value, version）推送给 A，A 更新本地</li>
+<li><strong>Push/Pull</strong> : 与 Pull 类似，只是多了一步，A 再将本地比 B 新的数据推送给 B，B 则更新本地</li>
+</ul>
+<h2 id="memberlist-的实现"><a href="#memberlist-的实现" class="headerlink" title="memberlist 的实现"></a>memberlist 的实现</h2><p>那么现在来分析一下一个<code>Gossip</code>的实现——hashicorp/memberlist</p>
+<h3 id="创建一个-Memberlist"><a href="#创建一个-Memberlist" class="headerlink" title="创建一个 Memberlist"></a>创建一个 Memberlist</h3><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Create</span><span class="params">(conf *Config)</span> <span class="params">(*Memberlist, error)</span></span> &#123;</span><br><span class="line">	m, err := newMemberlist(conf)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> err := m.setAlive(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		m.Shutdown()</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span>, err</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 重要方法，里面调度了三个重要的，与gossip协议有关的任务</span></span><br><span class="line">	m.schedule()</span><br><span class="line">	<span class="keyword">return</span> m, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接着这一块代码就很重要了，在<code>scheuld</code>里面调度了三个重要的任务，这三个任务都有各自的指责，现在我们来看一下</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Schedule is used to ensure the Tick is performed periodically. This</span></span><br><span class="line"><span class="comment">// function is safe to call multiple times. If the memberlist is already</span></span><br><span class="line"><span class="comment">// scheduled, then it won't do anything.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *Memberlist)</span> <span class="title">schedule</span><span class="params">()</span></span> &#123;</span><br><span class="line">	m.tickerLock.Lock()</span><br><span class="line">	<span class="keyword">defer</span> m.tickerLock.Unlock()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// If we already have tickers, then don't do anything, since we're</span></span><br><span class="line">	<span class="comment">// scheduled</span></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(m.tickers) &gt; <span class="number">0</span> &#123;</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Create the stop tick channel, a blocking channel. We close this</span></span><br><span class="line">	<span class="comment">// when we should stop the tickers.</span></span><br><span class="line">	stopCh := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 用于单轮故障检测和gossip协议广播</span></span><br><span class="line">	<span class="keyword">if</span> m.config.ProbeInterval &gt; <span class="number">0</span> &#123;</span><br><span class="line">		t := time.NewTicker(m.config.ProbeInterval)</span><br><span class="line">		<span class="keyword">go</span> m.triggerFunc(m.config.ProbeInterval, t.C, stopCh, m.probe)</span><br><span class="line">		m.tickers = <span class="built_in">append</span>(m.tickers, t)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 创建一个定时的 push-pull 触发器</span></span><br><span class="line">	<span class="keyword">if</span> m.config.PushPullInterval &gt; <span class="number">0</span> &#123;</span><br><span class="line">		<span class="keyword">go</span> m.pushPullTrigger(stopCh)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 创建一个定时任务，将消息广播给随机的k个节点</span></span><br><span class="line">	<span class="keyword">if</span> m.config.GossipInterval &gt; <span class="number">0</span> &amp;&amp; m.config.GossipNodes &gt; <span class="number">0</span> &#123;</span><br><span class="line">		t := time.NewTicker(m.config.GossipInterval)</span><br><span class="line">		<span class="keyword">go</span> m.triggerFunc(m.config.GossipInterval, t.C, stopCh, m.gossip)</span><br><span class="line">		m.tickers = <span class="built_in">append</span>(m.tickers, t)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// If we made any tickers, then record the stopTick channel for</span></span><br><span class="line">	<span class="comment">// later.</span></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(m.tickers) &gt; <span class="number">0</span> &#123;</span><br><span class="line">		m.stopTick = stopCh</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="probe"><a href="#probe" class="headerlink" title="probe"></a>probe</h4><p>首先我们先来分析下<code>m.probe</code>是做什么事情的</p>
+<p>这里会通过<code>m.config.ProbeInterval</code>参数来判断是否开启<code>Probe</code>任务，如果设置了的话，则会开启一个定时的TimerTicker</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> m.config.ProbeInterval &gt; <span class="number">0</span> &#123;</span><br><span class="line">	t := time.NewTicker(m.config.ProbeInterval)</span><br><span class="line">	<span class="keyword">go</span> m.triggerFunc(m.config.ProbeInterval, t.C, stopCh, m.probe)</span><br><span class="line">	m.tickers = <span class="built_in">append</span>(m.tickers, t)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来就是<code>Probe</code>任务的正体了。</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Tick is used to perform a single round of failure detection and gossip</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *Memberlist)</span> <span class="title">probe</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Track the number of indexes we've considered probing</span></span><br><span class="line">	numCheck := <span class="number">0</span></span><br><span class="line">START:</span><br><span class="line">    <span class="comment">// 开始本次的循环</span></span><br><span class="line">	m.nodeLock.RLock()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 确保不会出现无限循环</span></span><br><span class="line">	<span class="keyword">if</span> numCheck &gt;= <span class="built_in">len</span>(m.nodes) &#123;</span><br><span class="line">		m.nodeLock.RUnlock()</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 当索引超出节点的数量长度时，重置索引位置</span></span><br><span class="line">	<span class="keyword">if</span> m.probeIndex &gt;= <span class="built_in">len</span>(m.nodes) &#123;</span><br><span class="line">		m.nodeLock.RUnlock()</span><br><span class="line">		m.resetNodes()</span><br><span class="line">        m.probeIndex = <span class="number">0</span></span><br><span class="line">        <span class="comment">// 记录循环次数</span></span><br><span class="line">		numCheck++</span><br><span class="line">		<span class="keyword">goto</span> START</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 确定是否应该探测该节点 </span></span><br><span class="line">	skip := <span class="literal">false</span></span><br><span class="line">	<span class="keyword">var</span> node nodeState</span><br><span class="line"></span><br><span class="line">    node = *m.nodes[m.probeIndex]</span><br><span class="line">    <span class="comment">// 节点是不是自己</span></span><br><span class="line">	<span class="keyword">if</span> node.Name == m.config.Name &#123;</span><br><span class="line">        <span class="comment">// 如果节点是自己，则跳过</span></span><br><span class="line">		skip = <span class="literal">true</span></span><br><span class="line">	&#125; <span class="keyword">else</span> <span class="keyword">if</span> node.DeadOrLeft() &#123;</span><br><span class="line">        <span class="comment">// 如果节点已经死亡或者离开集群了，则跳过</span></span><br><span class="line">		skip = <span class="literal">true</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Potentially skip</span></span><br><span class="line">	m.nodeLock.RUnlock()</span><br><span class="line">	m.probeIndex++</span><br><span class="line">	<span class="keyword">if</span> skip &#123;</span><br><span class="line">		numCheck++</span><br><span class="line">		<span class="keyword">goto</span> START</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 探查特定节点 </span></span><br><span class="line">	m.probeNode(&amp;node)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面这段代码看着其实就挺简单的，其核心就是，判断该节点是否可以进行探测任务。总结下几个步骤</p>
+<ul>
+<li>当前循环测试是否超过了节点数量，超过则跳出循环</li>
+<li>当前节点的索引是否超过节点数量，是则重置索引位置，重新循环</li>
+<li>当前节点是否是自己，或者是否以及处于死亡或者离开的状态，是则跳过重新循环</li>
+<li>进行节点探测</li>
+</ul>
+<p>接着我们来看<code>probeNode(&amp;node)</code>做的事情</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// probeNode handles a single round of failure checking on a node.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *Memberlist)</span> <span class="title">probeNode</span><span class="params">(node *nodeState)</span></span> &#123;</span><br><span class="line">	<span class="keyword">defer</span> metrics.MeasureSince([]<span class="keyword">string</span>&#123;<span class="string">"memberlist"</span>, <span class="string">"probeNode"</span>&#125;, time.Now())</span><br><span class="line"></span><br><span class="line">    <span class="comment">// metrics data collection</span></span><br><span class="line">	...</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 开始准备好本次的Ping消息</span></span><br><span class="line">	selfAddr, selfPort := m.getAdvertise()</span><br><span class="line">	ping := ping&#123;</span><br><span class="line">		SeqNo:      m.nextSeqNo(),</span><br><span class="line">		Node:       node.Name,</span><br><span class="line">		SourceAddr: selfAddr,</span><br><span class="line">		SourcePort: selfPort,</span><br><span class="line">		SourceNode: m.config.Name,</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 构建 ack channel</span></span><br><span class="line">    ackCh := <span class="built_in">make</span>(<span class="keyword">chan</span> ackMessage, m.config.IndirectChecks+<span class="number">1</span>)</span><br><span class="line">    <span class="comment">// 构建 uack channel</span></span><br><span class="line">    nackCh := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;, m.config.IndirectChecks+<span class="number">1</span>)</span><br><span class="line">    <span class="comment">// 设置 Probe 对应的 channel 通道</span></span><br><span class="line">	m.setProbeChannels(ping.SeqNo, ackCh, nackCh, probeInterval)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 准备发送的事件</span></span><br><span class="line">	sent := time.Now()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 期望的截止时间</span></span><br><span class="line">    deadline := sent.Add(probeInterval)</span><br><span class="line">    <span class="comment">// probe的目标节点</span></span><br><span class="line">	addr := node.Address()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Arrange for our self-awareness to get updated.</span></span><br><span class="line">	<span class="keyword">var</span> awarenessDelta <span class="keyword">int</span></span><br><span class="line">	<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		m.awareness.ApplyDelta(awarenessDelta)</span><br><span class="line">    &#125;()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 如果目前节点的状态为存活状态</span></span><br><span class="line">	<span class="keyword">if</span> node.State == stateAlive &#123;</span><br><span class="line">        <span class="comment">// 这里直接调用 encodeAndSendMsg 将 ping 信息发出去</span></span><br><span class="line">		<span class="keyword">if</span> err := m.encodeAndSendMsg(node.FullAddress(), pingMsg, &amp;ping); err != <span class="literal">nil</span> &#123;</span><br><span class="line">            m.logger.Printf(<span class="string">"[ERR] memberlist: Failed to send ping: %s"</span>, err)</span><br><span class="line">            <span class="comment">// 根据错误原因进行判断，是否需要跳转到对应的处理逻辑</span></span><br><span class="line">			<span class="keyword">if</span> failedRemote(err) &#123;</span><br><span class="line">				<span class="keyword">goto</span> HANDLE_REMOTE_FAILURE</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">var</span> msgs [][]<span class="keyword">byte</span></span><br><span class="line">        <span class="comment">// 对数据进行编码</span></span><br><span class="line">		<span class="keyword">if</span> buf, err := encode(pingMsg, &amp;ping); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			m.logger.Printf(<span class="string">"[ERR] memberlist: Failed to encode ping message: %s"</span>, err)</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			msgs = <span class="built_in">append</span>(msgs, buf.Bytes())</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 怀疑信息</span></span><br><span class="line">		s := suspect&#123;Incarnation: node.Incarnation, Node: node.Name, From: m.config.Name&#125;</span><br><span class="line">		<span class="keyword">if</span> buf, err := encode(suspectMsg, &amp;s); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			m.logger.Printf(<span class="string">"[ERR] memberlist: Failed to encode suspect message: %s"</span>, err)</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">			msgs = <span class="built_in">append</span>(msgs, buf.Bytes())</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 对需要发送的数据进行压缩</span></span><br><span class="line">        compound := makeCompoundMessage(msgs)</span><br><span class="line">        <span class="comment">// 调用 rawSendMsgPacket 发送数据</span></span><br><span class="line">		<span class="keyword">if</span> err := m.rawSendMsgPacket(node.FullAddress(), &amp;node.Node, compound.Bytes()); err != <span class="literal">nil</span> &#123;</span><br><span class="line">            m.logger.Printf(<span class="string">"[ERR] memberlist: Failed to send compound ping and suspect message to %s: %s"</span>, addr, err)</span><br><span class="line">            <span class="comment">// 根据错误原因进行判断，是否需要跳转到对应的处理逻辑</span></span><br><span class="line">			<span class="keyword">if</span> failedRemote(err) &#123;</span><br><span class="line">				<span class="keyword">goto</span> HANDLE_REMOTE_FAILURE</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Arrange for our self-awareness to get updated. At this point we've</span></span><br><span class="line">	<span class="comment">// sent the ping, so any return statement means the probe succeeded</span></span><br><span class="line">	<span class="comment">// which will improve our health until we get to the failure scenarios</span></span><br><span class="line">	<span class="comment">// at the end of this function, which will alter this delta variable</span></span><br><span class="line">	<span class="comment">// accordingly.</span></span><br><span class="line">	awarenessDelta = <span class="number">-1</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// Wait for response or round-trip-time.</span></span><br><span class="line">	<span class="keyword">select</span> &#123;</span><br><span class="line">    <span class="comment">// 如果 ack 通道有消息了</span></span><br><span class="line">    <span class="keyword">case</span> v := &lt;-ackCh:</span><br><span class="line">        <span class="comment">// ack 相应的处理逻辑</span></span><br><span class="line">		<span class="keyword">if</span> v.Complete == <span class="literal">true</span> &#123;</span><br><span class="line">			<span class="keyword">if</span> m.config.Ping != <span class="literal">nil</span> &#123;</span><br><span class="line">                rtt := v.Timestamp.Sub(sent)</span><br><span class="line">                <span class="comment">// 广播通知本次 probe 的结果</span></span><br><span class="line">				m.config.Ping.NotifyPingComplete(&amp;node.Node, rtt, v.Payload)</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// As an edge case, if we get a timeout, we need to re-enqueue it</span></span><br><span class="line">		<span class="comment">// here to break out of the select below.</span></span><br><span class="line">		<span class="keyword">if</span> v.Complete == <span class="literal">false</span> &#123;</span><br><span class="line">			ackCh &lt;- v</span><br><span class="line">        &#125;</span><br><span class="line">    <span class="comment">// 如果在指定的时间内还没有完成，则结束</span></span><br><span class="line">	<span class="keyword">case</span> &lt;-time.After(m.config.ProbeTimeout):</span><br><span class="line">		<span class="comment">// Note that we don't scale this timeout based on awareness and</span></span><br><span class="line">		<span class="comment">// the health score. That's because we don't really expect waiting</span></span><br><span class="line">		<span class="comment">// longer to help get UDP through. Since health does extend the</span></span><br><span class="line">		<span class="comment">// probe interval it will give the TCP fallback more time, which</span></span><br><span class="line">		<span class="comment">// is more active in dealing with lost packets, and it gives more</span></span><br><span class="line">		<span class="comment">// time to wait for indirect acks/nacks.</span></span><br><span class="line">		m.logger.Printf(<span class="string">"[DEBUG] memberlist: Failed ping: %s (timeout reached)"</span>, node.Name)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 这里开始处理错误逻辑</span></span><br><span class="line">HANDLE_REMOTE_FAILURE:</span><br><span class="line">	<span class="comment">// 获取一些随机活动节点</span></span><br><span class="line">	m.nodeLock.RLock()</span><br><span class="line">	kNodes := kRandomNodes(m.config.IndirectChecks, m.nodes, <span class="function"><span class="keyword">func</span><span class="params">(n *nodeState)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">        <span class="comment">// 如果是本机节点或者是目标节点或者节点状态不是存活的节点，都不会被选中</span></span><br><span class="line">		<span class="keyword">return</span> n.Name == m.config.Name ||</span><br><span class="line">			n.Name == node.Name ||</span><br><span class="line">			n.State != stateAlive</span><br><span class="line">	&#125;)</span><br><span class="line">	m.nodeLock.RUnlock()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 尝试间接对节点进行Ping操作，其实这里就是由于可能是自己的问题导致对该节点的访问失败，因此让其他节点代替自己对目标节点发起Ping操作</span></span><br><span class="line">	expectedNacks := <span class="number">0</span></span><br><span class="line">	selfAddr, selfPort = m.getAdvertise()</span><br><span class="line">	ind := indirectPingReq&#123;</span><br><span class="line">		SeqNo:      ping.SeqNo,</span><br><span class="line">		Target:     node.Addr,</span><br><span class="line">		Port:       node.Port,</span><br><span class="line">		Node:       node.Name,</span><br><span class="line">		SourceAddr: selfAddr,</span><br><span class="line">		SourcePort: selfPort,</span><br><span class="line">		SourceNode: m.config.Name,</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 对目前的 k 个节点进行消息发送</span></span><br><span class="line">	<span class="keyword">for</span> _, peer := <span class="keyword">range</span> kNodes &#123;</span><br><span class="line">		<span class="comment">// We only expect nack to be sent from peers who understand</span></span><br><span class="line">		<span class="comment">// version 4 of the protocol.</span></span><br><span class="line">		<span class="keyword">if</span> ind.Nack = peer.PMax &gt;= <span class="number">4</span>; ind.Nack &#123;</span><br><span class="line">			expectedNacks++</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 发送消息</span></span><br><span class="line">		<span class="keyword">if</span> err := m.encodeAndSendMsg(peer.FullAddress(), indirectPingMsg, &amp;ind); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			m.logger.Printf(<span class="string">"[ERR] memberlist: Failed to send indirect ping: %s"</span>, err)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 因为UDP的不可靠性，这里再次采用一个TCP探测来避免由于网络故障引起的探测失败问题。</span></span><br><span class="line">	<span class="comment">// 这里自己直接通过TCP协议进行一次对该节点的直接通信操作</span></span><br><span class="line">	fallbackCh := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>, <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 首先要判断是否可以开启TCP直接通信操作</span></span><br><span class="line">	disableTcpPings := m.config.DisableTcpPings ||</span><br><span class="line">		(m.config.DisableTcpPingsForNode != <span class="literal">nil</span> &amp;&amp; m.config.DisableTcpPingsForNode(node.Name))</span><br><span class="line">	<span class="keyword">if</span> (!disableTcpPings) &amp;&amp; (node.PMax &gt;= <span class="number">3</span>) &#123;</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">			<span class="keyword">defer</span> <span class="built_in">close</span>(fallbackCh)</span><br><span class="line">			<span class="comment">// 直接对目标节点发起TCP通信</span></span><br><span class="line">			didContact, err := m.sendPingAndWaitForAck(node.FullAddress(), ping, deadline)</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				m.logger.Printf(<span class="string">"[ERR] memberlist: Failed fallback ping: %s"</span>, err)</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				fallbackCh &lt;- didContact</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;()</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		<span class="built_in">close</span>(fallbackCh)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 如果接收到 ack 回复，则结束</span></span><br><span class="line">	<span class="keyword">select</span> &#123;</span><br><span class="line">	<span class="keyword">case</span> v := &lt;-ackCh:</span><br><span class="line">		<span class="keyword">if</span> v.Complete == <span class="literal">true</span> &#123;</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> didContact := <span class="keyword">range</span> fallbackCh &#123;</span><br><span class="line">		<span class="comment">// 这里如果TCP探测成功，但是UDP探测失败，则当前的网络状况出现以异常</span></span><br><span class="line">		<span class="keyword">if</span> didContact &#123;</span><br><span class="line">			m.logger.Printf(<span class="string">"[WARN] memberlist: Was able to connect to %s but other probes failed, network may be misconfigured"</span>, node.Name)</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 否则，当TCP探测也失败时，则需要下一步处理——广播自己对该节点的健康状态有所怀疑</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	...</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 无论是UDP还是TCP，都没能接收到目标节点的反馈，广播自己怀疑该节点健康状况有问题.</span></span><br><span class="line">	m.logger.Printf(<span class="string">"[INFO] memberlist: Suspect %s has failed, no acks received"</span>, node.Name)</span><br><span class="line">	s := suspect&#123;Incarnation: node.Incarnation, Node: node.Name, From: m.config.Name&#125;</span><br><span class="line">	m.suspectNode(&amp;s)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至此，<code>probe</code>任务到这里就讲完了</p>
+<h4 id="pushPullTrigger"><a href="#pushPullTrigger" class="headerlink" title="pushPullTrigger"></a>pushPullTrigger</h4><p>接着，我们来看看<code>m.pushPullTrigger</code>是做了什么</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这里是 gossip 的 push-pull 定时触发任务，并且这里 memberlist 做了一个优化：根据当前集群节点数据来决定，从而避免影响当前网络状况。</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *Memberlist)</span> <span class="title">pushPullTrigger</span><span class="params">(stop &lt;-<span class="keyword">chan</span> <span class="keyword">struct</span>&#123;&#125;)</span></span> &#123;</span><br><span class="line">	interval := m.config.PushPullInterval</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Use a random stagger to avoid syncronizing</span></span><br><span class="line">	randStagger := time.Duration(<span class="keyword">uint64</span>(rand.Int63()) % <span class="keyword">uint64</span>(interval))</span><br><span class="line">	<span class="keyword">select</span> &#123;</span><br><span class="line">	<span class="keyword">case</span> &lt;-time.After(randStagger):</span><br><span class="line">	<span class="keyword">case</span> &lt;-stop:</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Tick using a dynamic timer</span></span><br><span class="line">	<span class="keyword">for</span> &#123;</span><br><span class="line">		<span class="comment">// pushPullScale 是一个优化点，通过当前集群节点的数量来动态的调整任务延迟时间</span></span><br><span class="line">		tickTime := pushPullScale(interval, m.estNumNodes())</span><br><span class="line">		<span class="keyword">select</span> &#123;</span><br><span class="line">		<span class="keyword">case</span> &lt;-time.After(tickTime):</span><br><span class="line">			m.pushPull()</span><br><span class="line">		<span class="keyword">case</span> &lt;-stop:</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的<code>pushPullScale</code>就是一个优化的措施，如果当前集群节点的数量超出了阈值，则进行scale操作。</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">pushPullScale</span><span class="params">(interval time.Duration, n <span class="keyword">int</span>)</span> <span class="title">time</span>.<span class="title">Duration</span></span> &#123;</span><br><span class="line">	<span class="comment">// Don't scale until we cross the threshold</span></span><br><span class="line">	<span class="keyword">if</span> n &lt;= pushPullScaleThreshold &#123;</span><br><span class="line">		<span class="keyword">return</span> interval</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	multiplier := math.Ceil(math.Log2(<span class="keyword">float64</span>(n))-math.Log2(pushPullScaleThreshold)) + <span class="number">1.0</span></span><br><span class="line">	<span class="keyword">return</span> time.Duration(multiplier) * interval</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里是通过 push-pull 操作，与对方节点交换自己的全部信息，这实际上是一个很昂贵的操作，因为要交换的数据可能很多很大。因此在一个 tick 内只会与一个节点进行一次 push-pull 操作</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *Memberlist)</span> <span class="title">pushPull</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Get a random live node</span></span><br><span class="line">	m.nodeLock.RLock()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 随机选取一个节点进行全部信息交换</span></span><br><span class="line">	nodes := kRandomNodes(<span class="number">1</span>, m.nodes, <span class="function"><span class="keyword">func</span><span class="params">(n *nodeState)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">		<span class="keyword">return</span> n.Name == m.config.Name ||</span><br><span class="line">			n.State != stateAlive</span><br><span class="line">	&#125;)</span><br><span class="line">	m.nodeLock.RUnlock()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// If no nodes, bail</span></span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(nodes) == <span class="number">0</span> &#123;</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	node := nodes[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 进行 push-pull 操作</span></span><br><span class="line">	<span class="keyword">if</span> err := m.pushPullNode(node.FullAddress(), <span class="literal">false</span>); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		m.logger.Printf(<span class="string">"[ERR] memberlist: Push/Pull with %s failed: %s"</span>, node.Name, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当通过随机选取K个节点完成之后，会选择这k个节点的第一个节点进行两个节点间的数据同步操作。</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// pushPullNode does a complete state exchange with a specific node.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *Memberlist)</span> <span class="title">pushPullNode</span><span class="params">(a Address, join <span class="keyword">bool</span>)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">defer</span> metrics.MeasureSince([]<span class="keyword">string</span>&#123;<span class="string">"memberlist"</span>, <span class="string">"pushPullNode"</span>&#125;, time.Now())</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 尝试向对方节点发送数据并且接收对方节点的反馈消息，包括两部分</span></span><br><span class="line">	<span class="comment">// 一部分是对方已知的集群节点信息，一部分是用户数据信息</span></span><br><span class="line">	remote, userState, err := m.sendAndReceiveState(a, join)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 这里接收到了对方节点的数据之后，将信息和自己本地的进行merge合并。</span></span><br><span class="line">	<span class="keyword">if</span> err := m.mergeRemoteState(join, remote, userState); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>那自己节点发送的数据是什么呢？也就是<code>m.sendAndReceiveState</code>这一步做了什么事情</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// sendLocalState is invoked to send our local state over a stream connection.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *Memberlist)</span> <span class="title">sendLocalState</span><span class="params">(conn net.Conn, join <span class="keyword">bool</span>)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="comment">// 首先这里设置网络链接的超时时间</span></span><br><span class="line">	conn.SetDeadline(time.Now().Add(m.config.TCPTimeout))</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Prepare the local node state</span></span><br><span class="line">	m.nodeLock.RLock()</span><br><span class="line">	<span class="comment">// 这里将自己所知道的所有集群节点信息进行收集整理，待等下发送给对方节点</span></span><br><span class="line">	localNodes := <span class="built_in">make</span>([]pushNodeState, <span class="built_in">len</span>(m.nodes))</span><br><span class="line">	<span class="keyword">for</span> idx, n := <span class="keyword">range</span> m.nodes &#123;</span><br><span class="line">		localNodes[idx].Name = n.Name</span><br><span class="line">		localNodes[idx].Addr = n.Addr</span><br><span class="line">		localNodes[idx].Port = n.Port</span><br><span class="line">		localNodes[idx].Incarnation = n.Incarnation</span><br><span class="line">		localNodes[idx].State = n.State</span><br><span class="line">		localNodes[idx].Meta = n.Meta</span><br><span class="line">		localNodes[idx].Vsn = []<span class="keyword">uint8</span>&#123;</span><br><span class="line">			n.PMin, n.PMax, n.PCur,</span><br><span class="line">			n.DMin, n.DMax, n.DCur,</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	m.nodeLock.RUnlock()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Get the delegate state</span></span><br><span class="line">	<span class="comment">// 如果存在用户数据信息，则提取出来准备一起发送</span></span><br><span class="line">	<span class="keyword">var</span> userData []<span class="keyword">byte</span></span><br><span class="line">	<span class="keyword">if</span> m.config.Delegate != <span class="literal">nil</span> &#123;</span><br><span class="line">		userData = m.config.Delegate.LocalState(join)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Create a bytes buffer writer</span></span><br><span class="line">	bufConn := bytes.NewBuffer(<span class="literal">nil</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 数据发送出去之前需要做好的一些编码操作</span></span><br><span class="line">	...</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Get the send buffer</span></span><br><span class="line">	<span class="keyword">return</span> m.rawSendMsgStream(conn, bufConn.Bytes())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因此，到这里，push-pull操作中的push操作就完成了，其pull操作也基本类似，将自己的信息推给对方节点之后，就准备“拉取对方节点的数据”，在接收到对方节点发送来的消息之后，需要将对方节点的数据与自己的进行合并</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// mergeRemoteState is used to merge the remote state with our local state</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *Memberlist)</span> <span class="title">mergeRemoteState</span><span class="params">(join <span class="keyword">bool</span>, remoteNodes []pushNodeState, userBuf []<span class="keyword">byte</span>)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="comment">// 对协议进行验证</span></span><br><span class="line">	<span class="keyword">if</span> err := m.verifyProtocol(remoteNodes); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Invoke the merge delegate if any</span></span><br><span class="line">	<span class="keyword">if</span> join &amp;&amp; m.config.Merge != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="comment">// 这里传输过来的是对方节点他所已知的集群的成员节点列表信息数据</span></span><br><span class="line">		nodes := <span class="built_in">make</span>([]*Node, <span class="built_in">len</span>(remoteNodes))</span><br><span class="line">		<span class="keyword">for</span> idx, n := <span class="keyword">range</span> remoteNodes &#123;</span><br><span class="line">			<span class="comment">// 数据转换成对象</span></span><br><span class="line">			...</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 广播通知有节点需要合并操作</span></span><br><span class="line">		<span class="keyword">if</span> err := m.config.Merge.NotifyMerge(nodes); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 合并节点的状态</span></span><br><span class="line">	m.mergeState(remoteNodes)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 如果存在用户数据信息，则调用接口用户需要进行数据合并操作</span></span><br><span class="line">	<span class="keyword">if</span> userBuf != <span class="literal">nil</span> &amp;&amp; m.config.Delegate != <span class="literal">nil</span> &#123;</span><br><span class="line">		m.config.Delegate.MergeRemoteState(userBuf, join)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// mergeState is invoked by the network layer when we get a Push/Pull</span></span><br><span class="line"><span class="comment">// state transfer</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *Memberlist)</span> <span class="title">mergeState</span><span class="params">(remote []pushNodeState)</span></span> &#123;</span><br><span class="line">	<span class="keyword">for</span> _, r := <span class="keyword">range</span> remote &#123;</span><br><span class="line">		<span class="keyword">switch</span> r.State &#123;</span><br><span class="line">		<span class="comment">// 如果是节点存在，则走 aliveNode </span></span><br><span class="line">		<span class="keyword">case</span> stateAlive:</span><br><span class="line">			a := alive&#123;</span><br><span class="line">				Incarnation: r.Incarnation,</span><br><span class="line">				Node:        r.Name,</span><br><span class="line">				Addr:        r.Addr,</span><br><span class="line">				Port:        r.Port,</span><br><span class="line">				Meta:        r.Meta,</span><br><span class="line">				Vsn:         r.Vsn,</span><br><span class="line">			&#125;</span><br><span class="line">			m.aliveNode(&amp;a, <span class="literal">nil</span>, <span class="literal">false</span>)</span><br><span class="line">		<span class="comment">// 如果节点已经离开，则走 deadNode</span></span><br><span class="line">		<span class="keyword">case</span> stateLeft:</span><br><span class="line">			d := dead&#123;Incarnation: r.Incarnation, Node: r.Name, From: r.Name&#125;</span><br><span class="line">			m.deadNode(&amp;d)</span><br><span class="line">		<span class="keyword">case</span> stateDead:</span><br><span class="line">			<span class="comment">// If the remote node believes a node is dead, we prefer to</span></span><br><span class="line">			<span class="comment">// suspect that node instead of declaring it dead instantly</span></span><br><span class="line">			<span class="keyword">fallthrough</span></span><br><span class="line">		<span class="comment">// 如果只是对节点有所怀疑，则广播此怀疑消息</span></span><br><span class="line">		<span class="keyword">case</span> stateSuspect:</span><br><span class="line">			s := suspect&#123;Incarnation: r.Incarnation, Node: r.Name, From: m.config.Name&#125;</span><br><span class="line">			m.suspectNode(&amp;s)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>到这里，push-pull的流程就走完了。</p>
+<h4 id="Gossip"><a href="#Gossip" class="headerlink" title="Gossip"></a>Gossip</h4><p>现在，我们来看最后一步，也就是<code>Gossip</code>，这一步就是将自己的数据随机的广播给多个节点去。</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// gossip is invoked every GossipInterval period to broadcast our gossip</span></span><br><span class="line"><span class="comment">// messages to a few random nodes.</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *Memberlist)</span> <span class="title">gossip</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="keyword">defer</span> metrics.MeasureSince([]<span class="keyword">string</span>&#123;<span class="string">"memberlist"</span>, <span class="string">"gossip"</span>&#125;, time.Now())</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Get some random live, suspect, or recently dead nodes</span></span><br><span class="line">	m.nodeLock.RLock()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 这里随机选择K个节点来进行广播操作</span></span><br><span class="line">	kNodes := kRandomNodes(m.config.GossipNodes, m.nodes, <span class="function"><span class="keyword">func</span><span class="params">(n *nodeState)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">		<span class="keyword">if</span> n.Name == m.config.Name &#123;</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">switch</span> n.State &#123;</span><br><span class="line">		<span class="keyword">case</span> stateAlive, stateSuspect:</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">		</span><br><span class="line">		<span class="comment">// 如果节点处于 dead 状态的话，需要对该节点的上次状态变更时间距离现在时间的时间差，与GossipToTheDeadTimezhi</span></span><br><span class="line">		<span class="keyword">case</span> stateDead:</span><br><span class="line">			<span class="keyword">return</span> time.Since(n.StateChange) &gt; m.config.GossipToTheDeadTime</span><br><span class="line"></span><br><span class="line">		<span class="keyword">default</span>:</span><br><span class="line">			<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;)</span><br><span class="line">	m.nodeLock.RUnlock()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Compute the bytes available</span></span><br><span class="line">	bytesAvail := m.config.UDPBufferSize - compoundHeaderOverhead</span><br><span class="line">	<span class="keyword">if</span> m.config.EncryptionEnabled() &#123;</span><br><span class="line">		bytesAvail -= encryptOverhead(m.encryptionVersion())</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span> _, node := <span class="keyword">range</span> kNodes &#123;</span><br><span class="line">		<span class="comment">// 这里会收集需要广播出去的数据信息，分为两大部分</span></span><br><span class="line">		<span class="comment">// 第一部分，也是最优先收集的：memberlist 协议自身运行时产生的数据信息</span></span><br><span class="line">		<span class="comment">// 第二部分，如果用户实现了接口，则收集用户侧需要进行广播的消息数据</span></span><br><span class="line">		msgs := m.getBroadcasts(compoundOverhead, bytesAvail)</span><br><span class="line">		<span class="keyword">if</span> <span class="built_in">len</span>(msgs) == <span class="number">0</span> &#123;</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 这里的代码就只是将数据发送出去而已</span></span><br><span class="line">		...</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/gossip/" rel="tag"># gossip</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/09/18/java-web-56/" rel="prev" title="JRaft 选主流程浅析">
+      <i class="fa fa-chevron-left"></i> JRaft 选主流程浅析
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/02/23/java-web-59/" rel="next" title="CPU 100% 占用率，但是怎么排查不出是哪一个线程使用最高？">
+      CPU 100% 占用率，但是怎么排查不出是哪一个线程使用最高？ <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Gossip-协议"><span class="nav-number">1.</span> <span class="nav-text">Gossip 协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#memberlist-的实现"><span class="nav-number">2.</span> <span class="nav-text">memberlist 的实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建一个-Memberlist"><span class="nav-number">2.1.</span> <span class="nav-text">创建一个 Memberlist</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#probe"><span class="nav-number">2.1.1.</span> <span class="nav-text">probe</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pushPullTrigger"><span class="nav-number">2.1.2.</span> <span class="nav-text">pushPullTrigger</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Gossip"><span class="nav-number">2.1.3.</span> <span class="nav-text">Gossip</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">liaochuntao</p>
+  <div class="site-description" itemprop="description">励志成为一位大佬</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">118</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">21</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

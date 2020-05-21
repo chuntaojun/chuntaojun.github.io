@@ -1,236 +1,88 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 3.7.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"www.liaochuntao.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
-  </script>
-
-  <meta name="description" content="CopyOnWriteArrayList的并发实现 锁机制的采用：final transient ReentrantLock lock = new ReentrantLock(); 元素的存储：private transient volatile Object[] array;，采用了volatile修饰，确保array的在多线程下的可见性 并发下的设置元素，采用了java.util.concur">
-<meta property="og:type" content="article">
-<meta property="og:title" content="java源码解析之CopyOnWriteArrayList">
-<meta property="og:url" content="https://www.liaochuntao.cn/2019/02/27/java-web-25/index.html">
-<meta property="og:site_name" content="春少 Blog">
-<meta property="og:description" content="CopyOnWriteArrayList的并发实现 锁机制的采用：final transient ReentrantLock lock = new ReentrantLock(); 元素的存储：private transient volatile Object[] array;，采用了volatile修饰，确保array的在多线程下的可见性 并发下的设置元素，采用了java.util.concur">
-<meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-27T14:38:42.000Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="java源码解析之CopyOnWriteArrayList">
-<meta name="twitter:description" content="CopyOnWriteArrayList的并发实现 锁机制的采用：final transient ReentrantLock lock = new ReentrantLock(); 元素的存储：private transient volatile Object[] array;，采用了volatile修饰，确保array的在多线程下的可见性 并发下的设置元素，采用了java.util.concur">
-
-<link rel="canonical" href="https://www.liaochuntao.cn/2019/02/27/java-web-25/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'default'
-  };
-</script>
-
-  <title>java源码解析之CopyOnWriteArrayList | 春少 Blog</title>
+  <meta charset="utf-8">
   
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+  
+  
+    <meta name="description" content="励志成为一位大佬">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    java源码解析之CopyOnWriteArrayList |
+    
+    春少 Blog</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-java-web-25" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">春少 Blog</h1>
-      <span class="logo-line-after"><i></i></span>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
-    </div>
-  </div>
-</div>
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h1 class="article-title" itemprop="name">
+      java源码解析之CopyOnWriteArrayList
+    </h1>
+  
+  
 
 
 
 
-<nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
-
-  </li>
-        <li class="menu-item menu-item-schedule">
-
-    <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>Schedule</a>
-
-  </li>
-        <li class="menu-item menu-item-sitemap">
-
-    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
-
-  </li>
-  </ul>
-</nav>
-
-
-
-
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
+            </header>
             
 
-    
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/02/27/java-web-25/">
+                
+                    <div class="article-meta">
+                        <a href="/2019/02/27/java-web-25/" class="article-date">
+  <time datetime="2019-02-27T16:08:48.000Z" itemprop="datePublished">2019-02-27</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
+                    </div>
+                    
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          java源码解析之CopyOnWriteArrayList
-        </h1>
+                        
+                            
+    <div class="tocbot"></div>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2019-02-27 16:08:48 / Modified: 22:38:42" itemprop="dateCreated datePublished" datetime="2019-02-27T16:08:48+08:00">2019-02-27</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a>
-                </span>
-            </span>
 
-          
 
-        </div>
-      </header>
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                
 
-      
-        <h4 id="CopyOnWriteArrayList的并发实现"><a href="#CopyOnWriteArrayList的并发实现" class="headerlink" title="CopyOnWriteArrayList的并发实现"></a>CopyOnWriteArrayList的并发实现</h4><ul>
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                                    <h4 id="CopyOnWriteArrayList的并发实现"><a href="#CopyOnWriteArrayList的并发实现" class="headerlink" title="CopyOnWriteArrayList的并发实现"></a>CopyOnWriteArrayList的并发实现</h4><ul>
 <li>锁机制的采用：<code>final transient ReentrantLock lock = new ReentrantLock();</code></li>
 <li>元素的存储：<code>private transient volatile Object[] array;</code>，采用了<code>volatile</code>修饰，确保array的在多线程下的可见性</li>
-<li><p>并发下的设置元素，采用了<code>java.util.concurrent</code>包的<code>ReentrantLock</code>锁（创建时采用了默认的不公平锁），在设置新元素时，是获取了原数组的一个拷贝<code>Object[] elements = getArray();</code>，在拷贝的数组上进行元素的更改，在更改完成后，通过<code>setArray</code>方法更新旧的array数组</p>
- <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> E <span class="title">set</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</span><br><span class="line">    lock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Object[] elements = getArray();</span><br><span class="line">        E oldValue = get(elements, index);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (oldValue != element) &#123;</span><br><span class="line">            <span class="keyword">int</span> len = elements.length;</span><br><span class="line">            Object[] newElements = Arrays.copyOf(elements, len);</span><br><span class="line">            newElements[index] = element;</span><br><span class="line">            setArray(newElements);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// Not quite a no-op; ensures volatile write semantics</span></span><br><span class="line">            setArray(elements);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> oldValue;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>特点：CopyOnWriteArrayList对于数据的更改的反馈是延迟性的，从上面一个示例代码可以看出，由于是通过数组的copy操作，在拷贝的副本上进行相应的数据操作，然后在进行副本替代原数据的操作，从而实现ArrayList的并发操作；因此，当两个线程同时对CopyOnWriteArrayList进行操作时，假设A线程遍历CopyOnWriteArrayList，B线程在对CopyOnWriteArrayList进行数据的修改，A线程所遍历的还是旧数据，是无法立马感知线程B对CopyOnWriteArrayList的修改操作</li>
+<li>并发下的设置元素，采用了<code>java.util.concurrent</code>包的<code>ReentrantLock</code>锁（创建时采用了默认的不公平锁），在设置新元素时，是获取了原数组的一个拷贝<code>Object[] elements = getArray();</code>，在拷贝的数组上进行元素的更改，在更改完成后，通过<code>setArray</code>方法更新旧的array数组</li>
 </ul>
-</li>
+<a id="more"></a>
+<pre><code><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> E <span class="title">set</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</span><br><span class="line">    lock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Object[] elements = getArray();</span><br><span class="line">        E oldValue = get(elements, index);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (oldValue != element) &#123;</span><br><span class="line">            <span class="keyword">int</span> len = elements.length;</span><br><span class="line">            Object[] newElements = Arrays.copyOf(elements, len);</span><br><span class="line">            newElements[index] = element;</span><br><span class="line">            setArray(newElements);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// Not quite a no-op; ensures volatile write semantics</span></span><br><span class="line">            setArray(elements);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> oldValue;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</code></pre><ul>
+<li>特点：CopyOnWriteArrayList对于数据的更改的反馈是延迟性的，从上面一个示例代码可以看出，由于是通过数组的copy操作，在拷贝的副本上进行相应的数据操作，然后在进行副本替代原数据的操作，从而实现ArrayList的并发操作；因此，当两个线程同时对CopyOnWriteArrayList进行操作时，假设A线程遍历CopyOnWriteArrayList，B线程在对CopyOnWriteArrayList进行数据的修改，A线程所遍历的还是旧数据，是无法立马感知线程B对CopyOnWriteArrayList的修改操作</li>
 </ul>
 <h4 id="final-ReentrantLock-lock-this-lock-为什么要多此一举？"><a href="#final-ReentrantLock-lock-this-lock-为什么要多此一举？" class="headerlink" title="final ReentrantLock lock = this.lock 为什么要多此一举？"></a>final ReentrantLock lock = this.lock 为什么要多此一举？</h4><p>在看<code>CopyOnWriteArrayList</code>时，对其中的一段代码很是不解</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> E <span class="title">set</span><span class="params">(<span class="keyword">int</span> index, E element)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">this</span>.lock;</span><br><span class="line">    lock.lock();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -246,196 +98,151 @@
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">Constant pool:</span><br><span class="line">   #1 = Methodref          #11.#26        // java/lang/Object."&lt;init&gt;":()V</span><br><span class="line">   #2 = Class              #27            // java/util/concurrent/locks/ReentrantLock</span><br><span class="line">   #3 = Methodref          #2.#26         // java/util/concurrent/locks/ReentrantLock."&lt;init&gt;":()V</span><br><span class="line">   #4 = Fieldref           #7.#28         // MemoryTest.lock:Ljava/util/concurrent/locks/ReentrantLock;</span><br><span class="line">   #5 = Methodref          #2.#29         // java/util/concurrent/locks/ReentrantLock.lock:()V</span><br><span class="line">   #6 = Methodref          #2.#30         // java/util/concurrent/locks/ReentrantLock.unlock:()V</span><br><span class="line">   #7 = Class              #31            // MemoryTest</span><br><span class="line">   #8 = Methodref          #7.#26         // MemoryTest."&lt;init&gt;":()V</span><br><span class="line">   #9 = Methodref          #7.#32         // MemoryTest.test:()V</span><br><span class="line">  #10 = Methodref          #7.#33         // MemoryTest.test2:()V</span><br><span class="line">  #11 = Class              #34            // java/lang/Object</span><br><span class="line">  #12 = Utf8               lock</span><br><span class="line">  #13 = Utf8               Ljava/util/concurrent/locks/ReentrantLock;</span><br><span class="line">  #14 = Utf8               a</span><br><span class="line">  #15 = Utf8               I</span><br><span class="line">  #16 = Utf8               &lt;init&gt;</span><br><span class="line">  #17 = Utf8               ()V</span><br><span class="line">  #18 = Utf8               Code</span><br><span class="line">  #19 = Utf8               LineNumberTable</span><br><span class="line">  #20 = Utf8               test</span><br><span class="line">  #21 = Utf8               test2</span><br><span class="line">  #22 = Utf8               main</span><br><span class="line">  #23 = Utf8               ([Ljava/lang/String;)V</span><br><span class="line">  #24 = Utf8               SourceFile</span><br><span class="line">  #25 = Utf8               MemoryTest.java</span><br><span class="line">  #26 = NameAndType        #16:#17        // "&lt;init&gt;":()V</span><br><span class="line">  #27 = Utf8               java/util/concurrent/locks/ReentrantLock</span><br><span class="line">  #28 = NameAndType        #12:#13        // lock:Ljava/util/concurrent/locks/ReentrantLock;</span><br><span class="line">  #29 = NameAndType        #12:#17        // lock:()V</span><br><span class="line">  #30 = NameAndType        #35:#17        // unlock:()V</span><br><span class="line">  #31 = Utf8               MemoryTest</span><br><span class="line">  #32 = NameAndType        #20:#17        // test:()V</span><br><span class="line">  #33 = NameAndType        #21:#17        // test2:()V</span><br><span class="line">  #34 = Utf8               java/lang/Object</span><br><span class="line">  #35 = Utf8               unlock</span><br></pre></td></tr></table></figure>
 <p>通过查看编译后字节码后，我们可以发现，在<code>test</code>方法中，由于直接使用成员变量，因此有两次<code>getfield</code>操作，这是从常量池中获取<code>lock</code>这个成员变量，而java内存情况是，方法执行是是在虚拟机栈中的，而常量池是在方法区中的，需要从堆中拿到指针然后压入栈中，因此，由于<code>test</code>方法是直接使用成员变量，因此会有而外的开销；而<code>test2</code>方法中，由于将成员变量赋值给了方法内的局部变量，相比<code>test</code>方法，少了一次的指针从堆拿取然后入栈的操作</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span></span>;</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: (<span class="number">0x0001</span>) ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=<span class="number">1</span>, locals=<span class="number">1</span>, args_size=<span class="number">1</span></span><br><span class="line">         <span class="number">0</span>: aload_0</span><br><span class="line">         1: getfield      #4                  // Field lock:Ljava/util/concurrent/locks/ReentrantLock;</span><br><span class="line">         4: invokevirtual #5                  // Method java/util/concurrent/locks/ReentrantLock.lock:()V</span><br><span class="line">         <span class="number">7</span>: aload_0</span><br><span class="line">         8: getfield      #4                  // Field lock:Ljava/util/concurrent/locks/ReentrantLock;</span><br><span class="line">        11: invokevirtual #6                  // Method java/util/concurrent/locks/ReentrantLock.unlock:()V</span><br><span class="line">        <span class="number">14</span>: <span class="keyword">return</span></span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line <span class="number">13</span>: <span class="number">0</span></span><br><span class="line">        line <span class="number">14</span>: <span class="number">7</span></span><br><span class="line">        line <span class="number">15</span>: <span class="number">14</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test2</span><span class="params">()</span></span>;</span><br><span class="line">    descriptor: ()V</span><br><span class="line">    flags: (<span class="number">0x0001</span>) ACC_PUBLIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=<span class="number">1</span>, locals=<span class="number">2</span>, args_size=<span class="number">1</span></span><br><span class="line">         <span class="number">0</span>: aload_0</span><br><span class="line">         1: getfield      #4                  // Field lock:Ljava/util/concurrent/locks/ReentrantLock;</span><br><span class="line">         <span class="number">4</span>: astore_1</span><br><span class="line">         <span class="number">5</span>: aload_1</span><br><span class="line">         6: invokevirtual #5                  // Method java/util/concurrent/locks/ReentrantLock.lock:()V</span><br><span class="line">         <span class="number">9</span>: aload_1</span><br><span class="line">        10: invokevirtual #6                  // Method java/util/concurrent/locks/ReentrantLock.unlock:()V</span><br><span class="line">        <span class="number">13</span>: <span class="keyword">return</span></span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line <span class="number">18</span>: <span class="number">0</span></span><br><span class="line">        line <span class="number">19</span>: <span class="number">5</span></span><br><span class="line">        line <span class="number">20</span>: <span class="number">9</span></span><br><span class="line">        line <span class="number">21</span>: <span class="number">13</span></span><br></pre></td></tr></table></figure>
+                                                                        
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/02/27/java-web-25/" data-id="ckagk2wjl002o16l9ec6tpj59" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
     </div>
 
     
-    
-    
-
-      <footer class="post-footer">
-
         
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2019/02/27/java-web-24/" rel="prev" title="简易实现文件分块上传功能——后端代码的实现">
-      <i class="fa fa-chevron-left"></i> 简易实现文件分块上传功能——后端代码的实现
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/03/02/leetcode-19/" rel="next" title="leetcode回顾——[934] Shortest Bridge">
-      leetcode回顾——[934] Shortest Bridge <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
+  <nav class="article-nav">
     
-  </article>
-  
-  
-  
-
-
-
-          </div>
+      <a href="/2019/03/02/leetcode-19/" class="article-nav-link">
+        <strong class="article-nav-caption">Newer</strong>
+        <div class="article-nav-title">
           
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
+            leetcode回顾——[934] Shortest Bridge
+          
         </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#CopyOnWriteArrayList的并发实现"><span class="nav-number">1.</span> <span class="nav-text">CopyOnWriteArrayList的并发实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#final-ReentrantLock-lock-this-lock-为什么要多此一举？"><span class="nav-number">2.</span> <span class="nav-text">final ReentrantLock lock = this.lock 为什么要多此一举？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解答问题"><span class="nav-number">3.</span> <span class="nav-text">解答问题</span></a></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">liaochuntao</p>
-  <div class="site-description" itemprop="description">励志成为一位大佬</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">118</span>
-          <span class="site-state-item-name">posts</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">10</span>
-        <span class="site-state-item-name">categories</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">21</span>
-        <span class="site-state-item-name">tags</span>
-      </div>
+      </a>
+    
+    
+      <a href="/2019/02/27/java-web-24/" class="article-nav-link">
+        <strong class="article-nav-caption">Older</strong>
+        <div class="article-nav-title">简易实现文件分块上传功能——后端代码的实现</div>
+      </a>
+    
   </nav>
-</div>
-  <div class="links-of-author motion-element">
-      <span class="links-of-author-item">
-        <a href="https://github.com/chuntaojun" title="GitHub → https://github.com/chuntaojun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-      <span class="links-of-author-item">
-        <a href="mailto:lessspring@outlook.com" title="E-Mail → mailto:lessspring@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
-      </span>
-  </div>
 
 
+            
 
-      </div>
+                
+                    
+                        
+                            
 
+</article>
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+    <li><i class="fe fe-bookmark"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul>
     </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
+    <ul class="list-inline">
+      <li>&copy; 2020 春少 Blog</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
 
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-        
-
-<div class="copyright">
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+<nav class="navbar">
   
-  &copy; 
-  <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="春少 Blog"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/gallery">Gallery</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
-  </div>
+    </li>
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+</aside>
+<script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
 
-        
-
-
-
-
-
-
-
-
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
 
 
 
+  <script src="/js/tocbot.min.js"></script>
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
 
 
-
-
-
-
-
-
-
-
-
-
-  
-
-  
+<script src="/js/ocean.js"></script>
 
 <script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
 </html>

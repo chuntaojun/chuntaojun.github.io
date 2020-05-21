@@ -1,543 +1,425 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 3.7.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"www.liaochuntao.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
-  </script>
-
-  <meta name="description" content="励志成为一位大佬">
-<meta property="og:type" content="website">
-<meta property="og:title" content="春少 Blog">
-<meta property="og:url" content="https://www.liaochuntao.cn/page/7/index.html">
-<meta property="og:site_name" content="春少 Blog">
-<meta property="og:description" content="励志成为一位大佬">
-<meta property="og:locale" content="default">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="春少 Blog">
-<meta name="twitter:description" content="励志成为一位大佬">
-
-<link rel="canonical" href="https://www.liaochuntao.cn/page/7/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : true,
-    isPost : false,
-    lang   : 'default'
-  };
-</script>
-
-  <title>春少 Blog</title>
+  <meta charset="utf-8">
   
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+  
+  
+    <meta name="description" content="励志成为一位大佬">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    
+    春少 Blog</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
-
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">春少 Blog</h1>
-      <span class="logo-line-after"><i></i></span>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
-    </div>
-  </div>
-</div>
-
-
-
-
-<nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
-
-  </li>
-        <li class="menu-item menu-item-schedule">
-
-    <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>Schedule</a>
-
-  </li>
-        <li class="menu-item menu-item-sitemap">
-
-    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
-
-  </li>
-  </ul>
-</nav>
-
-
-
-
-</div>
-    </header>
-
+<body>
+<main class="content">
+  <section class="jumbotron">
+  <div class="video">
     
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
+      <div class="video-frame">
+        <img src="/images/ocean/overlay-hero.png" alt="Decorative image frame">
+      </div>
+    
+    <div class="video-media">
+      <video playsinline="" autoplay="" loop="" muted="" data-autoplay=""
+             poster="/images/ocean/ocean.png" x5-video-player-type="h5">
+        <source src="/images/ocean/ocean.mp4" type="video/mp4">
+        <source src="/images/ocean/ocean.ogv" type="video/ogg">
+        <source src="/images/ocean/ocean.webm" type="video/webm">
+        <p>Your user agent does not support the HTML5 Video element.</p>
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+    <div class="video-inner text-center text-white">
+      <h1><a href="/">春少 Blog</a></h1>
+      <p></p>
+      <div><img src="/images/hexo-inverted.svg" class="brand" alt="春少 Blog"></div>
+    </div>
+    <div class="video-learn-more">
+      <a class="anchor" href="#landingpage"><i class="fe fe-mouse"></i></a>
+    </div>
   </div>
+</section>
+
+<div id="landingpage">
+  <section class="outer">
+    <article class="articles">
+      
+      <h1 class="page-type-title"></h1>
+      
+        
+          <article id="post-leetcode-10" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/12/24/leetcode-10/">leetcode回顾——Open the Lock</a>
+    </h2>
+  
+  
 
 
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
 
-          <div class="content index posts-expand">
+
+            </header>
             
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/12/22/leetcode-9/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
+                
+                    <div class="article-meta">
+                        <a href="/2018/12/24/leetcode-10/" class="article-date">
+  <time datetime="2018-12-24T14:35:29.000Z" itemprop="datePublished">2018-12-24</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/LeetCode/">LeetCode</a>
+  </div>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/12/22/leetcode-9/" class="post-title-link" itemprop="url">leetcode回顾——链表的归并排序</a>
-        </h2>
+                    </div>
+                    
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
+                        
 
-              <time title="Created: 2018-12-22 23:05:13 / Modified: 23:13:24" itemprop="dateCreated datePublished" datetime="2018-12-22T23:05:13+08:00">2018-12-22</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
-                </span>
-            </span>
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
 
-          
 
-        </div>
-      </header>
+                                            
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                                
+                                                    <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">你有一个带有四个圆形拨轮的转盘锁。每个拨轮都有10个数字： &apos;0&apos;, &apos;1&apos;, &apos;2&apos;, &apos;3&apos;, &apos;4&apos;, &apos;5&apos;, &apos;6&apos;, &apos;7&apos;, &apos;8&apos;, &apos;9&apos; 。每个拨轮可以自由旋转：例如把 &apos;9&apos; 变为  &apos;0&apos;，&apos;0&apos; 变为 &apos;9&apos; 。每次旋转都只能旋转一个拨轮的一位数字。锁的初始数字为 &apos;0000&apos; ，一个代表四个拨轮的数字的字符串。列表 deadends 包含了一组死亡数字，一旦拨轮的数字和列表里的任何一个元素相同，这个锁将会被永久锁定，无法再被旋转。字符串 target 代表可以解锁的数字，你需要给出最小的旋转次数，如果无论如何不能解锁，返回 -1。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入：deadends = [&quot;0201&quot;,&quot;0101&quot;,&quot;0102&quot;,&quot;1212&quot;,&quot;2002&quot;], target = &quot;0202&quot;</span><br><span class="line">输出：6</span><br><span class="line">解释：</span><br><span class="line">可能的移动序列为 &quot;0000&quot; -&gt; &quot;1000&quot; -&gt; &quot;1100&quot; -&gt; &quot;1200&quot; -&gt; &quot;1201&quot; -&gt; &quot;1202&quot; -&gt; &quot;0202&quot;。</span><br><span class="line">注意 &quot;0000&quot; -&gt; &quot;0001&quot; -&gt; &quot;0002&quot; -&gt; &quot;0102&quot; -&gt; &quot;0202&quot; 这样的序列是不能解锁的，</span><br><span class="line">因为当拨动到 &quot;0102&quot; 时这个锁就会被锁定。</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: deadends = [&quot;8888&quot;], target = &quot;0009&quot;</span><br><span class="line">输出：1</span><br><span class="line">解释：</span><br><span class="line">把最后一位反向旋转一次即可 &quot;0000&quot; -&gt; &quot;0009&quot;。</span><br><span class="line">示例 3:</span><br><span class="line"></span><br><span class="line">输入: deadends = [&quot;8887&quot;,&quot;8889&quot;,&quot;8878&quot;,&quot;8898&quot;,&quot;8788&quot;,&quot;8988&quot;,&quot;7888&quot;,&quot;9888&quot;], target = &quot;8888&quot;</span><br><span class="line">输出：-1</span><br><span class="line">解释：</span><br><span class="line">无法旋转到目标数字且不被锁定。</span><br><span class="line">示例 4:</span><br><span class="line"></span><br><span class="line">输入: deadends = [&quot;0000&quot;], target = &quot;8888&quot;</span><br><span class="line">输出：-1</span><br><span class="line"></span><br><span class="line">提示：</span><br><span class="line"></span><br><span class="line">死亡列表 deadends 的长度范围为 [1, 500]。</span><br><span class="line">目标数字 target 不会在 deadends 之中。</span><br><span class="line">每个 deadends 和 target 中的字符串的数字会在 10,000 个可能的情况 &apos;0000&apos; 到 &apos;9999&apos; 中产生。</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2018/12/24/leetcode-10/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/12/24/leetcode-10/" data-id="ckagk2wlh006416l9porf0ab0" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
 
-      
-          <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: 4-&gt;2-&gt;1-&gt;3</span><br><span class="line">输出: 1-&gt;2-&gt;3-&gt;4</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: -1-&gt;5-&gt;3-&gt;4-&gt;0</span><br><span class="line">输出: -1-&gt;0-&gt;3-&gt;4-&gt;5</span><br></pre></td></tr></table></figure>
-<h4 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h4><p>归并排序的首要就是将数据均分成两部分，如果是传统的数组的话，直接获取数组长度然后直接求出中点进行左右划分，但是链表的话，是没办法直接获取长度的(仅针对此题的链表数据结构)，这时，可以利用快慢指针，来实现中点划分：设置快指针的速度是慢指针的两倍，那么，当快指针走到链表的末端时，慢指针的位置一定是链表的中点位置，这样就实现了归并的数据划分操作；剩下的，就和数组的归并排序差不多了，只不过，中间存放变量从数组变为了指针，因此需要确保每次merge的时候指针能够指向正确的位置即可</p>
-<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ListNode</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        self.val = x</span><br><span class="line">        self.next = <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">sortList</span><span class="params">(self, head)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type head: ListNode</span></span><br><span class="line"><span class="string">        :rtype: ListNode</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">None</span> <span class="keyword">if</span> head == <span class="keyword">None</span> <span class="keyword">else</span> self.mergeSort(node=head)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">mergeSort</span><span class="params">(self, node)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        快慢指针，</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> node.next == <span class="keyword">None</span>:</span><br><span class="line">            <span class="keyword">return</span> node</span><br><span class="line">        p = node; q = node; pre = <span class="keyword">None</span></span><br><span class="line">        <span class="keyword">while</span> q != <span class="keyword">None</span> <span class="keyword">and</span> q.next != <span class="keyword">None</span>:</span><br><span class="line">            pre = p</span><br><span class="line">            p = p.next</span><br><span class="line">            q = q.next.next</span><br><span class="line">        pre.next = <span class="keyword">None</span></span><br><span class="line">        l = self.mergeSort(node)</span><br><span class="line">        r = self.mergeSort(p)</span><br><span class="line">        <span class="keyword">return</span> self.merge(l1=l, l2=r)</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">merge</span><span class="params">(self, l1, l2)</span>:</span></span><br><span class="line">        node = ListNode(<span class="number">-1</span>)</span><br><span class="line">        tmp = node</span><br><span class="line">        <span class="keyword">while</span> l1 != <span class="keyword">None</span> <span class="keyword">and</span> l2 != <span class="keyword">None</span>:</span><br><span class="line">            <span class="keyword">if</span> l1.val &lt;= l2.val:</span><br><span class="line">                tmp.next = l1</span><br><span class="line">                l1 = l1.next</span><br><span class="line">                tmp = tmp.next</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                tmp.next = l2</span><br><span class="line">                l2 = l2.next</span><br><span class="line">                tmp = tmp.next</span><br><span class="line">        <span class="keyword">while</span> l1 != <span class="keyword">None</span>:</span><br><span class="line">            tmp.next = l1</span><br><span class="line">            l1 = l1.next</span><br><span class="line">            tmp = tmp.next</span><br><span class="line">        <span class="keyword">while</span> l2 != <span class="keyword">None</span>:</span><br><span class="line">            tmp.next = l2</span><br><span class="line">            l2 = l2.next</span><br><span class="line">            tmp = tmp.next</span><br><span class="line">        tmp = <span class="keyword">None</span></span><br><span class="line">        <span class="keyword">return</span> node.next</span><br></pre></td></tr></table></figure>
-      
     </div>
 
     
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
+
+                
+
+</article>
+        
+          <article id="post-leetcode-9" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/12/22/leetcode-9/">leetcode回顾——链表的归并排序</a>
+    </h2>
   
   
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/12/19/leetcode-8/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/12/19/leetcode-8/" class="post-title-link" itemprop="url">leetcode回顾——Merge Intervals</a>
-        </h2>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
+            </header>
+            
 
-              <time title="Created: 2018-12-19 22:24:04 / Modified: 22:46:00" itemprop="dateCreated datePublished" datetime="2018-12-19T22:24:04+08:00">2018-12-19</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
-                </span>
-            </span>
+                
+                    <div class="article-meta">
+                        <a href="/2018/12/22/leetcode-9/" class="article-date">
+  <time datetime="2018-12-22T23:05:13.000Z" itemprop="datePublished">2018-12-22</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/LeetCode/">LeetCode</a>
+  </div>
 
-          
+                    </div>
+                    
 
-        </div>
-      </header>
+                        
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
 
-      
-          <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">给出一个区间的集合，请合并所有重叠的区间。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: [[1,3],[2,6],[8,10],[15,18]]</span><br><span class="line">输出: [[1,6],[8,10],[15,18]]</span><br><span class="line">解释: 区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: [[1,4],[4,5]]</span><br><span class="line">输出: [[1,5]]</span><br><span class="line">解释: 区间 [1,4] 和 [4,5] 可被视为重叠区间。</span><br></pre></td></tr></table></figure>
-<h4 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h4><p>其实这道题还是很快想到办法的，两个区间的位置关系就三种</p>
-<blockquote>
-<p>第一种 无交集</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">                1--2--3--4--5--6--7--8--9</span><br><span class="line">区间一：[2,3]       [---]    </span><br><span class="line">区间二：[5,6]                [---]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>第二种 部分相交</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">                1--2--3--4--5--6--7--8--9</span><br><span class="line">区间一：[2,5]       [--------]    </span><br><span class="line">区间二：[4,6]             [------]</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>第三种 包含</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">                1--2--3--4--5--6--7--8--9</span><br><span class="line">区间一：[2,8]       [------------------]    </span><br><span class="line">区间二：[4,6]             [------]</span><br></pre></td></tr></table></figure>
-<p>因此，只需要理清这三种关系中，每个区间的左右两个端点的值的大小关系就能解出这道题了。</p>
-<p>为了能够一次遍历实现区间合并，还需要对参数<code>intervals</code>进行一些操作，利用<code>lambda</code>表达式设置排序的比较对象，使得元素排序根据区间的左端点的大小进行升序排序，然后就按上面的三种情况进行仔细区分分析就可以了</p>
-<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">merge</span><span class="params">(self, intervals)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type intervals: List[Interval]</span></span><br><span class="line"><span class="string">        :rtype: List[Interval]</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">if</span> len(intervals) &lt;= <span class="number">1</span>:</span><br><span class="line">            <span class="keyword">return</span> intervals</span><br><span class="line">        intervals.sort(key=<span class="keyword">lambda</span> x: x.start)</span><br><span class="line">        a = <span class="number">0</span>; b = <span class="number">1</span></span><br><span class="line">        <span class="keyword">while</span> a &lt; len(intervals):</span><br><span class="line">            <span class="keyword">if</span> b == len(intervals):</span><br><span class="line">                a += <span class="number">1</span></span><br><span class="line">                b = a + <span class="number">1</span></span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            t_1 = intervals[a]</span><br><span class="line">            t_2 = intervals[b]</span><br><span class="line">            <span class="keyword">if</span> t_1.end &gt;= t_2.start:</span><br><span class="line">                intervals[a].end = max(t_1.end, t_2.end)</span><br><span class="line">                intervals.pop(b)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                a += <span class="number">1</span></span><br><span class="line">                b += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> intervals</span><br></pre></td></tr></table></figure>
-      
+
+                                            
+
+                                                
+                                                    <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">在 O(n log n) 时间复杂度和常数级空间复杂度下，对链表进行排序。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: 4-&gt;2-&gt;1-&gt;3</span><br><span class="line">输出: 1-&gt;2-&gt;3-&gt;4</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: -1-&gt;5-&gt;3-&gt;4-&gt;0</span><br><span class="line">输出: -1-&gt;0-&gt;3-&gt;4-&gt;5</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2018/12/22/leetcode-9/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/12/22/leetcode-9/" data-id="ckagk2wmf007t16l9fbj3by5b" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
     </div>
 
     
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
+
+                
+
+</article>
+        
+          <article id="post-leetcode-8" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/12/19/leetcode-8/">leetcode回顾——Merge Intervals</a>
+    </h2>
   
   
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/12/14/leetcode-7/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/12/14/leetcode-7/" class="post-title-link" itemprop="url">leetcode回顾——字符串的排列</a>
-        </h2>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
+            </header>
+            
 
-              <time title="Created: 2018-12-14 11:11:27" itemprop="dateCreated datePublished" datetime="2018-12-14T11:11:27+08:00">2018-12-14</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-01-06 14:27:26" itemprop="dateModified" datetime="2019-01-06T14:27:26+08:00">2019-01-06</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
-                </span>
-            </span>
+                
+                    <div class="article-meta">
+                        <a href="/2018/12/19/leetcode-8/" class="article-date">
+  <time datetime="2018-12-19T22:24:04.000Z" itemprop="datePublished">2018-12-19</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/LeetCode/">LeetCode</a>
+  </div>
 
-          
+                    </div>
+                    
 
-        </div>
-      </header>
+                        
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
 
-      
-          <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">给定两个字符串 s1 和 s2，写一个函数来判断 s2 是否包含 s1 的排列。</span><br><span class="line"></span><br><span class="line">换句话说，第一个字符串的排列之一是第二个字符串的子串。</span><br><span class="line"></span><br><span class="line">示例1:</span><br><span class="line"></span><br><span class="line">输入: s1 = &quot;ab&quot; s2 = &quot;eidbaooo&quot;</span><br><span class="line">输出: True</span><br><span class="line">解释: s2 包含 s1 的排列之一 (&quot;ba&quot;).</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">示例2:</span><br><span class="line"></span><br><span class="line">输入: s1= &quot;ab&quot; s2 = &quot;eidboaoo&quot;</span><br><span class="line">输出: False</span><br></pre></td></tr></table></figure>
-<h4 id="初期解题思路"><a href="#初期解题思路" class="headerlink" title="初期解题思路"></a>初期解题思路</h4><p>滑动窗口+字符串排序+list比较——&gt;超时</p>
-<p>要求s1的任意排序是否是s2的子串，如果对s1的排序结果搜索的话，那百分之百是会超时的，这个时候，就要从s2入手了，因此s1可以任意排序，那么，在s2上设置一个长度为s1的滑动窗口，在s2上滑动，将滑动窗口内的字符串进行ascii排序，同时对s1采取同样的操作，然后比较排序后两个list是否相等，如果不相等，那么窗口右移一个字母</p>
-<blockquote>
-<p>python 代码</p>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">checkInclusion</span><span class="params">(self, s1, s2)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type s1: str</span></span><br><span class="line"><span class="string">        :type s2: str</span></span><br><span class="line"><span class="string">        :rtype: bool</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        len_s1 = len(s1)</span><br><span class="line">        s_1 = list(s1).sort()</span><br><span class="line">        l = <span class="number">0</span></span><br><span class="line">        <span class="keyword">while</span> l &lt; len(s2):</span><br><span class="line">            r = l + len_s1</span><br><span class="line">            tmp = list(s2[l: r])</span><br><span class="line">            tmp.sort()</span><br><span class="line">            <span class="keyword">if</span> tmp == s_1:</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">True</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                l += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">False</span></span><br></pre></td></tr></table></figure>
-<h4 id="正确解题思路"><a href="#正确解题思路" class="headerlink" title="正确解题思路"></a>正确解题思路</h4><p>滑动窗口+字符出现次数hash表</p>
-<p>最开始的思路只对了一半。也就是滑动窗口，但是，耗时在了排序，其实，并不用去管字母的顺序，只需要比较s1中各个字母出现的次数与s2的滑动窗口内各个字母出现的次数即可，其时间复杂度就是O(N - M)</p>
-<blockquote>
-<p>python 代码</p>
-</blockquote>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">checkInclusion</span><span class="params">(self, s1, s2)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type s1: str</span></span><br><span class="line"><span class="string">        :type s2: str</span></span><br><span class="line"><span class="string">        :rtype: bool</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        len_s1 = len(s1)</span><br><span class="line">        s_1 = [<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">26</span>)]</span><br><span class="line">        s_2 = [<span class="number">0</span> <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">26</span>)]</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(s1)):</span><br><span class="line">            s_1[ord(s1[i]) - ord(<span class="string">'a'</span>)] += <span class="number">1</span></span><br><span class="line">        l = <span class="number">0</span></span><br><span class="line">        r = l</span><br><span class="line">        <span class="keyword">while</span> l &lt;= len(s2) - len_s1:</span><br><span class="line">            <span class="keyword">if</span> r == len(s2):</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            <span class="keyword">if</span> r &gt;= len_s1:</span><br><span class="line">                l += <span class="number">1</span></span><br><span class="line">                s_2[ord(s2[l - <span class="number">1</span>]) - ord(<span class="string">'a'</span>)] -= <span class="number">1</span></span><br><span class="line">            s_2[ord(s2[r]) - ord(<span class="string">'a'</span>)] += <span class="number">1</span></span><br><span class="line">            r += <span class="number">1</span></span><br><span class="line">            <span class="keyword">if</span> s_2 == s_1:</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">True</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">False</span></span><br></pre></td></tr></table></figure>
-      
+
+                                            
+
+                                                
+                                                    <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">给出一个区间的集合，请合并所有重叠的区间。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: [[1,3],[2,6],[8,10],[15,18]]</span><br><span class="line">输出: [[1,6],[8,10],[15,18]]</span><br><span class="line">解释: 区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: [[1,4],[4,5]]</span><br><span class="line">输出: [[1,5]]</span><br><span class="line">解释: 区间 [1,4] 和 [4,5] 可被视为重叠区间。</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2018/12/19/leetcode-8/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/12/19/leetcode-8/" data-id="ckagk2wmd007p16l959hfiebf" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
     </div>
 
     
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
+
+                
+
+</article>
+        
+          <article id="post-leetcode-7" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/12/14/leetcode-7/">leetcode回顾——字符串的排列</a>
+    </h2>
   
   
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/12/10/leetcode-6/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/12/10/leetcode-6/" class="post-title-link" itemprop="url">leetcode回顾——Find the Duplicate Number</a>
-        </h2>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
+            </header>
+            
 
-              <time title="Created: 2018-12-10 21:59:28" itemprop="dateCreated datePublished" datetime="2018-12-10T21:59:28+08:00">2018-12-10</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2018-12-14 11:11:21" itemprop="dateModified" datetime="2018-12-14T11:11:21+08:00">2018-12-14</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/LeetCode/" itemprop="url" rel="index"><span itemprop="name">LeetCode</span></a>
-                </span>
-            </span>
+                
+                    <div class="article-meta">
+                        <a href="/2018/12/14/leetcode-7/" class="article-date">
+  <time datetime="2018-12-14T11:11:27.000Z" itemprop="datePublished">2018-12-14</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/LeetCode/">LeetCode</a>
+  </div>
 
-          
+                    </div>
+                    
 
-        </div>
-      </header>
+                        
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
 
-      
-          <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">给定一个包含 n + 1 个整数的数组 nums，其数字都在 1 到 n 之间（包括 1 和 n），可知至少存在一个重复的整数。假设只有一个重复的整数，找出这个重复的数。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: [1,3,4,2,2]</span><br><span class="line">输出: 2</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: [3,1,3,4,2]</span><br><span class="line">输出: 3</span><br><span class="line">说明：</span><br><span class="line"></span><br><span class="line">不能更改原数组（假设数组是只读的）。</span><br><span class="line">只能使用额外的 O(1) 的空间。</span><br><span class="line">时间复杂度小于 O(n2) 。</span><br><span class="line">数组中只有一个重复的数字，但它可能不止重复出现一次。</span><br></pre></td></tr></table></figure>
-<h4 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h4><p>题目有一个很关键的信息——长度为<code>n + 1</code>的数组，并且数字都在1～n之间，如果该题目允许我们改变原数组的话，我们只需要对数组进行排序，然后一次遍历即可，但是现在题目要求我们不改变原数组，因此，对原数组排序就行不通了。虽然不允许我们对原数组排序，但是，我们可以这样想，既然这个数组内的元素范围在1～n，但是长度却是<code>n + 1</code>，假设a、b均在这个数组中，当[a, b]中不存在重复数字时，那么，区间[a, b]的长度就等于<code>(a - b + 1)</code>,如果存在重复数字，那么区间长度就变成了<code>(a - b + 2)</code>，那么如何计算这个区间长度呢？这个时候就要利用一下排序以及二分的思想，找到[1, n]区间的中间数字m，分为两个区间[1, m], [m + 1, n]，在[1, m]区间中计算大于等于1且小于等于m的元素的个数，如果个数等于(m - 1 + 1)，那么重复数字就落在了[m + 1, n]当中，否则，再次对[1, m]进行二分计算两个子区间的长度，最后找到重复的数字</p>
-<h4 id="AC代码"><a href="#AC代码" class="headerlink" title="AC代码"></a>AC代码</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">findDuplicate</span><span class="params">(self, nums)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        :type nums: List[int]</span></span><br><span class="line"><span class="string">        :rtype: int</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        start = <span class="number">1</span></span><br><span class="line">        end = len(nums) - <span class="number">1</span></span><br><span class="line">        <span class="keyword">while</span> start &lt;= end:</span><br><span class="line">            mid = start + int((end - start) / <span class="number">2</span>)</span><br><span class="line">            c = self.count(nums=nums, start=start, end=mid)</span><br><span class="line">            <span class="keyword">if</span> start == end:</span><br><span class="line">                <span class="keyword">if</span> c &gt; <span class="number">1</span>:</span><br><span class="line">                    <span class="keyword">return</span> start</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">            <span class="keyword">if</span> c &gt; (mid - start + <span class="number">1</span>):</span><br><span class="line">                end = mid</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                start = mid + <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">count</span><span class="params">(self, nums, start, end)</span>:</span></span><br><span class="line">        n = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(nums)):</span><br><span class="line">            <span class="keyword">if</span> nums[i] &gt;= start <span class="keyword">and</span> nums[i] &lt;= end:</span><br><span class="line">                n += <span class="number">1</span></span><br><span class="line">        <span class="keyword">return</span> n</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    s = Solution()</span><br><span class="line">    t = [<span class="number">1</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">2</span>,<span class="number">2</span>]</span><br><span class="line">    print(s.findDuplicate(nums=t))</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>学习自：<a href="https://blog.csdn.net/whdAlive/article/details/80459730" target="_blank" rel="noopener">https://blog.csdn.net/whdAlive/article/details/80459730</a></p>
-</blockquote>
 
-      
+                                            
+
+                                                
+                                                    <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">给定两个字符串 s1 和 s2，写一个函数来判断 s2 是否包含 s1 的排列。</span><br><span class="line"></span><br><span class="line">换句话说，第一个字符串的排列之一是第二个字符串的子串。</span><br><span class="line"></span><br><span class="line">示例1:</span><br><span class="line"></span><br><span class="line">输入: s1 = &quot;ab&quot; s2 = &quot;eidbaooo&quot;</span><br><span class="line">输出: True</span><br><span class="line">解释: s2 包含 s1 的排列之一 (&quot;ba&quot;).</span><br><span class="line"> </span><br><span class="line"></span><br><span class="line">示例2:</span><br><span class="line"></span><br><span class="line">输入: s1= &quot;ab&quot; s2 = &quot;eidboaoo&quot;</span><br><span class="line">输出: False</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2018/12/14/leetcode-7/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/12/14/leetcode-7/" data-id="ckagk2wmc007n16l9a3et6jws" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
     </div>
 
     
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
+
+                
+
+</article>
+        
+          <article id="post-leetcode-6" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/12/10/leetcode-6/">leetcode回顾——Find the Duplicate Number</a>
+    </h2>
   
   
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/11/30/java-web-20/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/11/30/java-web-20/" class="post-title-link" itemprop="url">记一次jenkins+docker+node的自动化部署</a>
-        </h2>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
+            </header>
+            
 
-              <time title="Created: 2018-11-30 12:13:20 / Modified: 18:23:51" itemprop="dateCreated datePublished" datetime="2018-11-30T12:13:20+08:00">2018-11-30</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a>
-                </span>
-            </span>
+                
+                    <div class="article-meta">
+                        <a href="/2018/12/10/leetcode-6/" class="article-date">
+  <time datetime="2018-12-10T21:59:28.000Z" itemprop="datePublished">2018-12-10</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/LeetCode/">LeetCode</a>
+  </div>
 
-          
+                    </div>
+                    
 
-        </div>
-      </header>
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">给定一个包含 n + 1 个整数的数组 nums，其数字都在 1 到 n 之间（包括 1 和 n），可知至少存在一个重复的整数。假设只有一个重复的整数，找出这个重复的数。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: [1,3,4,2,2]</span><br><span class="line">输出: 2</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: [3,1,3,4,2]</span><br><span class="line">输出: 3</span><br><span class="line">说明：</span><br><span class="line"></span><br><span class="line">不能更改原数组（假设数组是只读的）。</span><br><span class="line">只能使用额外的 O(1) 的空间。</span><br><span class="line">时间复杂度小于 O(n2) 。</span><br><span class="line">数组中只有一个重复的数字，但它可能不止重复出现一次。</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2018/12/10/leetcode-6/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/12/10/leetcode-6/" data-id="ckagk2wmb007l16l9c4d9wfxg" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
+    </div>
 
     
-    
-    
-    <div class="post-body" itemprop="articleBody">
 
-      
-          <h4 id="jenkins"><a href="#jenkins" class="headerlink" title="jenkins"></a>jenkins</h4><blockquote>
+                
+
+</article>
+        
+          <article id="post-java-web-20" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/11/30/java-web-20/">记一次jenkins+docker+node的自动化部署</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2018/11/30/java-web-20/" class="article-date">
+  <time datetime="2018-11-30T12:13:20.000Z" itemprop="datePublished">2018-11-30</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="jenkins"><a href="#jenkins" class="headerlink" title="jenkins"></a>jenkins</h4><blockquote>
 <p>what is jenkins</p>
 </blockquote>
 <p>Jenkins——采用java语言编写的持续集成服务器</p>
@@ -554,674 +436,379 @@
 <li><p>生成后后续过程的自动化</p>
 </li>
 </ol>
-<h4 id="安装步骤"><a href="#安装步骤" class="headerlink" title="安装步骤"></a>安装步骤</h4><p>此处建议安装非docker镜像的jenkins，因为官方的jenkins镜像并不集成docker；所以要么安装非docker版本的jenkins，要么自己编写一个集成docker的jenkins或者使用已经集成docker的jenkins镜像</p>
-<blockquote>
-<p>linux(ubuntu/debain系列) 安装</p>
-</blockquote>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -</span><br><span class="line"><span class="built_in">echo</span> deb http://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install jenkins</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>备注</p>
-</blockquote>
-<ol>
-<li><p>在进行以上的操作时，首先确保有jdk环境</p>
-</li>
-<li><p>jenkins的默认端口为<code>8080</code>端口，如果需要更改的话，前往<code>/etc/default/jenkins</code>进行修改<code>HTTP_PORT</code></p>
-</li>
-<li><p>如果想将jenkins的用户提升为root，那么前往<code>/etc/default/jenkiins</code>修改<code>JENKINS_USER</code>以及<code>JENKINS_GROUP</code></p>
-</li>
-</ol>
-<h4 id="编写Dockerfile"><a href="#编写Dockerfile" class="headerlink" title="编写Dockerfile"></a>编写Dockerfile</h4><p>在进行jenkins结合docker之前，我们首先要为我们的项目编写<code>Dockerfile</code>，告知docker该如何构建我们项目的镜像</p>
-<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> ubuntu</span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get update \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apt-get install -y nodejs npm</span></span><br><span class="line"><span class="bash">COPY . /root/web</span></span><br><span class="line"><span class="bash">WORKDIR /root/web</span></span><br><span class="line"><span class="bash">EXPOSE 8077</span></span><br><span class="line"><span class="bash">RUN npm -g install http-server</span></span><br><span class="line"><span class="bash">CMD [<span class="string">"http-server"</span>, <span class="string">"-p"</span>, <span class="string">"8077 "</span>]</span></span><br></pre></td></tr></table></figure>
-<h4 id="jenkins相关设置"><a href="#jenkins相关设置" class="headerlink" title="jenkins相关设置"></a>jenkins相关设置</h4><p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-20-1.png" alt="jenkins设置"></p>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-20-2.png" alt="jenkins设置"></p>
-<p><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-20-3.png" alt="jenkins设置"></p>
-<h4 id="测试一下"><a href="#测试一下" class="headerlink" title="测试一下"></a>测试一下</h4><p><a href="https://www.bilibili.com/video/av37085497/" target="_blank" rel="noopener">哔哩哔哩演示视频</a></p>
+                                                        
+                                                            <a class="article-more-link" href="/2018/11/30/java-web-20/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/11/30/java-web-20/" data-id="ckagk2wje002b16l9cujvnmnw" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
 
-      
     </div>
 
     
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
+
+                
+
+</article>
+        
+          <article id="post-java-web-19" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/11/29/java-web-19/">利用AOP编程实现springboot多数据源的切换</a>
+    </h2>
   
   
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/11/29/java-web-19/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/11/29/java-web-19/" class="post-title-link" itemprop="url">利用AOP编程实现springboot多数据源的切换</a>
-        </h2>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
+            </header>
+            
 
-              <time title="Created: 2018-11-29 15:14:39" itemprop="dateCreated datePublished" datetime="2018-11-29T15:14:39+08:00">2018-11-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2018-12-02 17:41:10" itemprop="dateModified" datetime="2018-12-02T17:41:10+08:00">2018-12-02</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a>
-                </span>
-            </span>
+                
+                    <div class="article-meta">
+                        <a href="/2018/11/29/java-web-19/" class="article-date">
+  <time datetime="2018-11-29T15:14:39.000Z" itemprop="datePublished">2018-11-29</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
 
-          
+                    </div>
+                    
 
-        </div>
-      </header>
+                        
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
 
-      
-          <h4 id="为什么需要多数据源切换"><a href="#为什么需要多数据源切换" class="headerlink" title="为什么需要多数据源切换"></a>为什么需要多数据源切换</h4><p>在正式的、较大的项目中，很少会只有一个数据库的，至少都会有一个主数据库和一个从数据库，从数据库作为数据备份以及数据读取，而主库作为数据写入；因此就产生了一个问题——如何在项目中做到数据源的切换，如何根据操作进行数据库主从的切换。</p>
+
+                                            
+
+                                                
+                                                    <h4 id="为什么需要多数据源切换"><a href="#为什么需要多数据源切换" class="headerlink" title="为什么需要多数据源切换"></a>为什么需要多数据源切换</h4><p>在正式的、较大的项目中，很少会只有一个数据库的，至少都会有一个主数据库和一个从数据库，从数据库作为数据备份以及数据读取，而主库作为数据写入；因此就产生了一个问题——如何在项目中做到数据源的切换，如何根据操作进行数据库主从的切换。</p>
 <h4 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h4><p>在利用springboot集成mybatis的时候，mybatis的sessionFactory由springboot进行创建，而sessionFactory由依赖于数据库连接，因此，首先就是需要解决数据源的问题，这里，利用springboot的注入功能，去注入三个DataSource的bean——<code>masterDataSource</code>、<code>slaveDataSource</code>以及<code>dynamicDataSource</code>，而<code>dynamicDataSource</code>这个我们需要加上<code>@Primary</code>注解，表明这个是优先注入的DataSource对象</p>
-<blockquote>
-<p>properties文件</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">mysql.url.master=127.0.0.1:3306/dubbo_cloud</span><br><span class="line">spring.datasource.master.jdbc-url =jdbc:mysql://$&#123;mysql.url.master&#125;?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;allowMultiQueries=true</span><br><span class="line">spring.datasource.master.username=root</span><br><span class="line">spring.datasource.master.password=1203</span><br><span class="line">spring.datasource.master.driver-class-name=com.mysql.jdbc.Driver</span><br><span class="line">spring.datasource.master.hikari.auto-commit=true</span><br><span class="line">spring.datasource.master.hikari.maximumPoolSize=10</span><br><span class="line">spring.datasource.master.hikari.validation-timeout=1000</span><br><span class="line">spring.datasource.master.hikari.connection-timeout=1000</span><br><span class="line">spring.datasource.master.hikari.max-lifetime=30000</span><br><span class="line"></span><br><span class="line">mysql.url.slave=127.0.0.1:3307/dubbo_cloud_slave</span><br><span class="line">spring.datasource.slave.jdbc-url =jdbc:mysql://$&#123;mysql.url.slave&#125;?useUnicode=true&amp;characterEncoding=utf-8&amp;useSSL=false&amp;allowMultiQueries=true</span><br><span class="line">spring.datasource.slave.username=root</span><br><span class="line">spring.datasource.slave.password=1203</span><br><span class="line">spring.datasource.slave.driver-class-name=com.mysql.jdbc.Driver</span><br><span class="line">spring.datasource.slave.hikari.auto-commit=true</span><br><span class="line">spring.datasource.slave.hikari.maximumPoolSize=10</span><br><span class="line">spring.datasource.slave.hikari.validation-timeout=1000</span><br><span class="line">spring.datasource.slave.hikari.connection-timeout=1000</span><br><span class="line">spring.datasource.slave.hikari.max-lifetime=30000</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>java代码</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## DynamicDataSource.java</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DynamicDataSource</span> <span class="keyword">extends</span> <span class="title">AbstractRoutingDataSource</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Object <span class="title">determineCurrentLookupKey</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> JdbcContextHolder.get();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">## DataSourceConfigure.java</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataSourceConfigure</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(value = <span class="string">"masterDataSource"</span>)</span><br><span class="line">    <span class="meta">@ConfigurationProperties</span>(prefix=<span class="string">"spring.datasource.master"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> DataSource <span class="title">masterDataSource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> DataSourceBuilder.create().build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(value = <span class="string">"slaveDataSource"</span>)</span><br><span class="line">    <span class="meta">@ConfigurationProperties</span>(prefix=<span class="string">"spring.datasource.slave"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> DataSource <span class="title">salveDataSource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> DataSourceBuilder.create().build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Primary</span></span><br><span class="line">    <span class="meta">@Bean</span>(value = <span class="string">"dynamicDataSource"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> DataSource <span class="title">dataSource</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        DynamicDataSource dynamicDataSource = <span class="keyword">new</span> DynamicDataSource();</span><br><span class="line">        DataSource master = masterDataSource();</span><br><span class="line">        DataSource slave = salveDataSource();</span><br><span class="line">        dynamicDataSource.setDefaultTargetDataSource(master);</span><br><span class="line">        Map&lt;Object, Object&gt; datasource = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        datasource.put(DataSourceType.MASTER_DB.getType(), master);</span><br><span class="line">        datasource.put(DataSourceType.SALVE_ONE.getType(), slave);</span><br><span class="line">        dynamicDataSource.setTargetDataSources(datasource);</span><br><span class="line">        <span class="keyword">return</span> dynamicDataSource;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>至此，完成了第一步的多个数据源的注入，现在，该考虑如何实现数据源的切换；其实，在上面的代码中，<code>dataSource()</code>方法已经实现了动态数据源的切换——通过创建一个<code>DynamicDataSource</code>对象，而这个<code>DynamicDataSource</code>对象是继承了springboot的<code>org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource</code>，该类实际充当了DataSource的路由中介, 能在运行时, 根据某种key值来动态切换到真正的DataSource上。而这个key的切换，就是<code>DynamicDataSource</code>方法中的<code>determineCurrentLookupKey()</code></p>
-<p>现在，该考虑一下如何根据操作实现数据源的切换，首先，要考虑一个问题，就是实际中是多线程的，如何假设有两个业务在运行在两个线程上，一个线程需要读从库，一个线程需要写主库，要如何保证这两个业务的数据源切换不影响对方？这里就需要用ThreadLocal来实现，ThreadLocal可以实现统一初始化值，但是在修改值的时候，每个线程互相不影响，在自己的线程空间中修改Threadlocal而不会影响别的线程空间中Threadlocal中的值</p>
-<blockquote>
-<p>java代码</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">## DataSourceType.java</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> DataSourceType &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 数据库主库</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    MASTER_DB(<span class="number">1</span>, <span class="string">"master"</span>),</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 数据库从库</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    SALVE_ONE(<span class="number">2</span>, <span class="string">"slave-one"</span>)</span><br><span class="line">    ;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> value;</span><br><span class="line">    <span class="keyword">private</span> String type;</span><br><span class="line"></span><br><span class="line">    DataSourceType(<span class="keyword">int</span> value, String type) &#123;</span><br><span class="line">        <span class="keyword">this</span>.value = value;</span><br><span class="line">        <span class="keyword">this</span>.type = type;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> type;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"DataSourceType&#123;"</span> +</span><br><span class="line">                <span class="string">"value="</span> + value +</span><br><span class="line">                <span class="string">", type='"</span> + type + <span class="string">'\''</span> +</span><br><span class="line">                <span class="string">'&#125;'</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">## JdbcContextHolder.java</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JdbcContextHolder</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">static</span> ThreadLocal&lt;String&gt; dbChose = <span class="keyword">new</span> ThreadLocal&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> dbChose.get();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(DataSourceType dbType)</span> </span>&#123;</span><br><span class="line">        dbChose.set(dbType.getType());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><br>现在就剩最后一步了，根据操作切换数据源，这里，就需要用到java强大的注解功能以及aop切面编程</p>
-<p>首先创建一个注解<code>@Dynamic</code>，作用于方法上，实现方法级别的数据源切换</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Target</span>(ElementType.METHOD)</span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Dynamic &#123;</span><br><span class="line"></span><br><span class="line">    <span class="function">DataSourceType <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> DataSourceType.MASTER_DB</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>创建好注解后，开始实现方法的aop切面</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="meta">@Order</span>(<span class="number">1</span>)</span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DataSourceAspect</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Pointcut</span>(<span class="string">"execution(* com.tensor.org.dao.api..*.*(..))"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">aspect</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Before</span>(<span class="string">"aspect()"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">switchDataSource</span><span class="params">(JoinPoint joinPoint)</span> </span>&#123;</span><br><span class="line">        Object target = joinPoint.getTarget();</span><br><span class="line">        String method = joinPoint.getSignature().getName();</span><br><span class="line">        Class&lt;?&gt; cls = target.getClass();</span><br><span class="line">        Class&lt;?&gt;[] paramTypes = ((MethodSignature) joinPoint.getSignature()).getMethod().getParameterTypes();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Method m = cls.getMethod(method, paramTypes);</span><br><span class="line">            <span class="keyword">if</span> (m != <span class="keyword">null</span> &amp;&amp; m.isAnnotationPresent(Dynamic.class)) &#123;</span><br><span class="line">                Dynamic dynamic = m.getAnnotation(Dynamic.class);</span><br><span class="line">                JdbcContextHolder.set(dynamic.value());</span><br><span class="line">                log.info(<span class="string">"切换数据源完成 ： &#123;&#125;"</span>, dynamic.value());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">            log.error(<span class="string">"switchDataSource NoSuchMethodException Err : &#123;&#125;"</span>, e.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>首先创建一个aop切点，也就是这段代码</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Pointcut</span>(<span class="string">"execution(* com.tensor.org.dao.api..*.*(..))"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">aspect</span><span class="params">()</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
-<p>通过注解<code>@Pointcut</code>创建了一个切点，范围是<code>com.tensor.org.dao.api</code>包以及子包下的所有方法，然后，在切点执行前，我们需要做一个操作，也就是数据源切换，<code>JoinPoint</code>作为织入点，包含了目标对象，当前被织入的方法的信息，然后利用java反射获取方法的信息，如果被<code>@Dynamic</code>所修饰，获取该注解的value信息，进行数据源的切换</p>
-<h4 id="学习的博客地址"><a href="#学习的博客地址" class="headerlink" title="学习的博客地址"></a>学习的博客地址</h4><p><a href="https://blog.csdn.net/neosmith/article/details/61202084" target="_blank" rel="noopener">csdn——Spring Boot + Mybatis多数据源和动态数据源配置</a></p>
+                                                        
+                                                            <a class="article-more-link" href="/2018/11/29/java-web-19/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/11/29/java-web-19/" data-id="ckagk2wjc002816l9s3kqfqph" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
 
-      
     </div>
 
     
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
+
+                
+
+</article>
+        
+          <article id="post-java-web-17" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/11/19/java-web-17/">利用Netty、SpringBoot以及Dubbo构建一个分布式的消息通知系统(初版)</a>
+    </h2>
   
   
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/11/19/java-web-17/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/11/19/java-web-17/" class="post-title-link" itemprop="url">利用Netty、SpringBoot以及Dubbo构建一个分布式的消息通知系统(初版)</a>
-        </h2>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
+            </header>
+            
 
-              <time title="Created: 2018-11-19 21:47:13" itemprop="dateCreated datePublished" datetime="2018-11-19T21:47:13+08:00">2018-11-19</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2018-11-22 15:20:23" itemprop="dateModified" datetime="2018-11-22T15:20:23+08:00">2018-11-22</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a>
-                </span>
-            </span>
+                
+                    <div class="article-meta">
+                        <a href="/2018/11/19/java-web-17/" class="article-date">
+  <time datetime="2018-11-19T21:47:13.000Z" itemprop="datePublished">2018-11-19</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
 
-          
+                    </div>
+                    
 
-        </div>
-      </header>
+                        
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
 
-      
-          <h4 id="前话"><a href="#前话" class="headerlink" title="前话"></a>前话</h4><p>之前在接商业外包的时候，遇到了一个需要服务端主动推送消息的需求，当时由于对Netty的不熟悉以及没有很好的理解Netty的websocket，因此用了<code>SSE</code>去解决了这个问题，但是缺点就是会占用大量的带宽</p>
+
+                                            
+
+                                                
+                                                    <h4 id="前话"><a href="#前话" class="headerlink" title="前话"></a>前话</h4><p>之前在接商业外包的时候，遇到了一个需要服务端主动推送消息的需求，当时由于对Netty的不熟悉以及没有很好的理解Netty的websocket，因此用了<code>SSE</code>去解决了这个问题，但是缺点就是会占用大量的带宽</p>
 <h4 id="Netty的websocket"><a href="#Netty的websocket" class="headerlink" title="Netty的websocket"></a>Netty的websocket</h4><p>Netty的一个链接就是一个<code>channel</code>(通道)，因此，如果要实现服务端的主动消息推送，那么就要实现对channel的统一管理；幸运的是，Netty其内部已经实现了对channel的统一管理的容器——<code>ChannelGroup</code>，ChannelGroup其内部用了一个<code>ConcurrentMap&lt;ChannelId, Channel&gt;</code>来作为channel的承载容器，而channelId是channel的一个属性，但是，如果仅仅依靠ChannelGroup还不能够实现真正可用于生产环境中的消息推送系统，因为channelId与业务是完全没有关联的，因此，我这里又用了一个<code>ConcurrentMap&lt;String, ChannelId&gt;</code>来实现用户的业务标识与channelId的对应关系：当客户端需要连接消息推送中心时，需要带上自己的业务编号信息，然后，服务端接收消息后将用户业务编号解析并与channel一同存储到自定义的管理容器中</p>
-<blockquote>
-<p>代码实现</p>
-</blockquote>
-<p>Netty的websocket实现端</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NoticeChannelHandlerImpl</span> <span class="keyword">extends</span> <span class="title">SimpleChannelInboundHandler</span>&lt;<span class="title">TextWebSocketFrame</span>&gt;</span></span><br><span class="line"><span class="class">        <span class="keyword">implements</span> <span class="title">NoticeChannelHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 仅仅通知学生用户</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> ChannelGroup studentChannels = <span class="keyword">new</span> DefaultChannelGroup(GlobalEventExecutor.INSTANCE);</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 仅仅通知教师用户</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> ChannelGroup teacherChannels = <span class="keyword">new</span> DefaultChannelGroup(GlobalEventExecutor.INSTANCE);</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 全局通知所有用户</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> ChannelGroup globalChannels = <span class="keyword">new</span> DefaultChannelGroup(GlobalEventExecutor.INSTANCE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 客户端首次接入时，需发送用户编号信息</span></span><br><span class="line"><span class="comment">     * 客户端发送的信息：&#123;ChannelGroupType&#125;-&#123;user_uuid&#125;</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> ctx</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> msg</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">channelRead0</span><span class="params">(ChannelHandlerContext ctx, TextWebSocketFrame msg)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Channel channel = ctx.channel();</span><br><span class="line">        String[] contexts = msg.text().split(<span class="string">"-"</span>);</span><br><span class="line">        <span class="keyword">int</span> clientContextSplitNum = <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (contexts.length != clientContextSplitNum) &#123;</span><br><span class="line">            channel.writeAndFlush(<span class="keyword">new</span> TextWebSocketFrame(StringsValue.CN.CLIENT_SEND_ERR_MSG));</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ChannelIdPool.add(contexts[<span class="number">1</span>], channel.id());</span><br><span class="line">            addToChannelGroup(contexts[<span class="number">0</span>], channel);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelActive</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        log.info(<span class="string">"新接入编号为 [&#123;&#125;] 的客户端"</span>, ctx.channel().id());</span><br><span class="line">        <span class="keyword">super</span>.channelActive(ctx);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">channelInactive</span><span class="params">(ChannelHandlerContext ctx)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.channelInactive(ctx);</span><br><span class="line">        log.info(<span class="string">"客户端编号为 [&#123;&#125;] 已断开链接"</span>, ctx.channel().id());</span><br><span class="line">        ChannelIdPool.remove(ctx.channel().id());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">exceptionCaught</span><span class="params">(ChannelHandlerContext ctx, Throwable cause)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.exceptionCaught(ctx, cause);</span><br><span class="line">        log.error(<span class="string">"客户端编号为 [&#123;&#125;] 报错：[&#123;&#125;]"</span>, ctx.channel().id(), cause.getMessage());</span><br><span class="line">        ctx.close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>ConcurrentMap&lt;String, ChannelId&gt;容器的实现</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ChannelIdPool</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ConcurrentHashMap&lt;String, ChannelId&gt; channelIdMap;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        channelIdMap = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ChannelIdPool</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Optional&lt;ChannelId&gt; <span class="title">get</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> Optional.ofNullable(channelIdMap.get(key));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(String key, ChannelId channelId)</span> </span>&#123;</span><br><span class="line">        channelIdMap.put(key, channelId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">        channelIdMap.remove(key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">remove</span><span class="params">(ChannelId channelId)</span> </span>&#123;</span><br><span class="line">        Iterator&lt;Map.Entry&lt;String, ChannelId&gt;&gt; iterator = channelIdMap.entrySet().iterator();</span><br><span class="line">        <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">            Map.Entry&lt;String, ChannelId&gt; entry = iterator.next();</span><br><span class="line">            <span class="keyword">if</span> (entry.getValue().compareTo(channelId) == <span class="number">0</span>) &#123;</span><br><span class="line">                iterator.remove();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="如何设置Netty服务端相关配置"><a href="#如何设置Netty服务端相关配置" class="headerlink" title="如何设置Netty服务端相关配置"></a>如何设置Netty服务端相关配置</h4><blockquote>
-<p>Netty 服务端的配置</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PropertySource</span>(value = <span class="string">"classpath:netty-server.properties"</span>)</span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NettyServerConfigure</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;netty.server.tcp.port&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> tcpPort;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;netty.server.boss.thread.count&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> bossCount;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;netty.server.worker.thread.count&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> workerCount;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;netty.server.so.keepalive&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> keepAlive;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;netty.server.so.backlog&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> backlog;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(value = <span class="string">"ServerBootstrap"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ServerBootstrap <span class="title">bootstrap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ServerBootstrap b = <span class="keyword">new</span> ServerBootstrap();</span><br><span class="line">        b.group(bossGroup(), workerGroup())</span><br><span class="line">                .channel(NioServerSocketChannel.class)</span><br><span class="line">                .handler(<span class="keyword">new</span> LoggingHandler(LogLevel.DEBUG))</span><br><span class="line">                .childHandler(nettyWebSocketChannelInitializer);</span><br><span class="line">        Map&lt;ChannelOption&lt;?&gt;, Object&gt; tcpChannelOptions = tcpChannelOptions();</span><br><span class="line">        Set&lt;ChannelOption&lt;?&gt;&gt; keySet = tcpChannelOptions.keySet();</span><br><span class="line">        <span class="keyword">for</span> (<span class="meta">@SuppressWarnings</span>(<span class="string">"rawtypes"</span>) ChannelOption option : keySet) &#123;</span><br><span class="line">            b.option(option, tcpChannelOptions.get(option));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier</span>(<span class="string">"ChannelInitializer"</span>)</span><br><span class="line">    <span class="keyword">private</span> NettyWebSocketChannelInitializer nettyWebSocketChannelInitializer;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(name = <span class="string">"tcpChannelOptions"</span>)</span><br><span class="line">    <span class="keyword">public</span> Map&lt;ChannelOption&lt;?&gt;, Object&gt; tcpChannelOptions() &#123;</span><br><span class="line">        Map&lt;ChannelOption&lt;?&gt;, Object&gt; options = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        options.put(ChannelOption.SO_KEEPALIVE, keepAlive);</span><br><span class="line">        options.put(ChannelOption.SO_BACKLOG, backlog);</span><br><span class="line">        <span class="keyword">return</span> options;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(name = <span class="string">"bossGroup"</span>, destroyMethod = <span class="string">"shutdownGracefully"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> NioEventLoopGroup <span class="title">bossGroup</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> NioEventLoopGroup(bossCount);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(name = <span class="string">"workerGroup"</span>, destroyMethod = <span class="string">"shutdownGracefully"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> NioEventLoopGroup <span class="title">workerGroup</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> NioEventLoopGroup(workerCount);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span>(name = <span class="string">"tcpSocketAddress"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> InetSocketAddress <span class="title">tcpPort</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> InetSocketAddress(tcpPort);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>Netty的websocket的初始化配置</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Qualifier</span>(<span class="string">"ChannelInitializer"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NettyWebSocketChannelInitializer</span> <span class="keyword">extends</span> <span class="title">ChannelInitializer</span>&lt;<span class="title">SocketChannel</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">initChannel</span><span class="params">(SocketChannel ch)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        ChannelPipeline pipeline = ch.pipeline();</span><br><span class="line"></span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> HttpServerCodec());</span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> HttpObjectAggregator(<span class="number">65536</span>));</span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> ChunkedWriteHandler());</span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> WebSocketServerProtocolHandler(<span class="string">"/notice"</span>));</span><br><span class="line">        <span class="comment">// 心跳机制</span></span><br><span class="line"><span class="comment">//        pipeline.addLast("ping", new IdleStateHandler(25, 15, 10, TimeUnit.SECONDS));</span></span><br><span class="line">        pipeline.addLast(<span class="keyword">new</span> NoticeChannelHandlerImpl());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>真正的Tcp服务端启动相关配置</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TcpServerConfigure</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier</span>(<span class="string">"ServerBootstrap"</span>)</span><br><span class="line">    <span class="keyword">private</span> ServerBootstrap serverBootstrap;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="meta">@Qualifier</span>(<span class="string">"tcpSocketAddress"</span>)</span><br><span class="line">    <span class="keyword">private</span> InetSocketAddress tcpPort;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Channel serverChannel;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        serverChannel =  serverBootstrap.bind(tcpPort).sync().channel().closeFuture().sync().channel();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PreDestroy</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">stop</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        serverChannel.close();</span><br><span class="line">        serverChannel.parent().close();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ServerBootstrap <span class="title">getServerBootstrap</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> serverBootstrap;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setServerBootstrap</span><span class="params">(ServerBootstrap serverBootstrap)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.serverBootstrap = serverBootstrap;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> InetSocketAddress <span class="title">getTcpPort</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> tcpPort;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTcpPort</span><span class="params">(InetSocketAddress tcpPort)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.tcpPort = tcpPort;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="消息发布、消费中心"><a href="#消息发布、消费中心" class="headerlink" title="消息发布、消费中心"></a>消息发布、消费中心</h4><blockquote>
-<p>消息发布中心</p>
-</blockquote>
-<p>对于消息发布中心，其职能就只限与接收由发布者需要发布的消息，将消息缓存在一个消息发布容器中，为什么需要缓存起来？因为可能有些用户是这些消息的接收者，但是由于没有登陆，也就没有对应的channel注册，因此需要将消息缓存在容器中，当消息的所有接收者都接收到消息时，将该消息从容器中移除，至此，一个消息在消息发布中心的生命到此结束。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NoticePublishCenterImpl</span> <span class="keyword">extends</span> <span class="title">Observable</span> <span class="keyword">implements</span> <span class="title">NoticePublishCenter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Object lock = <span class="keyword">new</span> Object();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span> <span class="keyword">private</span> NoticeConsumerCenter noticeConsumerCenter;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> ConcurrentHashMap&lt;String, NoticePackage&gt; noticeCenterPool;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        noticeCenterPool = <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NoticePublishCenterImpl</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        addObserver(noticeConsumerCenter);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">createNoticeGroup</span><span class="params">(NoticePackage noticePackage)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (noticeCenterPool.containsKey(noticePackage.getNoticeLabel())) &#123;</span><br><span class="line">            noticeCenterPool.put(noticePackage.getNoticeLabel(), noticePackage);</span><br><span class="line">            notifyObservers(noticePackage);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 该推送任务已完成，从通知消息池中销毁该通知消息</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> groupName</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">finishNotice</span><span class="params">(String groupName)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">            noticeCenterPool.remove(groupName);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 由消息消费者中心通知回调告知通知发布中心该消息消费结果</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> o</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> arg</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(Observable o, Object arg)</span> </span>&#123;</span><br><span class="line">        NoticePackage noticePackage = (NoticePackage) arg;</span><br><span class="line">        <span class="keyword">if</span> (noticePackage.getTotalReceivers() == <span class="number">0</span>) &#123;</span><br><span class="line">            finishNotice(noticePackage.getNoticeLabel());</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            noticeCenterPool.put(noticePackage.getNoticeLabel(), noticePackage);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在代码中看到了观察者模式所特有的<code>addObserver</code>以及<code>notifyObservers</code>，在这里，我将消息发布中心与消费中心用了观察者模式分解；当消息发布中心接收到发布事件后，通知消息消费中心准备开始执行消息发布任务，通知有，消息发布中心就不需要阻塞等待消息消费中心的作业完成结果，而是继续做自己的事情；而消息消费中心同样也实现了观察者模式，当消息消费中心完了消息发布中心所通知的任务后，将任务完成结果通知消息发布中心，剩下的关于消息消费的结果的处理就完全扔给了消息发布中心，而消息消费中心则可以继续自己的其他消息消费任务</p>
-<blockquote>
-<p>消息消费中心</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NoticeConsumerCenterImpl</span> <span class="keyword">extends</span> <span class="title">Observable</span> <span class="keyword">implements</span> <span class="title">NoticeConsumerCenter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ConcurrentLinkedQueue&lt;String&gt; receivers = <span class="keyword">new</span> ConcurrentLinkedQueue&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> NoticeChannelHandler noticeChannelHandler;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> NoticePublishCenter publishCenter;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ThreadPoolExecutor PublishThreadPool;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@PostConstruct</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        addObserver(publishCenter);</span><br><span class="line">        PublishThreadPool = <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">4</span>,</span><br><span class="line">                <span class="number">12</span>,</span><br><span class="line">                <span class="number">60</span>,</span><br><span class="line">                TimeUnit.SECONDS,</span><br><span class="line">                <span class="keyword">new</span> LinkedBlockingQueue&lt;&gt;(<span class="number">100</span>),</span><br><span class="line">                <span class="keyword">new</span> NoticeThreadFactory(),</span><br><span class="line">                <span class="keyword">new</span> RejectHandler());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(Observable o, Object arg)</span> </span>&#123;</span><br><span class="line">        NoticePackage noticePackage = (NoticePackage) arg;</span><br><span class="line">        PublishThreadPool.execute(<span class="keyword">new</span> NoticeCallable(noticePackage));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addReceiver</span><span class="params">(String receiver)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!receivers.contains(receiver)) &#123;</span><br><span class="line">            receivers.add(receiver);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeReceiver</span><span class="params">(String receiver)</span> </span>&#123;</span><br><span class="line">        receivers.remove(receiver);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">NoticeCallable</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> NoticePackage noticePackage;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">NoticeCallable</span><span class="params">(NoticePackage noticePackage)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.noticePackage = noticePackage;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            List&lt;String&gt; tmpReceivers = noticePackage.getReceivers();</span><br><span class="line">            tmpReceivers.stream().filter(receiver -&gt; receivers.contains(receiver)).flatMap(receiver -&gt; &#123;</span><br><span class="line">                noticePackage.setUserId(receiver);</span><br><span class="line">                noticeChannelHandler.publishMsg(noticePackage);</span><br><span class="line">                noticePackage.setTotalReceivers(noticePackage.getTotalReceivers() - <span class="number">1</span>);</span><br><span class="line">                <span class="keyword">return</span> Stream.of(noticePackage);</span><br><span class="line">            &#125;).flatMap(noticePackage -&gt; &#123;</span><br><span class="line">                <span class="keyword">if</span> (noticePackage.getTotalReceivers() == <span class="number">0</span>) &#123;</span><br><span class="line">                    notifyObservers(noticePackage);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> Stream.empty();</span><br><span class="line">            &#125;).count();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 线程池任务拒绝策略</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">RejectHandler</span> <span class="keyword">implements</span> <span class="title">RejectedExecutionHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">rejectedExecution</span><span class="params">(Runnable r, ThreadPoolExecutor executor)</span> </span>&#123;</span><br><span class="line">            log.error(<span class="string">"消息推送服务任务被拒绝。 &#123;&#125;"</span>, executor.toString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">NoticeThreadFactory</span> <span class="keyword">implements</span> <span class="title">ThreadFactory</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> String namePrefix;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> AtomicInteger nextId = <span class="keyword">new</span> AtomicInteger(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        NoticeThreadFactory() &#123;</span><br><span class="line">            namePrefix = <span class="string">"消息推送-工作线程-"</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Thread <span class="title">newThread</span><span class="params">(Runnable r)</span> </span>&#123;</span><br><span class="line">            String name = namePrefix + nextId.getAndDecrement();</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Thread(r, name);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="哔哩哔哩项目演示视频"><a href="#哔哩哔哩项目演示视频" class="headerlink" title="哔哩哔哩项目演示视频"></a>哔哩哔哩项目演示视频</h4><p><a href="https://www.bilibili.com/video/av36497338/" target="_blank" rel="noopener">哔哩哔哩项目演示视频：利用Netty、SpringBoot以及Dubbo构建一个分布式的消息通知系统(初版)</a></p>
+                                                        
+                                                            <a class="article-more-link" href="/2018/11/19/java-web-17/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/11/19/java-web-17/" data-id="ckagk2wja002416l9z4g0qhe5" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
 
-      
     </div>
 
     
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
+
+                
+
+</article>
+        
+          <article id="post-java-web-16" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/11/06/java-web-16/">微服务之Dubbo初体验</a>
+    </h2>
   
   
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/11/06/java-web-16/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/11/06/java-web-16/" class="post-title-link" itemprop="url">微服务之Dubbo初体验</a>
-        </h2>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
+            </header>
+            
 
-              <time title="Created: 2018-11-06 21:41:09" itemprop="dateCreated datePublished" datetime="2018-11-06T21:41:09+08:00">2018-11-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2018-11-08 13:06:43" itemprop="dateModified" datetime="2018-11-08T13:06:43+08:00">2018-11-08</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a>
-                </span>
-            </span>
+                
+                    <div class="article-meta">
+                        <a href="/2018/11/06/java-web-16/" class="article-date">
+  <time datetime="2018-11-06T21:41:09.000Z" itemprop="datePublished">2018-11-06</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
 
-          
+                    </div>
+                    
 
-        </div>
-      </header>
+                        
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
 
-      
-          <h4 id="Dubbo与SpringBoot集成"><a href="#Dubbo与SpringBoot集成" class="headerlink" title="Dubbo与SpringBoot集成"></a>Dubbo与SpringBoot集成</h4><blockquote>
+
+                                            
+
+                                                
+                                                    <h4 id="Dubbo与SpringBoot集成"><a href="#Dubbo与SpringBoot集成" class="headerlink" title="Dubbo与SpringBoot集成"></a>Dubbo与SpringBoot集成</h4><blockquote>
 <p>依赖</p>
 </blockquote>
 <figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">compile</span> <span class="keyword">group</span>: <span class="string">'com.alibaba.boot'</span>, name: <span class="string">'dubbo-spring-boot-starter'</span>, version: <span class="string">'0.2.0'</span></span><br><span class="line">implementation <span class="keyword">group</span>: <span class="string">'com.alibaba'</span>, name: <span class="string">'dubbo'</span>, version: <span class="string">'2.6.4'</span></span><br></pre></td></tr></table></figure>
-<h4 id="消费者配置文件信息"><a href="#消费者配置文件信息" class="headerlink" title="消费者配置文件信息"></a>消费者配置文件信息</h4><blockquote>
-<p>SpringBoot version is 2.0.5.RELEASE</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># Spring boot application</span><br><span class="line">spring.application.name = consumer</span><br><span class="line">server.port = 8084</span><br><span class="line"></span><br><span class="line"># Dubbo Config properties</span><br><span class="line">## ApplicationConfig Bean</span><br><span class="line"># 设置dubbo应用的id信息以及name信息</span><br><span class="line">dubbo.application.id = dubbo-consumer-demo</span><br><span class="line">dubbo.application.name = dubbo-consumer-demo</span><br><span class="line"></span><br><span class="line"># 配置dubbo协议</span><br><span class="line">## ProtocolConfig Bean</span><br><span class="line">dubbo.protocol.id = dubbo</span><br><span class="line">dubbo.protocol.name = dubbo</span><br><span class="line">dubbo.protocol.port=20880</span><br></pre></td></tr></table></figure>
-<h4 id="服务者配置文件信息"><a href="#服务者配置文件信息" class="headerlink" title="服务者配置文件信息"></a>服务者配置文件信息</h4><blockquote>
-<p>SpringBoot version is 2.0.5.RELEASE</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">server.port=8080</span><br><span class="line"></span><br><span class="line"># Base packages to scan Dubbo Components</span><br><span class="line"># 扫描服务者对外提供的服务</span><br><span class="line">dubbo.scan.basePackages=com.dubbo.demo.service</span><br><span class="line"></span><br><span class="line"># Dubbo Config properties</span><br><span class="line">## ApplicationConfig Bean</span><br><span class="line">dubbo.application.id = dubbo-provider-demo</span><br><span class="line">dubbo.application.name = dubbo-provider-demo</span><br><span class="line"></span><br><span class="line"># 配置dubbo协议</span><br><span class="line">## ProtocolConfig Bean</span><br><span class="line">dubbo.protocol.id = dubbo</span><br><span class="line">dubbo.protocol.name = dubbo</span><br><span class="line">dubbo.protocol.port = 20880</span><br><span class="line"></span><br><span class="line">## RegistryConfig Bean</span><br><span class="line">dubbo.registry.id = my-registry</span><br><span class="line"># 服务注册中心地址，采用zookeeper</span><br><span class="line">dubbo.registry.address=zookeeper://127.0.0.1:2181</span><br><span class="line"></span><br><span class="line">spring.application.name=provider</span><br></pre></td></tr></table></figure>
-<h4 id="具体实现代码"><a href="#具体实现代码" class="headerlink" title="具体实现代码"></a>具体实现代码</h4><p>代码地址：<a href="http://120.24.90.180:10080/liaochuntao/dubbo-demo.git" target="_blank" rel="noopener">gogs</a></p>
+                                                        
+                                                            <a class="article-more-link" href="/2018/11/06/java-web-16/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/11/06/java-web-16/" data-id="ckagk2wj9002216l941ai3v5o" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
 
-      
     </div>
 
     
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/10/13/java-web-14/">
+                
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/10/13/java-web-14/" class="post-title-link" itemprop="url">关于使用nginx实现图片防盗链</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-10-13 14:25:07" itemprop="dateCreated datePublished" datetime="2018-10-13T14:25:07+08:00">2018-10-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2018-10-21 17:47:05" itemprop="dateModified" datetime="2018-10-21T17:47:05+08:00">2018-10-21</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h4 id="什么是nginx"><a href="#什么是nginx" class="headerlink" title="什么是nginx"></a>什么是nginx</h4><p><a href="https://wizardforcel.gitbooks.io/nginx-doc/content/Text/1.1_overview.html" target="_blank" rel="noopener">nginx中文文档</a></p>
-<h4 id="什么是Referer"><a href="#什么是Referer" class="headerlink" title="什么是Referer"></a>什么是Referer</h4><p>Referer 首部包含了当前请求页面的来源页面的地址，即表示当前页面是通过此来源页面里的链接进入的。服务端一般使用 Referer 首部识别访问来源，可能会以此进行统计分析、日志记录以及缓存优化等。</p>
-<p>通俗来说，假如我通过Google搜索去搜索<code>referer</code>，然后搜索引擎给出了一堆链接，这个时候，我点击链接，那么http头就会带上referer字段信息，并且值就是Google搜索的url地址<code>https://www.google.com</code>；因此，假设从A网址到B网址，那么这个referer字段就告诉B网址该请求是从A网址发起的。</p>
-<h4 id="nginx实现防盗链的原理"><a href="#nginx实现防盗链的原理" class="headerlink" title="nginx实现防盗链的原理"></a>nginx实现防盗链的原理</h4><p>既然http头部会带有referer字段，因此，就可以从这个字段入手，我们只需要确认我们的referer白名单，就可以成功的实现防盗链功能，因此，就需要拦截你所想拦截的请求，然后，去读取每一个请求的referer字段信息，如果存在空值或者referer字段的值不在白名单中，就可以返回相应的http状态码(404，403d等等)</p>
-<h4 id="具体配置代码"><a href="#具体配置代码" class="headerlink" title="具体配置代码"></a>具体配置代码</h4><blockquote>
-<p>摘抄自<a href="https://wizardforcel.gitbooks.io/nginx-doc/content/Text/1.1_overview.html" target="_blank" rel="noopener">nginx中文文档</a></p>
-</blockquote>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">location ~* \.(gif|jpg|png|swf|flv)$ &#123;  </span><br><span class="line">  root html  </span><br><span class="line">  valid_referers none blocked *.nginxcn.com;  </span><br><span class="line">  if ($invalid_referer) &#123;  </span><br><span class="line">    rewrite ^/ [www.nginx.cn](http://www.nginx.cn/)  </span><br><span class="line">    #return 404;  </span><br><span class="line">  &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ol>
-<li><p><code>valid_referers</code>就是所有请求通过拦截后根据referer白名单对比的结果</p>
-</li>
-<li><p><code>none blocked</code>就是指后面的域名、ip就是referer白名单的值</p>
-</li>
-<li><p><code>*.nginxcn.com</code>就是referer白名单</p>
-</li>
-</ol>
-<h4 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h4><blockquote>
-<p>referer可伪造</p>
-</blockquote>
-<p>像Java的httpclient，可以伪造一个referer去实现一个资源请求，然后顺利的下载资源，因此，通过referer所实现的防盗链接面对这样的操作，就是摆设。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2018/09/16/java-web-13/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2018/09/16/java-web-13/" class="post-title-link" itemprop="url">Java实现class文件热替换</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2018-09-16 23:11:34" itemprop="dateCreated datePublished" datetime="2018-09-16T23:11:34+08:00">2018-09-16</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2018-09-23 15:41:16" itemprop="dateModified" datetime="2018-09-23T15:41:16+08:00">2018-09-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h4 id="classloader"><a href="#classloader" class="headerlink" title="classloader"></a>classloader</h4><p>java的<code>classloader</code>是实现将java文件编译后产生的字节码加载进内存当中，最终成为可被java虚拟机直接使用的java类型。而原生的java虚拟机中的<code>classloader</code>，如果我们想直接实现class文件的热替换，是不可能的，因为java虚拟机双亲委派模型的限制；因此，为了实现我们目标——class文件热替换，必须实现一个我们自己的<code>classloader</code></p>
-<h4 id="my-classloader"><a href="#my-classloader" class="headerlink" title="my classloader"></a>my classloader</h4><p>要实现自己的classloader，首先要继承java自有的<code>ClassLoader</code>，重写父类的<code>findClass(String name)</code>方法，由前面可知，<code>classloader</code>是把<code>.class</code>文件读取加载进内存中，因此，我们可以写一个关于<code>.class</code>文件的file读取函数，将文件的内容读出并转为<code>byte[]</code>数组，然后返回这个字节数组即可。</p>
-<h4 id="监听文件变化"><a href="#监听文件变化" class="headerlink" title="监听文件变化"></a>监听文件变化</h4><p>要实现class文件热替换，那就要实现热这个关键。因此，就需要不断去监听class文件的变化情况，一旦class文件发生改变，立即通知我们自己创建的classloader去重新加载这个.class文件。然后覆盖原本内存中的class文件。从而实现我们热的关键</p>
-<h4 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h4><blockquote>
-<p>自定义的 ClassLoader</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyClassLoader</span> <span class="keyword">extends</span> <span class="title">ClassLoader</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> File file;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> File <span class="title">getFile</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> file;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setFile</span><span class="params">(File file)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.file = file;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="title">MyClassLoader</span><span class="params">(ClassLoader parent)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(parent);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> Class&lt;?&gt; loadClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.loadClass(name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; loadClass(String name, <span class="keyword">boolean</span> resolve) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.loadClass(name, resolve);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; findClass(String name) &#123;</span><br><span class="line">        Class clazz = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">byte</span>[] data = getClassFileBytes(getFile());</span><br><span class="line">            clazz = defineClass(name, data, <span class="number">0</span>, data.length);</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">null</span> == clazz) &#123;&#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> clazz;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">byte</span>[] getClassFileBytes(File file) <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        FileInputStream fis = <span class="keyword">new</span> FileInputStream(file);</span><br><span class="line">        FileChannel fileC = fis.getChannel();</span><br><span class="line">        ByteArrayOutputStream baos = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">        WritableByteChannel outC = Channels.newChannel(baos);</span><br><span class="line">        ByteBuffer buffer = ByteBuffer.allocateDirect(<span class="number">1024</span>);</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> i = fileC.read(buffer);</span><br><span class="line">            <span class="keyword">if</span> (i == <span class="number">0</span> || i == -<span class="number">1</span>) &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            buffer.flip();</span><br><span class="line">            outC.write(buffer);</span><br><span class="line">            buffer.clear();</span><br><span class="line">        &#125;</span><br><span class="line">        fis.close();</span><br><span class="line">        <span class="keyword">return</span> baos.toByteArray();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">super</span>.toString() + <span class="keyword">new</span> Date().toLocaleString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>测试</p>
-</blockquote>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    Class aClass;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> Thread() &#123;</span><br><span class="line">            <span class="keyword">long</span> lastModify = <span class="number">0</span>;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                    File f = <span class="keyword">new</span> File(<span class="string">"/media/tensor/resource/code/IdeaProjects/spring-demo/hot-swap/out/production/classes/com/hotswap/org/Test.class"</span>);</span><br><span class="line">                    <span class="keyword">if</span> (lastModify != f.lastModified()) &#123;</span><br><span class="line">                        lastModify = f.lastModified();</span><br><span class="line">                        MyClassLoader myClassLoader = <span class="keyword">new</span> MyClassLoader(<span class="keyword">this</span>.getContextClassLoader());</span><br><span class="line">                        myClassLoader.setFile(f);</span><br><span class="line">                        <span class="keyword">try</span> &#123;</span><br><span class="line">                            Class&lt;Test&gt; clazz = (Class&lt;Test&gt;) myClassLoader.findClass(<span class="string">"com.hotswap.org.Test"</span>);</span><br><span class="line">                            aClass = clazz;</span><br><span class="line">                        &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">                            e.printStackTrace();</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException, NoSuchMethodException, IllegalAccessException,</span></span><br><span class="line"><span class="function">            InvocationTargetException, InstantiationException </span>&#123;</span><br><span class="line">        Main m = <span class="keyword">new</span> Main();</span><br><span class="line">        m.init();</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (m.aClass != <span class="keyword">null</span>) &#123;</span><br><span class="line">                Method method = m.aClass.getMethod(<span class="string">"log"</span>, <span class="keyword">null</span>);</span><br><span class="line">                Object o = m.aClass.getConstructor(<span class="keyword">new</span> Class[]&#123;&#125;).newInstance(<span class="keyword">new</span> Object[]&#123;&#125;);</span><br><span class="line">                method.invoke(o, <span class="keyword">null</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            Thread.sleep(<span class="number">5</span> * <span class="number">1000</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-
-  
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/6/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/8/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
-  </nav>
-
-
-
-          </div>
-          
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
-        </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">liaochuntao</p>
-  <div class="site-description" itemprop="description">励志成为一位大佬</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
+</article>
         
-          <span class="site-state-item-count">118</span>
-          <span class="site-state-item-name">posts</span>
+          <article id="home-home" class="article article-type-home" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/10/13/home/">home</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2018/10/13/home/" class="article-date">
+  <time datetime="2018-10-13T14:28:08.000Z" itemprop="datePublished">2018-10-13</time>
+</a>
+                            
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                                    
+                                                                        
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/10/13/home/" data-id="ckagk2wiz001j16l97xvf4cya" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
+    </article>
+    
+  
+    
+      <nav class="page-nav">
+        <a class="extend prev" rel="prev" href="/page/6/">Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="page-number current">7</span><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/8/">Next</a>
+      </nav>
+    
+  </section>
+</div>
+
+  <footer class="footer">
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-bar-chart"></i> <span id="busuanzi_value_site_pv"></span></li>
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+</ul>
+    </div>
+    <ul class="list-inline">
+      <li>&copy; 2020 春少 Blog</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="春少 Blog"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/gallery">Gallery</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
         </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">10</span>
-        <span class="site-state-item-name">categories</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">21</span>
-        <span class="site-state-item-name">tags</span>
-      </div>
-  </nav>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
 </div>
-  <div class="links-of-author motion-element">
-      <span class="links-of-author-item">
-        <a href="https://github.com/chuntaojun" title="GitHub → https://github.com/chuntaojun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-      <span class="links-of-author-item">
-        <a href="mailto:lessspring@outlook.com" title="E-Mail → mailto:lessspring@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
-      </span>
-  </div>
-
-
-
-      </div>
-
-    </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
-
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-        
-
-<div class="copyright">
-  
-  &copy; 
-  <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
-  </div>
+</aside>
+<script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
 
-        
-
-
-
-
-
-
-
-
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-  
-
-  
+<script src="/js/ocean.js"></script>
 
 <script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
 </html>

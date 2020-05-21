@@ -1,231 +1,82 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 3.7.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"www.liaochuntao.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
-  </script>
-
-  <meta name="description" content="前话在编写SpringBoot Web程序完后，运行这个web程序，然后用http请求工具发送请求，然后程序对应的请求处理器就会执行相应的操作；那么，这个http请求是如何被web程序所接受的，又是如何路由到我们对应的http handler上的？ Web容器在使用SpringBoot有一大好处——再也不用外部的web容器了，它自身整合了目前流行的几大web容器，当然你也可以实现自己的web容器">
-<meta property="og:type" content="article">
-<meta property="og:title" content="从浏览器请求到WebApplication响应“hello world”的过程是什么">
-<meta property="og:url" content="https://www.liaochuntao.cn/2019/05/06/java-web-33/index.html">
-<meta property="og:site_name" content="春少 Blog">
-<meta property="og:description" content="前话在编写SpringBoot Web程序完后，运行这个web程序，然后用http请求工具发送请求，然后程序对应的请求处理器就会执行相应的操作；那么，这个http请求是如何被web程序所接受的，又是如何路由到我们对应的http handler上的？ Web容器在使用SpringBoot有一大好处——再也不用外部的web容器了，它自身整合了目前流行的几大web容器，当然你也可以实现自己的web容器">
-<meta property="og:locale" content="default">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-33-1.png">
-<meta property="og:updated_time" content="2019-05-06T05:24:23.000Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="从浏览器请求到WebApplication响应“hello world”的过程是什么">
-<meta name="twitter:description" content="前话在编写SpringBoot Web程序完后，运行这个web程序，然后用http请求工具发送请求，然后程序对应的请求处理器就会执行相应的操作；那么，这个http请求是如何被web程序所接受的，又是如何路由到我们对应的http handler上的？ Web容器在使用SpringBoot有一大好处——再也不用外部的web容器了，它自身整合了目前流行的几大web容器，当然你也可以实现自己的web容器">
-<meta name="twitter:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-33-1.png">
-
-<link rel="canonical" href="https://www.liaochuntao.cn/2019/05/06/java-web-33/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'default'
-  };
-</script>
-
-  <title>从浏览器请求到WebApplication响应“hello world”的过程是什么 | 春少 Blog</title>
+  <meta charset="utf-8">
   
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+  
+  
+    <meta name="description" content="励志成为一位大佬">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    从浏览器请求到WebApplication响应“hello world”的过程是什么 |
+    
+    春少 Blog</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-java-web-33" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">春少 Blog</h1>
-      <span class="logo-line-after"><i></i></span>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
-    </div>
-  </div>
-</div>
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h1 class="article-title" itemprop="name">
+      从浏览器请求到WebApplication响应“hello world”的过程是什么
+    </h1>
+  
+  
 
 
 
 
-<nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
-
-  </li>
-        <li class="menu-item menu-item-schedule">
-
-    <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>Schedule</a>
-
-  </li>
-        <li class="menu-item menu-item-sitemap">
-
-    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
-
-  </li>
-  </ul>
-</nav>
-
-
-
-
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
+            </header>
             
 
-    
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/05/06/java-web-33/">
+                
+                    <div class="article-meta">
+                        <a href="/2019/05/06/java-web-33/" class="article-date">
+  <time datetime="2019-05-06T11:08:18.000Z" itemprop="datePublished">2019-05-06</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
+                    </div>
+                    
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          从浏览器请求到WebApplication响应“hello world”的过程是什么
-        </h1>
+                        
+                            
+    <div class="tocbot"></div>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2019-05-06 11:08:18 / Modified: 13:24:23" itemprop="dateCreated datePublished" datetime="2019-05-06T11:08:18+08:00">2019-05-06</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a>
-                </span>
-            </span>
 
-          
 
-        </div>
-      </header>
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                
 
-      
-        <h4 id="前话"><a href="#前话" class="headerlink" title="前话"></a>前话</h4><p>在编写<code>SpringBoot Web</code>程序完后，运行这个<code>web</code>程序，然后用<code>http</code>请求工具发送请求，然后程序对应的请求处理器就会执行相应的操作；那么，这个<code>http</code>请求是如何被<code>web</code>程序所接受的，又是如何路由到我们对应的<code>http handler</code>上的？</p>
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                                    <h4 id="前话"><a href="#前话" class="headerlink" title="前话"></a>前话</h4><p>在编写<code>SpringBoot Web</code>程序完后，运行这个<code>web</code>程序，然后用<code>http</code>请求工具发送请求，然后程序对应的请求处理器就会执行相应的操作；那么，这个<code>http</code>请求是如何被<code>web</code>程序所接受的，又是如何路由到我们对应的<code>http handler</code>上的？</p>
 <h4 id="Web容器"><a href="#Web容器" class="headerlink" title="Web容器"></a>Web容器</h4><p>在使用<code>SpringBoot</code>有一大好处——再也不用外部的<code>web</code>容器了，它自身整合了目前流行的几大<code>web</code>容器，当然你也可以实现自己的<code>web</code>容器</p>
+<a id="more"></a>
 <p><code>SpringBoot</code>关于<code>Web</code>容器相关的代码在<code>org.springframework.boot.web.embedded</code>包中，该包下目前有四种<code>web</code>容器——<code>jetty</code>、<code>netty</code>、<code>tomcat</code>以及<code>undertow</code>；在这里我使用的是<code>netty</code>的<code>web</code>容器</p>
 <h5 id="ReactiveWebServerApplicationContext"><a href="#ReactiveWebServerApplicationContext" class="headerlink" title="ReactiveWebServerApplicationContext"></a>ReactiveWebServerApplicationContext</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onRefresh</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">super</span>.onRefresh();</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			createWebServer();</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> ApplicationContextException(<span class="string">"Unable to start reactive web server"</span>,</span><br><span class="line">					ex);</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">createWebServer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		ServerManager serverManager = <span class="keyword">this</span>.serverManager;</span><br><span class="line">		<span class="keyword">if</span> (serverManager == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">this</span>.serverManager = ServerManager.get(getWebServerFactory());</span><br><span class="line">		&#125;</span><br><span class="line">		initPropertySources();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>这个<code>createWebServer</code>方法的执行表示正式开始对<code>WebServer</code>进行相应的前期初始化，因为该方法调用的时期位于<code>ApplicationContext</code>的<code>onRefresh</code>时期，因此<code>ServerManager == null</code>，所以前去执行<code>ServerManager.get(getWebServerFactory())</code>进行创建一个<code>ServerManager</code></p>
@@ -282,196 +133,151 @@
 <p>这时执行完了<code>mapping.getHandler(exchange)</code>方法了，然后根据返回的<code>handler</code>是否为空决定是否创建<code>Http Not Found</code>错误；如果<code>handler</code>不为空，就是将请求信息送入对应的<code>handler</code>去处理了以及获取<code>handler</code>处理后的返回信息进行拦截返回。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Mono&lt;HandlerResult&gt; <span class="title">invokeHandler</span><span class="params">(ServerWebExchange exchange, Object handler)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.handlerAdapters != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">for</span> (HandlerAdapter handlerAdapter : <span class="keyword">this</span>.handlerAdapters) &#123;</span><br><span class="line">				<span class="keyword">if</span> (handlerAdapter.supports(handler)) &#123;</span><br><span class="line">					<span class="keyword">return</span> handlerAdapter.handle(exchange, handler);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> Mono.error(<span class="keyword">new</span> IllegalStateException(<span class="string">"No HandlerAdapter: "</span> + handler));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> Mono&lt;Void&gt; <span class="title">handleResult</span><span class="params">(ServerWebExchange exchange, HandlerResult result)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> getResultHandler(result).handleResult(exchange, result)</span><br><span class="line">				.onErrorResume(ex -&gt; result.applyExceptionHandler(ex).flatMap(exceptionResult -&gt;</span><br><span class="line">						getResultHandler(exceptionResult).handleResult(exchange, exceptionResult)));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> HandlerResultHandler <span class="title">getResultHandler</span><span class="params">(HandlerResult handlerResult)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.resultHandlers != <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">for</span> (HandlerResultHandler resultHandler : <span class="keyword">this</span>.resultHandlers) &#123;</span><br><span class="line">				<span class="keyword">if</span> (resultHandler.supports(handlerResult)) &#123;</span><br><span class="line">					<span class="keyword">return</span> resultHandler;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"No HandlerResultHandler for "</span> + handlerResult.getReturnValue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+                                                                        
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/06/java-web-33/" data-id="ckagk2wnl009616l9lvgbmr2m" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
     </div>
 
     
-    
-    
-
-      <footer class="post-footer">
-
         
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2019/04/29/java-web-31/" rel="prev" title="Nacos Server端注册一个服务实例流程">
-      <i class="fa fa-chevron-left"></i> Nacos Server端注册一个服务实例流程
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/05/06/leetcode-23/" rel="next" title="牛客网——剑指offer之数字在排序数组中出现的次数">
-      牛客网——剑指offer之数字在排序数组中出现的次数 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
+  <nav class="article-nav">
     
-  </article>
-  
-  
-  
-
-
-
-          </div>
+      <a href="/2019/05/06/leetcode-23/" class="article-nav-link">
+        <strong class="article-nav-caption">Newer</strong>
+        <div class="article-nav-title">
           
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
+            牛客网——剑指offer之数字在排序数组中出现的次数
+          
         </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#前话"><span class="nav-number">1.</span> <span class="nav-text">前话</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Web容器"><span class="nav-number">2.</span> <span class="nav-text">Web容器</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ReactiveWebServerApplicationContext"><span class="nav-number">2.1.</span> <span class="nav-text">ReactiveWebServerApplicationContext</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#NettyReactiveWebServerFactory"><span class="nav-number">2.2.</span> <span class="nav-text">NettyReactiveWebServerFactory</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ReactiveWebServerApplicationContext-1"><span class="nav-number">2.3.</span> <span class="nav-text">ReactiveWebServerApplicationContext</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#请求处理"><span class="nav-number">3.</span> <span class="nav-text">请求处理</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ReactorHttpHandlerAdapter"><span class="nav-number">3.1.</span> <span class="nav-text">ReactorHttpHandlerAdapter</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#HttpWebHandlerAdapter"><span class="nav-number">3.2.</span> <span class="nav-text">HttpWebHandlerAdapter</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#DispatcherHandler"><span class="nav-number">3.3.</span> <span class="nav-text">DispatcherHandler</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#PathPatternPredicate"><span class="nav-number">3.4.</span> <span class="nav-text">PathPatternPredicate</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">liaochuntao</p>
-  <div class="site-description" itemprop="description">励志成为一位大佬</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">118</span>
-          <span class="site-state-item-name">posts</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">10</span>
-        <span class="site-state-item-name">categories</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">21</span>
-        <span class="site-state-item-name">tags</span>
-      </div>
+      </a>
+    
+    
+      <a href="/2019/04/29/java-web-31/" class="article-nav-link">
+        <strong class="article-nav-caption">Older</strong>
+        <div class="article-nav-title">Nacos Server端注册一个服务实例流程</div>
+      </a>
+    
   </nav>
-</div>
-  <div class="links-of-author motion-element">
-      <span class="links-of-author-item">
-        <a href="https://github.com/chuntaojun" title="GitHub → https://github.com/chuntaojun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-      <span class="links-of-author-item">
-        <a href="mailto:lessspring@outlook.com" title="E-Mail → mailto:lessspring@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
-      </span>
-  </div>
 
 
+            
 
-      </div>
+                
+                    
+                        
+                            
 
+</article>
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+    <li><i class="fe fe-bookmark"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul>
     </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
+    <ul class="list-inline">
+      <li>&copy; 2020 春少 Blog</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
 
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-        
-
-<div class="copyright">
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+<nav class="navbar">
   
-  &copy; 
-  <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="春少 Blog"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/gallery">Gallery</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
-  </div>
+    </li>
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+</aside>
+<script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
 
-        
-
-
-
-
-
-
-
-
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
 
 
 
+  <script src="/js/tocbot.min.js"></script>
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
 
 
-
-
-
-
-
-
-
-
-
-
-  
-
-  
+<script src="/js/ocean.js"></script>
 
 <script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
 </html>

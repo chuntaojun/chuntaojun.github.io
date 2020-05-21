@@ -1,234 +1,81 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 3.7.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"www.liaochuntao.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
-  </script>
-
-  <meta name="description" content="JRaft 中的事务提交Apply Task123456789101112131415161718192021222324252627282930313233343536373839@Overridepublic void apply(final Task task) &amp;#123;    if (this.shutdownLatch != null) &amp;#123;        Utils.run">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Jraft中节点提交一个任务源码浅析">
-<meta property="og:url" content="https://www.liaochuntao.cn/2019/08/17/java-web-52/index.html">
-<meta property="og:site_name" content="春少 Blog">
-<meta property="og:description" content="JRaft 中的事务提交Apply Task123456789101112131415161718192021222324252627282930313233343536373839@Overridepublic void apply(final Task task) &amp;#123;    if (this.shutdownLatch != null) &amp;#123;        Utils.run">
-<meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2020-02-25T04:20:08.000Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Jraft中节点提交一个任务源码浅析">
-<meta name="twitter:description" content="JRaft 中的事务提交Apply Task123456789101112131415161718192021222324252627282930313233343536373839@Overridepublic void apply(final Task task) &amp;#123;    if (this.shutdownLatch != null) &amp;#123;        Utils.run">
-
-<link rel="canonical" href="https://www.liaochuntao.cn/2019/08/17/java-web-52/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'default'
-  };
-</script>
-
-  <title>Jraft中节点提交一个任务源码浅析 | 春少 Blog</title>
+  <meta charset="utf-8">
   
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+  
+  
+    <meta name="description" content="励志成为一位大佬">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    Jraft中节点提交一个任务源码浅析 |
+    
+    春少 Blog</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-java-web-52" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">春少 Blog</h1>
-      <span class="logo-line-after"><i></i></span>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
-    </div>
-  </div>
-</div>
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h1 class="article-title" itemprop="name">
+      Jraft中节点提交一个任务源码浅析
+    </h1>
+  
+  
 
 
 
 
-<nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
-
-  </li>
-        <li class="menu-item menu-item-schedule">
-
-    <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>Schedule</a>
-
-  </li>
-        <li class="menu-item menu-item-sitemap">
-
-    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
-
-  </li>
-  </ul>
-</nav>
-
-
-
-
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
+            </header>
             
 
-    
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/08/17/java-web-52/">
+                
+                    <div class="article-meta">
+                        <a href="/2019/08/17/java-web-52/" class="article-date">
+  <time datetime="2019-08-17T16:54:52.000Z" itemprop="datePublished">2019-08-17</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/JRaft/">JRaft</a>
+  </div>
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
+                    </div>
+                    
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Jraft中节点提交一个任务源码浅析
-        </h1>
+                        
+                            
+    <div class="tocbot"></div>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2019-08-17 16:54:52" itemprop="dateCreated datePublished" datetime="2019-08-17T16:54:52+08:00">2019-08-17</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2020-02-25 12:20:08" itemprop="dateModified" datetime="2020-02-25T12:20:08+08:00">2020-02-25</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JRaft/" itemprop="url" rel="index"><span itemprop="name">JRaft</span></a>
-                </span>
-            </span>
 
-          
 
-        </div>
-      </header>
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                
 
-      
-        <h4 id="JRaft-中的事务提交"><a href="#JRaft-中的事务提交" class="headerlink" title="JRaft 中的事务提交"></a>JRaft 中的事务提交</h4><h5 id="Apply-Task"><a href="#Apply-Task" class="headerlink" title="Apply Task"></a>Apply Task</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">apply</span><span class="params">(<span class="keyword">final</span> Task task)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.shutdownLatch != <span class="keyword">null</span>) &#123;</span><br><span class="line">        Utils.runClosureInThread(task.getDone(), <span class="keyword">new</span> Status(RaftError.ENODESHUTDOWN, <span class="string">"Node is shutting down."</span>));</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Node is shutting down"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    Requires.requireNonNull(task, <span class="string">"Null task"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个 LogEntry 对象用于承载日志数据</span></span><br><span class="line">    <span class="keyword">final</span> LogEntry entry = <span class="keyword">new</span> LogEntry();</span><br><span class="line">    entry.setData(task.getData());</span><br><span class="line">    <span class="keyword">int</span> retryTimes = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> EventTranslator&lt;LogEntryAndClosure&gt; translator = (event, sequence) -&gt; &#123;</span><br><span class="line">            event.reset();</span><br><span class="line">            event.done = task.getDone();</span><br><span class="line">            event.entry = entry;</span><br><span class="line">            event.expectedTerm = task.getExpectedTerm();</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">          <span class="comment">// 异步化发送日志</span></span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.applyQueue.tryPublishEvent(translator)) &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                retryTimes++;</span><br><span class="line">                <span class="keyword">if</span> (retryTimes &gt; MAX_APPLY_RETRY_TIMES) &#123;</span><br><span class="line">                    Utils.runClosureInThread(task.getDone(), <span class="keyword">new</span> Status(RaftError.EBUSY, <span class="string">"Node is busy, has too many tasks."</span>));</span><br><span class="line">                    LOG.warn(<span class="string">"Node &#123;&#125; applyQueue is overload."</span>, getNodeId());</span><br><span class="line">                    <span class="keyword">this</span>.metrics.recordTimes(<span class="string">"apply-task-overload-times"</span>, <span class="number">1</span>);</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                ThreadHelper.onSpinWait();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> Exception e) &#123;</span><br><span class="line">        Utils.runClosureInThread(task.getDone(), <span class="keyword">new</span> Status(RaftError.EPERM, <span class="string">"Node is down."</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                                    <h4 id="JRaft-中的事务提交"><a href="#JRaft-中的事务提交" class="headerlink" title="JRaft 中的事务提交"></a>JRaft 中的事务提交</h4><h5 id="Apply-Task"><a href="#Apply-Task" class="headerlink" title="Apply Task"></a>Apply Task</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">apply</span><span class="params">(<span class="keyword">final</span> Task task)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.shutdownLatch != <span class="keyword">null</span>) &#123;</span><br><span class="line">        Utils.runClosureInThread(task.getDone(), <span class="keyword">new</span> Status(RaftError.ENODESHUTDOWN, <span class="string">"Node is shutting down."</span>));</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Node is shutting down"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    Requires.requireNonNull(task, <span class="string">"Null task"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建一个 LogEntry 对象用于承载日志数据</span></span><br><span class="line">    <span class="keyword">final</span> LogEntry entry = <span class="keyword">new</span> LogEntry();</span><br><span class="line">    entry.setData(task.getData());</span><br><span class="line">    <span class="keyword">int</span> retryTimes = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> EventTranslator&lt;LogEntryAndClosure&gt; translator = (event, sequence) -&gt; &#123;</span><br><span class="line">            event.reset();</span><br><span class="line">            event.done = task.getDone();</span><br><span class="line">            event.entry = entry;</span><br><span class="line">            event.expectedTerm = task.getExpectedTerm();</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">          <span class="comment">// 异步化发送日志</span></span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.applyQueue.tryPublishEvent(translator)) &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                retryTimes++;</span><br><span class="line">                <span class="keyword">if</span> (retryTimes &gt; MAX_APPLY_RETRY_TIMES) &#123;</span><br><span class="line">                    Utils.runClosureInThread(task.getDone(), <span class="keyword">new</span> Status(RaftError.EBUSY, <span class="string">"Node is busy, has too many tasks."</span>));</span><br><span class="line">                    LOG.warn(<span class="string">"Node &#123;&#125; applyQueue is overload."</span>, getNodeId());</span><br><span class="line">                    <span class="keyword">this</span>.metrics.recordTimes(<span class="string">"apply-task-overload-times"</span>, <span class="number">1</span>);</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                ThreadHelper.onSpinWait();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> Exception e) &#123;</span><br><span class="line">        Utils.runClosureInThread(task.getDone(), <span class="keyword">new</span> Status(RaftError.EPERM, <span class="string">"Node is down."</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
 <p>这里采用了异步任务的方式，通过<code>publishEvent</code>进行事件发布<code>LogEntryAndClosure</code>任务，随后由对应的事件处理器进行处理</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">LogEntryAndClosureHandler</span> <span class="keyword">implements</span> <span class="title">EventHandler</span>&lt;<span class="title">LogEntryAndClosure</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">// task list for batch</span></span><br><span class="line">  	<span class="comment">// 暂存任务队列</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> List&lt;LogEntryAndClosure&gt; tasks = <span class="keyword">new</span> ArrayList&lt;&gt;(NodeImpl.<span class="keyword">this</span>.raftOptions.getApplyBatch());</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onEvent</span><span class="params">(<span class="keyword">final</span> LogEntryAndClosure event, <span class="keyword">final</span> <span class="keyword">long</span> sequence, <span class="keyword">final</span> <span class="keyword">boolean</span> endOfBatch)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">      	<span class="comment">// 如果出现了Node的shutdown事件，则尽量将未提交的任务进行apply</span></span><br><span class="line">        <span class="keyword">if</span> (event.shutdownLatch != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!<span class="keyword">this</span>.tasks.isEmpty()) &#123;</span><br><span class="line">                executeApplyingTasks(<span class="keyword">this</span>.tasks);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> num = GLOBAL_NUM_NODES.decrementAndGet();</span><br><span class="line">            LOG.info(<span class="string">"The number of active nodes decrement to &#123;&#125;."</span>, num);</span><br><span class="line">            event.shutdownLatch.countDown();</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">this</span>.tasks.add(event);</span><br><span class="line">      	<span class="comment">// jraft 采用了任务批量提交的形式，将多个LogEntry缓存在一个List数组中，然后通过判断是否</span></span><br><span class="line">      	<span class="comment">// 到达了批次值以及是否是消息队列批次的最后一个，进行任务的批量提交</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.tasks.size() &gt;= NodeImpl.<span class="keyword">this</span>.raftOptions.getApplyBatch() || endOfBatch) &#123;</span><br><span class="line">            executeApplyingTasks(<span class="keyword">this</span>.tasks);</span><br><span class="line">            <span class="keyword">this</span>.tasks.clear();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h5 id="处理任务"><a href="#处理任务" class="headerlink" title="处理任务"></a>处理任务</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">executeApplyingTasks</span><span class="params">(<span class="keyword">final</span> List&lt;LogEntryAndClosure&gt; tasks)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.writeLock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> size = tasks.size();</span><br><span class="line">      	<span class="comment">// 当前节点类型判断，如果不是Leader节点，则拒绝任务执行</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.state != State.STATE_LEADER) &#123;</span><br><span class="line">            <span class="keyword">final</span> Status st = <span class="keyword">new</span> Status();</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>.state != State.STATE_TRANSFERRING) &#123;</span><br><span class="line">                st.setError(RaftError.EPERM, <span class="string">"Is not leader."</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                st.setError(RaftError.EBUSY, <span class="string">"Is transferring leadership."</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            LOG.debug(<span class="string">"Node &#123;&#125; can't apply, status=&#123;&#125;."</span>, getNodeId(), st);</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">                Utils.runClosureInThread(tasks.get(i).done, st);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">      	<span class="comment">// 创建一个 LogEntry 列表</span></span><br><span class="line">        <span class="keyword">final</span> List&lt;LogEntry&gt; entries = <span class="keyword">new</span> ArrayList&lt;&gt;(size);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">          	<span class="comment">// 从中获取一个任务对象</span></span><br><span class="line">            <span class="keyword">final</span> LogEntryAndClosure task = tasks.get(i);</span><br><span class="line">          	<span class="comment">// 任务的期望任期与当前节点的任期进行比对</span></span><br><span class="line">          	<span class="comment">// 如果不满足条件，拒绝任务提交</span></span><br><span class="line">            <span class="keyword">if</span> (task.expectedTerm != -<span class="number">1</span> &amp;&amp; task.expectedTerm != <span class="keyword">this</span>.currTerm) &#123;</span><br><span class="line">                LOG.debug(<span class="string">"Node &#123;&#125; can't apply task whose expectedTerm=&#123;&#125; doesn't match currTerm=&#123;&#125;."</span>, getNodeId(), task.expectedTerm, <span class="keyword">this</span>.currTerm);</span><br><span class="line">                <span class="keyword">if</span> (task.done != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">final</span> Status st = <span class="keyword">new</span> Status(RaftError.EPERM, <span class="string">"expected_term=%d doesn't match current_term=%d"</span>, task.expectedTerm, <span class="keyword">this</span>.currTerm);</span><br><span class="line">                    Utils.runClosureInThread(task.done, st);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 添加本次日志同步的投票器</span></span><br><span class="line">            <span class="keyword">if</span> (!<span class="keyword">this</span>.ballotBox.appendPendingTask(<span class="keyword">this</span>.conf.getConf(), <span class="keyword">this</span>.conf.isStable() ? <span class="keyword">null</span> : <span class="keyword">this</span>.conf.getOldConf(), task.done)) &#123;</span><br><span class="line">                Utils.runClosureInThread(task.done, <span class="keyword">new</span> Status(RaftError.EINTERNAL, <span class="string">"Fail to append task."</span>));</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// set task entry info before adding to list.</span></span><br><span class="line">            task.entry.getId().setTerm(<span class="keyword">this</span>.currTerm);</span><br><span class="line">            task.entry.setType(EnumOutter.EntryType.ENTRY_TYPE_DATA);</span><br><span class="line">            entries.add(task.entry);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">this</span>.logManager.appendEntries(entries, <span class="keyword">new</span> LeaderStableClosure(entries));</span><br><span class="line">        <span class="comment">// update conf.first</span></span><br><span class="line">        <span class="keyword">this</span>.conf = <span class="keyword">this</span>.logManager.checkAndSetConfiguration(<span class="keyword">this</span>.conf);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.writeLock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -251,196 +98,151 @@
 <p>然后会触发<code>NodeImpl</code>中的<code>BallotBox</code>成员的<code>commitAt</code>方法来确认本次日志同步的结果</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">commitAt</span><span class="params">(<span class="keyword">long</span> firstLogIndex, <span class="keyword">long</span> lastLogIndex, PeerId peer)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//TODO  use lock-free algorithm here?</span></span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">long</span> stamp = stampedLock.writeLock();</span><br><span class="line">    <span class="keyword">long</span> lastCommittedIndex = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (pendingIndex == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (lastLogIndex &lt; pendingIndex) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (lastLogIndex &gt;= pendingIndex + pendingMetaQueue.size()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ArrayIndexOutOfBoundsException();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 日志开始位置</span></span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">long</span> startAt = Math.max(pendingIndex, firstLogIndex);</span><br><span class="line">        <span class="comment">// 位置指针</span></span><br><span class="line">        Ballot.PosHint hint = <span class="keyword">new</span> Ballot.PosHint();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">long</span> logIndex = startAt; logIndex &lt;= lastLogIndex; logIndex++) &#123;</span><br><span class="line">            <span class="keyword">final</span> Ballot bl = <span class="keyword">this</span>.pendingMetaQueue.get((<span class="keyword">int</span>) (logIndex - pendingIndex));</span><br><span class="line">            <span class="comment">// 进行投票统计</span></span><br><span class="line">            hint = bl.grant(peer, hint);</span><br><span class="line">            <span class="comment">// 如果半数同意了，则设置最新的日志索引条目</span></span><br><span class="line">            <span class="keyword">if</span> (bl.isGranted()) &#123;</span><br><span class="line">                lastCommittedIndex = logIndex;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (lastCommittedIndex == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// When removing a peer off the raft group which contains even number of</span></span><br><span class="line">        <span class="comment">// peers, the quorum would decrease by 1, e.g. 3 of 4 changes to 2 of 3. In</span></span><br><span class="line">        <span class="comment">// this case, the log after removal may be committed before some previous</span></span><br><span class="line">        <span class="comment">// logs, since we use the new configuration to deal the quorum of the</span></span><br><span class="line">        <span class="comment">// removal request, we think it's safe to commit all the uncommitted</span></span><br><span class="line">        <span class="comment">// previous logs, which is not well proved right now</span></span><br><span class="line">        pendingMetaQueue.removeRange(<span class="number">0</span>, (<span class="keyword">int</span>) (lastCommittedIndex - pendingIndex) + <span class="number">1</span>);</span><br><span class="line">        LOG.debug(<span class="string">"Committed log fromIndex=&#123;&#125;, toIndex=&#123;&#125;."</span>, pendingIndex, lastCommittedIndex);</span><br><span class="line">        pendingIndex = lastCommittedIndex + <span class="number">1</span>;</span><br><span class="line">        <span class="comment">// 更新最新的日志提交位置索引</span></span><br><span class="line">        <span class="keyword">this</span>.lastCommittedIndex = lastCommittedIndex;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        stampedLock.unlockWrite(stamp);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 进行日志提交——交由状态会处理</span></span><br><span class="line">    <span class="keyword">this</span>.waiter.onCommitted(lastCommittedIndex);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+                                                                        
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/08/17/java-web-52/" data-id="ckagk2wkt004w16l9xhx0xy1m" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
     </div>
 
     
-    
-    
-
-      <footer class="post-footer">
-
         
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2019/08/03/java-web-51/" rel="prev" title="JRaft中的轻量级的对象池实现原理浅析">
-      <i class="fa fa-chevron-left"></i> JRaft中的轻量级的对象池实现原理浅析
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/08/20/leetcode-29/" rel="next" title="有赞2020校招——编程题AC代码">
-      有赞2020校招——编程题AC代码 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
+  <nav class="article-nav">
     
-  </article>
-  
-  
-  
-
-
-
-          </div>
+      <a href="/2019/08/20/leetcode-29/" class="article-nav-link">
+        <strong class="article-nav-caption">Newer</strong>
+        <div class="article-nav-title">
           
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
+            有赞2020校招——编程题AC代码
+          
         </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#JRaft-中的事务提交"><span class="nav-number">1.</span> <span class="nav-text">JRaft 中的事务提交</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Apply-Task"><span class="nav-number">1.1.</span> <span class="nav-text">Apply Task</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#处理任务"><span class="nav-number">1.2.</span> <span class="nav-text">处理任务</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#日志传输给Follower"><span class="nav-number">1.3.</span> <span class="nav-text">日志传输给Follower</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">liaochuntao</p>
-  <div class="site-description" itemprop="description">励志成为一位大佬</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">118</span>
-          <span class="site-state-item-name">posts</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">10</span>
-        <span class="site-state-item-name">categories</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">21</span>
-        <span class="site-state-item-name">tags</span>
-      </div>
+      </a>
+    
+    
+      <a href="/2019/08/03/java-web-51/" class="article-nav-link">
+        <strong class="article-nav-caption">Older</strong>
+        <div class="article-nav-title">JRaft中的轻量级的对象池实现原理浅析</div>
+      </a>
+    
   </nav>
-</div>
-  <div class="links-of-author motion-element">
-      <span class="links-of-author-item">
-        <a href="https://github.com/chuntaojun" title="GitHub → https://github.com/chuntaojun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-      <span class="links-of-author-item">
-        <a href="mailto:lessspring@outlook.com" title="E-Mail → mailto:lessspring@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
-      </span>
-  </div>
 
 
+            
 
-      </div>
+                
+                    
+                        
+                            
 
+</article>
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+    <li><i class="fe fe-bookmark"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul>
     </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
+    <ul class="list-inline">
+      <li>&copy; 2020 春少 Blog</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
 
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-        
-
-<div class="copyright">
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+<nav class="navbar">
   
-  &copy; 
-  <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="春少 Blog"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/gallery">Gallery</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
-  </div>
+    </li>
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+</aside>
+<script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
 
-        
-
-
-
-
-
-
-
-
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
 
 
 
+  <script src="/js/tocbot.min.js"></script>
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
 
 
-
-
-
-
-
-
-
-
-
-
-  
-
-  
+<script src="/js/ocean.js"></script>
 
 <script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
 </html>

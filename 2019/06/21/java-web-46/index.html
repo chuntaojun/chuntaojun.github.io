@@ -1,231 +1,83 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 3.7.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"www.liaochuntao.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
-  </script>
-
-  <meta name="description" content="问题的由来在Java原生使用NIO(epoll)中，会存在一个著名的bug——epoll空轮训导致CPU出现100%的情况出现 Netty是如何解决这个问题的这里需要深入跟踪一下NioEventLoop类的实现 静态代码块123456789101112131415161718192021222324252627282930static &amp;#123;	final String key = &quot;sun.">
-<meta name="keywords" content="netty">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Netty是如何解决Java epoll中的BUG的">
-<meta property="og:url" content="https://www.liaochuntao.cn/2019/06/21/java-web-46/index.html">
-<meta property="og:site_name" content="春少 Blog">
-<meta property="og:description" content="问题的由来在Java原生使用NIO(epoll)中，会存在一个著名的bug——epoll空轮训导致CPU出现100%的情况出现 Netty是如何解决这个问题的这里需要深入跟踪一下NioEventLoop类的实现 静态代码块123456789101112131415161718192021222324252627282930static &amp;#123;	final String key = &quot;sun.">
-<meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-06-21T04:47:14.000Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Netty是如何解决Java epoll中的BUG的">
-<meta name="twitter:description" content="问题的由来在Java原生使用NIO(epoll)中，会存在一个著名的bug——epoll空轮训导致CPU出现100%的情况出现 Netty是如何解决这个问题的这里需要深入跟踪一下NioEventLoop类的实现 静态代码块123456789101112131415161718192021222324252627282930static &amp;#123;	final String key = &quot;sun.">
-
-<link rel="canonical" href="https://www.liaochuntao.cn/2019/06/21/java-web-46/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'default'
-  };
-</script>
-
-  <title>Netty是如何解决Java epoll中的BUG的 | 春少 Blog</title>
+  <meta charset="utf-8">
   
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+  
+  
+    <meta name="description" content="励志成为一位大佬">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    Netty是如何解决Java epoll中的BUG的 |
+    
+    春少 Blog</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-java-web-46" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">春少 Blog</h1>
-      <span class="logo-line-after"><i></i></span>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
-    </div>
-  </div>
-</div>
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h1 class="article-title" itemprop="name">
+      Netty是如何解决Java epoll中的BUG的
+    </h1>
+  
+  
 
 
 
 
-<nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
-
-  </li>
-        <li class="menu-item menu-item-schedule">
-
-    <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>Schedule</a>
-
-  </li>
-        <li class="menu-item menu-item-sitemap">
-
-    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
-
-  </li>
-  </ul>
-</nav>
-
-
-
-
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
+            </header>
             
 
-    
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/06/21/java-web-46/">
+                
+                    <div class="article-meta">
+                        <a href="/2019/06/21/java-web-46/" class="article-date">
+  <time datetime="2019-06-21T08:32:45.000Z" itemprop="datePublished">2019-06-21</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
+                    </div>
+                    
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Netty是如何解决Java epoll中的BUG的
-        </h1>
+                        
+                            
+    <div class="tocbot"></div>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2019-06-21 08:32:45 / Modified: 12:47:14" itemprop="dateCreated datePublished" datetime="2019-06-21T08:32:45+08:00">2019-06-21</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java-web/" itemprop="url" rel="index"><span itemprop="name">java-web</span></a>
-                </span>
-            </span>
 
-          
 
-        </div>
-      </header>
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                
 
-      
-        <h4 id="问题的由来"><a href="#问题的由来" class="headerlink" title="问题的由来"></a>问题的由来</h4><p>在Java原生使用<code>NIO(epoll)</code>中，会存在一个著名的<code>bug</code>——<code>epoll</code>空轮训导致CPU出现100%的情况出现</p>
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                                    <h4 id="问题的由来"><a href="#问题的由来" class="headerlink" title="问题的由来"></a>问题的由来</h4><p>在Java原生使用<code>NIO(epoll)</code>中，会存在一个著名的<code>bug</code>——<code>epoll</code>空轮训导致CPU出现100%的情况出现</p>
 <h4 id="Netty是如何解决这个问题的"><a href="#Netty是如何解决这个问题的" class="headerlink" title="Netty是如何解决这个问题的"></a>Netty是如何解决这个问题的</h4><p>这里需要深入跟踪一下<code>NioEventLoop</code>类的实现</p>
-<h5 id="静态代码块"><a href="#静态代码块" class="headerlink" title="静态代码块"></a>静态代码块</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">	<span class="keyword">final</span> String key = <span class="string">"sun.nio.ch.bugLevel"</span>;</span><br><span class="line">	<span class="keyword">final</span> String bugLevel = SystemPropertyUtil.get(key);</span><br><span class="line">	<span class="keyword">if</span> (bugLevel == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;Void&gt;() &#123;</span><br><span class="line">					<span class="meta">@Override</span></span><br><span class="line">					<span class="function"><span class="keyword">public</span> Void <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">						System.setProperty(key, <span class="string">""</span>);</span><br><span class="line">						<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">					&#125;</span><br><span class="line">			&#125;);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (<span class="keyword">final</span> SecurityException e) &#123;</span><br><span class="line">			logger.debug(<span class="string">"Unable to get/set System Property: "</span> + key, e);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 设置epoll空轮训bug判断的触发阈值</span></span><br><span class="line">	<span class="keyword">int</span> selectorAutoRebuildThreshold = SystemPropertyUtil.getInt(<span class="string">"io.netty.selectorAutoRebuildThreshold"</span>, <span class="number">512</span>);</span><br><span class="line">	<span class="keyword">if</span> (selectorAutoRebuildThreshold &lt; MIN_PREMATURE_SELECTOR_RETURNS) &#123;</span><br><span class="line">		selectorAutoRebuildThreshold = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	SELECTOR_AUTO_REBUILD_THRESHOLD = selectorAutoRebuildThreshold;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">		logger.debug(<span class="string">"-Dio.netty.noKeySetOptimization: &#123;&#125;"</span>, DISABLE_KEY_SET_OPTIMIZATION);</span><br><span class="line">		logger.debug(<span class="string">"-Dio.netty.selectorAutoRebuildThreshold: &#123;&#125;"</span>, SELECTOR_AUTO_REBUILD_THRESHOLD);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="静态代码块"><a href="#静态代码块" class="headerlink" title="静态代码块"></a>静态代码块</h5><a id="more"></a>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">	<span class="keyword">final</span> String key = <span class="string">"sun.nio.ch.bugLevel"</span>;</span><br><span class="line">	<span class="keyword">final</span> String bugLevel = SystemPropertyUtil.get(key);</span><br><span class="line">	<span class="keyword">if</span> (bugLevel == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;Void&gt;() &#123;</span><br><span class="line">					<span class="meta">@Override</span></span><br><span class="line">					<span class="function"><span class="keyword">public</span> Void <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">						System.setProperty(key, <span class="string">""</span>);</span><br><span class="line">						<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">					&#125;</span><br><span class="line">			&#125;);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (<span class="keyword">final</span> SecurityException e) &#123;</span><br><span class="line">			logger.debug(<span class="string">"Unable to get/set System Property: "</span> + key, e);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 设置epoll空轮训bug判断的触发阈值</span></span><br><span class="line">	<span class="keyword">int</span> selectorAutoRebuildThreshold = SystemPropertyUtil.getInt(<span class="string">"io.netty.selectorAutoRebuildThreshold"</span>, <span class="number">512</span>);</span><br><span class="line">	<span class="keyword">if</span> (selectorAutoRebuildThreshold &lt; MIN_PREMATURE_SELECTOR_RETURNS) &#123;</span><br><span class="line">		selectorAutoRebuildThreshold = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	SELECTOR_AUTO_REBUILD_THRESHOLD = selectorAutoRebuildThreshold;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">		logger.debug(<span class="string">"-Dio.netty.noKeySetOptimization: &#123;&#125;"</span>, DISABLE_KEY_SET_OPTIMIZATION);</span><br><span class="line">		logger.debug(<span class="string">"-Dio.netty.selectorAutoRebuildThreshold: &#123;&#125;"</span>, SELECTOR_AUTO_REBUILD_THRESHOLD);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>在静态代码块中看到一个很重要的属性<code>io.netty.selectorAutoRebuildThreshold</code>，这个属性是解决<code>JDK</code>中的<code>epoll</code>的bug的重要属性</p>
 <h5 id="Netty对于Selector的优化"><a href="#Netty对于Selector的优化" class="headerlink" title="Netty对于Selector的优化"></a>Netty对于Selector的优化</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> SelectorTuple <span class="title">openSelector</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">final</span> Selector unwrappedSelector;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 获取系统对应的提供的selector实现(epoll——linux、poll——MacOS)</span></span><br><span class="line">		unwrappedSelector = provider.openSelector();</span><br><span class="line">	&#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> ChannelException(<span class="string">"failed to open a new selector"</span>, e);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 是否禁止了selectorKey的优化</span></span><br><span class="line">	<span class="keyword">if</span> (DISABLE_KEY_SET_OPTIMIZATION) &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> SelectorTuple(unwrappedSelector);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 加载sun.nio.ch.SelectorImpl的class信息</span></span><br><span class="line">	Object maybeSelectorImplClass = AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;Object&gt;() &#123;</span><br><span class="line">			<span class="meta">@Override</span></span><br><span class="line">			<span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">				<span class="keyword">try</span> &#123;</span><br><span class="line">					<span class="keyword">return</span> Class.forName(<span class="string">"sun.nio.ch.SelectorImpl"</span>, <span class="keyword">false</span>, PlatformDependent.getSystemClassLoader());</span><br><span class="line">				&#125; <span class="keyword">catch</span> (Throwable cause) &#123;</span><br><span class="line">					<span class="keyword">return</span> cause;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 如果是异常，直接不进行下一步的selector优化</span></span><br><span class="line">  <span class="comment">// 如果是Class且是系统所提供的selector的class，则进行Netty的selector优化</span></span><br><span class="line">	<span class="keyword">if</span> (!(maybeSelectorImplClass <span class="keyword">instanceof</span> Class) ||</span><br><span class="line">		<span class="comment">// ensure the current selector implementation is what we can instrument.</span></span><br><span class="line">		!((Class&lt;?&gt;) maybeSelectorImplClass).isAssignableFrom(unwrappedSelector.getClass())) &#123;</span><br><span class="line">		<span class="keyword">if</span> (maybeSelectorImplClass <span class="keyword">instanceof</span> Throwable) &#123;</span><br><span class="line">			Throwable t = (Throwable) maybeSelectorImplClass;</span><br><span class="line">			logger.trace(<span class="string">"failed to instrument a special java.util.Set into: &#123;&#125;"</span>, unwrappedSelector, t);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> SelectorTuple(unwrappedSelector);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">final</span> Class&lt;?&gt; selectorImplClass = (Class&lt;?&gt;) maybeSelectorImplClass;</span><br><span class="line">  <span class="comment">// 使用Netty的自定义实现的selectedKeySet(本质是一个数组)</span></span><br><span class="line">	<span class="keyword">final</span> SelectedSelectionKeySet selectedKeySet = <span class="keyword">new</span> SelectedSelectionKeySet();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 进行相关的优化措施</span></span><br><span class="line">	Object maybeException = AccessController.doPrivileged(<span class="keyword">new</span> PrivilegedAction&lt;Object&gt;() &#123;</span><br><span class="line">			<span class="meta">@Override</span></span><br><span class="line">			<span class="function"><span class="keyword">public</span> Object <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">				<span class="keyword">try</span> &#123;</span><br><span class="line">          <span class="comment">// 利用反射获取selectedKeys字段信息</span></span><br><span class="line">					Field selectedKeysField = selectorImplClass.getDeclaredField(<span class="string">"selectedKeys"</span>);</span><br><span class="line">					Field publicSelectedKeysField = selectorImplClass.getDeclaredField(<span class="string">"publicSelectedKeys"</span>);</span><br><span class="line"></span><br><span class="line">          <span class="comment">// 如果是JDK9且存在Unsafe，则使用原本的sun.misc.Unsafe实现Field的替换</span></span><br><span class="line">					<span class="keyword">if</span> (PlatformDependent.javaVersion() &gt;= <span class="number">9</span> &amp;&amp; PlatformDependent.hasUnsafe()) &#123;</span><br><span class="line">						<span class="comment">// Let us try to use sun.misc.Unsafe to replace the SelectionKeySet.</span></span><br><span class="line">						<span class="comment">// This allows us to also do this in Java9+ without any extra flags.</span></span><br><span class="line">						<span class="keyword">long</span> selectedKeysFieldOffset = PlatformDependent.objectFieldOffset(selectedKeysField);</span><br><span class="line">						<span class="keyword">long</span> publicSelectedKeysFieldOffset = PlatformDependent.objectFieldOffset(publicSelectedKeysField);</span><br><span class="line">						<span class="keyword">if</span> (selectedKeysFieldOffset != -<span class="number">1</span> &amp;&amp; publicSelectedKeysFieldOffset != -<span class="number">1</span>) &#123;</span><br><span class="line">							PlatformDependent.putObject(unwrappedSelector, selectedKeysFieldOffset, selectedKeySet);</span><br><span class="line">							PlatformDependent.putObject(unwrappedSelector, publicSelectedKeysFieldOffset, selectedKeySet);</span><br><span class="line">							<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">						&#125;</span><br><span class="line">						<span class="comment">// We could not retrieve the offset, lets try reflection as last-resort.</span></span><br><span class="line">					&#125;</span><br><span class="line">          <span class="comment">// 否则使用反射进行操作，替换待优化的Field</span></span><br><span class="line">					Throwable cause = ReflectionUtil.trySetAccessible(selectedKeysField, <span class="keyword">true</span>);</span><br><span class="line">					<span class="keyword">if</span> (cause != <span class="keyword">null</span>) &#123;</span><br><span class="line">						<span class="keyword">return</span> cause;</span><br><span class="line">					&#125;</span><br><span class="line">					cause = ReflectionUtil.trySetAccessible(publicSelectedKeysField, <span class="keyword">true</span>);</span><br><span class="line">					<span class="keyword">if</span> (cause != <span class="keyword">null</span>) &#123;</span><br><span class="line">						<span class="keyword">return</span> cause;</span><br><span class="line">					&#125;</span><br><span class="line">          <span class="comment">// 进行相关的selectedKeys替换，替换为Netty的实现</span></span><br><span class="line">					selectedKeysField.set(unwrappedSelector, selectedKeySet);</span><br><span class="line">					publicSelectedKeysField.set(unwrappedSelector, selectedKeySet);</span><br><span class="line">					<span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">				&#125; <span class="keyword">catch</span> (NoSuchFieldException e) &#123;</span><br><span class="line">					<span class="keyword">return</span> e;</span><br><span class="line">				&#125; <span class="keyword">catch</span> (IllegalAccessException e) &#123;</span><br><span class="line">					<span class="keyword">return</span> e;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;);</span><br><span class="line"></span><br><span class="line">  	<span class="comment">// 如果在优化过程中出现错误，则直接不做优化</span></span><br><span class="line">		<span class="keyword">if</span> (maybeException <span class="keyword">instanceof</span> Exception) &#123;</span><br><span class="line">			selectedKeys = <span class="keyword">null</span>;</span><br><span class="line">			Exception e = (Exception) maybeException;</span><br><span class="line">			logger.trace(<span class="string">"failed to instrument a special java.util.Set into: &#123;&#125;"</span>, unwrappedSelector, e);</span><br><span class="line">			<span class="keyword">return</span> <span class="keyword">new</span> SelectorTuple(unwrappedSelector);</span><br><span class="line">		&#125;</span><br><span class="line">		selectedKeys = selectedKeySet;</span><br><span class="line">		logger.trace(<span class="string">"instrumented a special java.util.Set into: &#123;&#125;"</span>, unwrappedSelector);</span><br><span class="line">    <span class="comment">// 返回已优化过的selector，由于已将selectedKeySet替换进了JDK的selector实现中，因此所有的操作都</span></span><br><span class="line">    <span class="comment">// 会反应在selectedKeySet中</span></span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> SelectorTuple(unwrappedSelector, <span class="keyword">new</span> SelectedSelectionKeySetSelector(unwrappedSelector, selectedKeySet));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p><code>Netty</code>其实提供了对<code>selector</code>的优化措施，其实就只是对于<code>selectKeys</code>的优化，从集合转为了用数组对<code>selectKey</code>进行管理</p>
@@ -235,199 +87,153 @@
 <h5 id="Netty的selector重建过程"><a href="#Netty的selector重建过程" class="headerlink" title="Netty的selector重建过程"></a>Netty的selector重建过程</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">rebuildSelector0</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 旧的selector</span></span><br><span class="line">	<span class="keyword">final</span> Selector oldSelector = selector;</span><br><span class="line">  <span class="comment">// 新的selector</span></span><br><span class="line">	<span class="keyword">final</span> SelectorTuple newSelectorTuple;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (oldSelector == <span class="keyword">null</span>) &#123;</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 重新创建一个selector</span></span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		newSelectorTuple = openSelector();</span><br><span class="line">	&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">		logger.warn(<span class="string">"Failed to create a new Selector."</span>, e);</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Register all channels to the new Selector.</span></span><br><span class="line">	<span class="keyword">int</span> nChannels = <span class="number">0</span>;</span><br><span class="line">  <span class="comment">// 遍历所有oldSelector中的事件列表</span></span><br><span class="line">	<span class="keyword">for</span> (SelectionKey key: oldSelector.keys()) &#123;</span><br><span class="line">    <span class="comment">// 事件的附件信息</span></span><br><span class="line">		Object a = key.attachment();</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">// 判断事件是否有效以及是否在新的selector中</span></span><br><span class="line">			<span class="keyword">if</span> (!key.isValid() || key.channel().keyFor(newSelectorTuple.unwrappedSelector) != <span class="keyword">null</span>) &#123;</span><br><span class="line">				<span class="keyword">continue</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">int</span> interestOps = key.interestOps();</span><br><span class="line">      <span class="comment">// key注销</span></span><br><span class="line">			key.cancel();</span><br><span class="line">      <span class="comment">// 重新将key注册到新的selector中</span></span><br><span class="line">			SelectionKey newKey = key.channel().register(newSelectorTuple.unwrappedSelector, interestOps, a);</span><br><span class="line">			<span class="keyword">if</span> (a <span class="keyword">instanceof</span> AbstractNioChannel) &#123;</span><br><span class="line">				<span class="comment">// Update SelectionKey</span></span><br><span class="line">				((AbstractNioChannel) a).selectionKey = newKey;</span><br><span class="line">			&#125;</span><br><span class="line">			nChannels ++;</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			logger.warn(<span class="string">"Failed to re-register a Channel to the new Selector."</span>, e);</span><br><span class="line">			<span class="keyword">if</span> (a <span class="keyword">instanceof</span> AbstractNioChannel) &#123;</span><br><span class="line">				AbstractNioChannel ch = (AbstractNioChannel) a;</span><br><span class="line">				ch.unsafe().close(ch.unsafe().voidPromise());</span><br><span class="line">			&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">				NioTask&lt;SelectableChannel&gt; task = (NioTask&lt;SelectableChannel&gt;) a;</span><br><span class="line">				invokeChannelUnregistered(task, key, e);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 重新赋值selector对象</span></span><br><span class="line">	selector = newSelectorTuple.selector;</span><br><span class="line">	unwrappedSelector = newSelectorTuple.unwrappedSelector;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="comment">// time to close the old selector as everything else is registered to the new one</span></span><br><span class="line">    <span class="comment">// 重建完毕后，关闭原有的selector</span></span><br><span class="line">		oldSelector.close();</span><br><span class="line">	&#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">    ...</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>通过创建新的<code>selector</code>以及将<code>oldSelector</code>中的事件重新注册到<code>newSelector</code>中，完成<code>epoll</code>空轮训<code>bug</code>的修复。因此，<code>netty</code>通过对<code>JDK</code>的<code>select</code>操作进行一次包装，记录一次<code>select</code>操作中，<code>selectNow</code>所产生的次数进行<code>epoll</code>空轮训<code>bug</code>的判断以及修复</p>
 
+                                                                        
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/06/21/java-web-46/" data-id="ckagk2wkk004e16l9z58hde8w" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/netty/">netty</a></li></ul>
+
+                                    </footer>
+
     </div>
 
     
-    
-    
-
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/netty/" rel="tag"># netty</a>
-          </div>
-
         
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2019/06/11/java-web-45/" rel="prev" title="Nacos疑问之为什么我服务明明下线了却还是可以调用到？">
-      <i class="fa fa-chevron-left"></i> Nacos疑问之为什么我服务明明下线了却还是可以调用到？
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/06/22/leetcode-27/" rel="next" title="leetcode回顾——number-of-islands">
-      leetcode回顾——number-of-islands <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
+  <nav class="article-nav">
     
-  </article>
-  
-  
-  
-
-
-
-          </div>
+      <a href="/2019/06/22/leetcode-27/" class="article-nav-link">
+        <strong class="article-nav-caption">Newer</strong>
+        <div class="article-nav-title">
           
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
+            leetcode回顾——number-of-islands
+          
         </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#问题的由来"><span class="nav-number">1.</span> <span class="nav-text">问题的由来</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Netty是如何解决这个问题的"><span class="nav-number">2.</span> <span class="nav-text">Netty是如何解决这个问题的</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#静态代码块"><span class="nav-number">2.1.</span> <span class="nav-text">静态代码块</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Netty对于Selector的优化"><span class="nav-number">2.2.</span> <span class="nav-text">Netty对于Selector的优化</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#NioEventLoop所执行的任务"><span class="nav-number">2.3.</span> <span class="nav-text">NioEventLoop所执行的任务</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Netty的select操作-对selector的select操作的包装"><span class="nav-number">2.4.</span> <span class="nav-text">Netty的select操作(对selector的select操作的包装)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Netty的selector重建过程"><span class="nav-number">2.5.</span> <span class="nav-text">Netty的selector重建过程</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">liaochuntao</p>
-  <div class="site-description" itemprop="description">励志成为一位大佬</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">118</span>
-          <span class="site-state-item-name">posts</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">10</span>
-        <span class="site-state-item-name">categories</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">21</span>
-        <span class="site-state-item-name">tags</span>
-      </div>
+      </a>
+    
+    
+      <a href="/2019/06/11/java-web-45/" class="article-nav-link">
+        <strong class="article-nav-caption">Older</strong>
+        <div class="article-nav-title">Nacos疑问之为什么我服务明明下线了却还是可以调用到？</div>
+      </a>
+    
   </nav>
-</div>
-  <div class="links-of-author motion-element">
-      <span class="links-of-author-item">
-        <a href="https://github.com/chuntaojun" title="GitHub → https://github.com/chuntaojun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-      <span class="links-of-author-item">
-        <a href="mailto:lessspring@outlook.com" title="E-Mail → mailto:lessspring@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
-      </span>
-  </div>
 
 
+            
 
-      </div>
+                
+                    
+                        
+                            
 
+</article>
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+    <li><i class="fe fe-bookmark"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul>
     </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
+    <ul class="list-inline">
+      <li>&copy; 2020 春少 Blog</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
 
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-        
-
-<div class="copyright">
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+<nav class="navbar">
   
-  &copy; 
-  <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="春少 Blog"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/gallery">Gallery</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
-  </div>
+    </li>
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+</aside>
+<script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
 
-        
-
-
-
-
-
-
-
-
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
 
 
 
+  <script src="/js/tocbot.min.js"></script>
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
 
 
-
-
-
-
-
-
-
-
-
-
-  
-
-  
+<script src="/js/ocean.js"></script>
 
 <script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
 </html>

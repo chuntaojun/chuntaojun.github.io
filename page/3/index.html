@@ -1,1 +1,865 @@
-null
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+    <meta name="description" content="励志成为一位大佬">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    
+    春少 Blog</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
+</head>
+
+<body>
+<main class="content">
+  <section class="jumbotron">
+  <div class="video">
+    
+      <div class="video-frame">
+        <img src="/images/ocean/overlay-hero.png" alt="Decorative image frame">
+      </div>
+    
+    <div class="video-media">
+      <video playsinline="" autoplay="" loop="" muted="" data-autoplay=""
+             poster="/images/ocean/ocean.png" x5-video-player-type="h5">
+        <source src="/images/ocean/ocean.mp4" type="video/mp4">
+        <source src="/images/ocean/ocean.ogv" type="video/ogg">
+        <source src="/images/ocean/ocean.webm" type="video/webm">
+        <p>Your user agent does not support the HTML5 Video element.</p>
+      </video>
+      <div class="video-overlay"></div>
+    </div>
+    <div class="video-inner text-center text-white">
+      <h1><a href="/">春少 Blog</a></h1>
+      <p></p>
+      <div><img src="/images/hexo-inverted.svg" class="brand" alt="春少 Blog"></div>
+    </div>
+    <div class="video-learn-more">
+      <a class="anchor" href="#landingpage"><i class="fe fe-mouse"></i></a>
+    </div>
+  </div>
+</section>
+
+<div id="landingpage">
+  <section class="outer">
+    <article class="articles">
+      
+      <h1 class="page-type-title"></h1>
+      
+        
+          <article id="post-java-web-43" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/06/09/java-web-43/">Nacos 是如何剔除非健康实例的</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/06/09/java-web-43/" class="article-date">
+  <time datetime="2019-06-09T20:43:22.000Z" itemprop="datePublished">2019-06-09</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/nacos/">nacos</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="Nacos-Client-心跳上报"><a href="#Nacos-Client-心跳上报" class="headerlink" title="Nacos Client 心跳上报"></a>Nacos Client 心跳上报</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BeatProcessor</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="keyword">for</span> (Map.Entry&lt;String, BeatInfo&gt; entry : dom2Beat.entrySet()) &#123;</span><br><span class="line">				BeatInfo beatInfo = entry.getValue();</span><br><span class="line">				<span class="keyword">if</span> (beatInfo.isScheduled()) &#123;</span><br><span class="line">					<span class="keyword">continue</span>;</span><br><span class="line">				&#125;</span><br><span class="line">				beatInfo.setScheduled(<span class="keyword">true</span>);</span><br><span class="line">				executorService.schedule(<span class="keyword">new</span> BeatTask(beatInfo), <span class="number">0</span>, TimeUnit.MILLISECONDS);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">			NAMING_LOGGER.error(<span class="string">"[CLIENT-BEAT] Exception while scheduling beat."</span>, e);</span><br><span class="line">		&#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">			executorService.schedule(<span class="keyword">this</span>, clientBeatInterval, TimeUnit.MILLISECONDS);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BeatTask</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	BeatInfo beatInfo;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="title">BeatTask</span><span class="params">(BeatInfo beatInfo)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.beatInfo = beatInfo;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">long</span> result = serverProxy.sendBeat(beatInfo);</span><br><span class="line">		beatInfo.setScheduled(<span class="keyword">false</span>);</span><br><span class="line">		<span class="keyword">if</span> (result &gt; <span class="number">0</span>) &#123;</span><br><span class="line">			clientBeatInterval = result;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2019/06/09/java-web-43/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/06/09/java-web-43/" data-id="ckagk2wkf004516l9byj0wpin" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nacos/">nacos</a></li></ul>
+
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
+          <article id="post-java-web-44" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/06/09/java-web-44/">Spring中Bean的Scope周期的详解</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/06/09/java-web-44/" class="article-date">
+  <time datetime="2019-06-09T20:43:22.000Z" itemprop="datePublished">2019-06-09</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="Bean的使用范围有几种？"><a href="#Bean的使用范围有几种？" class="headerlink" title="Bean的使用范围有几种？"></a>Bean的使用范围有几种？</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Target</span>(&#123;ElementType.TYPE, ElementType.METHOD&#125;)</span><br><span class="line"><span class="meta">@Retention</span>(RetentionPolicy.RUNTIME)</span><br><span class="line"><span class="meta">@Documented</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> Scope &#123;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Alias for &#123;<span class="doctag">@link</span> #scopeName&#125;.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@see</span> #scopeName</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@AliasFor</span>(<span class="string">"scopeName"</span>)</span><br><span class="line">	<span class="function">String <span class="title">value</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Specifies the name of the scope to use for the annotated component/bean.</span></span><br><span class="line"><span class="comment">	 * &lt;p&gt;Defaults to an empty string (&#123;<span class="doctag">@code</span> ""&#125;) which implies</span></span><br><span class="line"><span class="comment">	 * &#123;<span class="doctag">@link</span> ConfigurableBeanFactory#SCOPE_SINGLETON SCOPE_SINGLETON&#125;.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@since</span> 4.2</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@see</span> ConfigurableBeanFactory#SCOPE_PROTOTYPE</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@see</span> ConfigurableBeanFactory#SCOPE_SINGLETON</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@see</span> org.springframework.web.context.WebApplicationContext#SCOPE_REQUEST</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@see</span> org.springframework.web.context.WebApplicationContext#SCOPE_SESSION</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@see</span> #value</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="meta">@AliasFor</span>(<span class="string">"value"</span>)</span><br><span class="line">	<span class="function">String <span class="title">scopeName</span><span class="params">()</span> <span class="keyword">default</span> ""</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/**</span></span><br><span class="line"><span class="comment">	 * Specifies whether a component should be configured as a scoped proxy</span></span><br><span class="line"><span class="comment">	 * and if so, whether the proxy should be interface-based or subclass-based.</span></span><br><span class="line"><span class="comment">	 * &lt;p&gt;Defaults to &#123;<span class="doctag">@link</span> ScopedProxyMode#DEFAULT&#125;, which typically indicates</span></span><br><span class="line"><span class="comment">	 * that no scoped proxy should be created unless a different default</span></span><br><span class="line"><span class="comment">	 * has been configured at the component-scan instruction level.</span></span><br><span class="line"><span class="comment">	 * &lt;p&gt;Analogous to &#123;<span class="doctag">@code</span> &lt;aop:scoped-proxy/&gt;&#125; support in Spring XML.</span></span><br><span class="line"><span class="comment">	 * <span class="doctag">@see</span> ScopedProxyMode</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="function">ScopedProxyMode <span class="title">proxyMode</span><span class="params">()</span> <span class="keyword">default</span> ScopedProxyMode.DEFAULT</span>;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过<code>Spring</code>的注解<code>Scope</code>可以知道，对于<code>Bean</code>的使用方位有四种——<code>singleton</code>、<code>prototype</code>、<code>session</code>、<code>request</code>，那么这几种<code>Bean</code>的使用范围是如何实现的呢？首先要看<code>Spring</code>中的一个重要的接口——<code>BeanDefinition</code></p>
+                                                        
+                                                            <a class="article-more-link" href="/2019/06/09/java-web-44/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/06/09/java-web-44/" data-id="ckagk2wkh004816l9uqpnchh0" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
+
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
+          <article id="post-java-web-42" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/06/03/java-web-42/">nacos是如何知道哪些客户端订阅了某项服务的</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/06/03/java-web-42/" class="article-date">
+  <time datetime="2019-06-03T16:37:29.000Z" itemprop="datePublished">2019-06-03</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/nacos/">nacos</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="为什么会存在订阅者？"><a href="#为什么会存在订阅者？" class="headerlink" title="为什么会存在订阅者？"></a>为什么会存在订阅者？</h4><p>因为存在某些需求，我的服务不想注册到服务发现中心去，我只是想安安静静的做一个索取者，我只想获取可以调用的服务而已</p>
+<h4 id="nacos是如何知道哪些客户端订阅了服务的"><a href="#nacos是如何知道哪些客户端订阅了服务的" class="headerlink" title="nacos是如何知道哪些客户端订阅了服务的"></a>nacos是如何知道哪些客户端订阅了服务的</h4><p>在nacos-client中，如果要获取服务实例，那么会调用这个方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// String queryList(String serviceName, String clusters, int udpPort, boolean healthyOnly)</span></span><br><span class="line">serverProxy.queryList(serviceName, clusters, <span class="number">0</span>, <span class="keyword">false</span>);</span><br></pre></td></tr></table></figure>
+<p>在这个方法中看到了一个参数<code>udpPort</code>，等等会用到；这个方法最终调用的HTTP-URL为<code>/v1/ns/instance/list</code>，接着去看<code>nacos-naming-server</code>对应的该<code>controller</code>做了什么事情</p>
+                                                        
+                                                            <a class="article-more-link" href="/2019/06/03/java-web-42/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/06/03/java-web-42/" data-id="ckagk2wke004216l98bgimyk1" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nacos/">nacos</a></li></ul>
+
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
+          <article id="post-java-web-41" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/06/01/java-web-41/">Nacos 是如何同时实现AP与CP的</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/06/01/java-web-41/" class="article-date">
+  <time datetime="2019-06-01T10:32:05.000Z" itemprop="datePublished">2019-06-01</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/nacos/">nacos</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="两种一致性策略如何在nacos中共存"><a href="#两种一致性策略如何在nacos中共存" class="headerlink" title="两种一致性策略如何在nacos中共存"></a>两种一致性策略如何在nacos中共存</h4><p>或许会有疑问，为什么早先的<code>cp</code>模式的<code>Zookeeper</code>或者<code>AP</code>模式的<code>Eureka</code>，都只有支持<code>CAP</code>理论下大家常用的<code>AP</code>实现或者<code>CP</code>实现，而nacos却能够两个都实现呢？</p>
+<p>其实<code>CAP</code>理论，仅仅是针对分布式下数据的一致性而言，如果你对于数据的一致性要求不高，可忍受最终一致性，那么<code>AP</code>模式的<code>Eureka</code>就可以满足你了，如果说你对数据的一致性要求很高，那么就使用<code>CP</code>模式的<code>Zookeeper</code>，而追其根本，并不是说<code>Eureka</code>是<code>AP</code>的，或者说<code>Zookeeper</code>是<code>CP</code>的，而是他们存储的数据的一致性，满足<code>AP</code>或者<code>CP</code>，因此也就不难实现在一个组件中实现<code>AP</code>模式与<code>CP</code>模式共存</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span>(<span class="string">"consistencyDelegate"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DelegateConsistencyServiceImpl</span> <span class="keyword">implements</span> <span class="title">ConsistencyService</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> PersistentConsistencyService persistentConsistencyService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> EphemeralConsistencyService ephemeralConsistencyService;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2019/06/01/java-web-41/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/06/01/java-web-41/" data-id="ckagk2wkd003z16l9vfspexr6" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nacos/">nacos</a></li></ul>
+
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
+          <article id="post-java-web-40" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/05/30/java-web-40/">记一次Java程序CPU占用率100%的问题排查、定位、解决</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/05/30/java-web-40/" class="article-date">
+  <time datetime="2019-05-30T20:54:37.000Z" itemprop="datePublished">2019-05-30</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="错误告知"><a href="#错误告知" class="headerlink" title="错误告知"></a>错误告知</h4><p>今天收到阿里云的警告邮件，告知我的实例当前<code>CPU</code>负载过高，当时就奇怪了，怎么实例负载过高了？于是登录的服务器查看当前<code>CPU</code>以及系统负载情况，果真<code>CPU</code>当前负载为百分之百，并且是自己部署上去的<code>Java</code>应用程序，于是开始进行错误信息定位</p>
+<h4 id="错误定位"><a href="#错误定位" class="headerlink" title="错误定位"></a>错误定位</h4><ul>
+<li>使用<code>jps or lsof -i:{port}</code>  得到目前Java程序的PID</li>
+<li>使用命令<code>ps -mp &lt;PID&gt; -o THREAD,tid,time</code>进行打印所有的线程信息状态</li>
+<li><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-40-1.png" alt="java pid"></li>
+<li>筛选出<code>CPU</code>占用率较高的线程<code>tid</code></li>
+<li>使用命令<code>printf &quot;%x\n&quot; tid</code>得到线程的16进制表示</li>
+<li><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-40-2.png" alt="printf"></li>
+<li>使用<code>jstack &lt;PID&gt; &gt; xxx.txt</code>将当前<code>Java</code>程序的线程栈打印出来，然后根据上面得到的线程的16进制表示，定位到具体的线程进行具体分析</li>
+<li><img src="http://120.24.90.180:8080/blog/image/java_web/java-web-40-3.png" alt="jstack"></li>
+</ul>
+<h4 id="代码定位"><a href="#代码定位" class="headerlink" title="代码定位"></a>代码定位</h4>
+                                                        
+                                                            <a class="article-more-link" href="/2019/05/30/java-web-40/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/30/java-web-40/" data-id="ckagk2wkc003w16l9infsa16d" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
+          <article id="post-leetcode-26" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/05/30/leetcode-26/">牛客网——剑指offer之数据流中的中位数</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/05/30/leetcode-26/" class="article-date">
+  <time datetime="2019-05-30T15:02:53.000Z" itemprop="datePublished">2019-05-30</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/LeetCode/">LeetCode</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><p>如何得到一个数据流中的中位数？如果从数据流中读出奇数个数值，那么中位数就是所有数值排序之后位于中间的数值。如果从数据流中读出偶数个数值，那么中位数就是所有数值排序之后中间两个数的平均值。我们使用Insert()方法读取数据流，使用GetMedian()方法获取当前读取数据的中位数。</p>
+<h4 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h4><p>这道题可以采用二分查找插入位置来做，因为是数据流的形式，我只要确保上次一插入操作的结果有序，那么利用二分查找插入位置，每次排序的时间复杂度均为O(log(N))</p>
+                                                        
+                                                            <a class="article-more-link" href="/2019/05/30/leetcode-26/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/30/leetcode-26/" data-id="ckagk2wm2007716l908klwbbo" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
+          <article id="post-java-web-39" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/05/29/java-web-39/">记一次Nacos的issue问题解决之并发导致的NPE异常</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/05/29/java-web-39/" class="article-date">
+  <time datetime="2019-05-29T17:54:13.000Z" itemprop="datePublished">2019-05-29</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="ISSUE"><a href="#ISSUE" class="headerlink" title="ISSUE"></a>ISSUE</h4><p><a href="https://github.com/nacos-group/nacos-spring-boot-project/issues/21" target="_blank" rel="noopener">Spring boot 应用启动被终止 #21</a></p>
+<h4 id="错误分析"><a href="#错误分析" class="headerlink" title="错误分析"></a>错误分析</h4><p><code>DeferredApplicationEventPublisher</code>的继承关系</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationEvent;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationEventPublisher;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationListener;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ConfigurableApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.event.ContextRefreshedEvent;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DeferredApplicationEventPublisher</span> <span class="keyword">implements</span> <span class="title">ApplicationEventPublisher</span>, <span class="title">ApplicationListener</span>&lt;<span class="title">ContextRefreshedEvent</span>&gt; </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2019/05/29/java-web-39/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/29/java-web-39/" data-id="ckagk2wka003t16l9fuxatmor" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nacos/">nacos</a></li></ul>
+
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
+          <article id="post-leetcode-25" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/05/28/leetcode-25/">牛客网——剑指offer之二叉树的下一个结点</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/05/28/leetcode-25/" class="article-date">
+  <time datetime="2019-05-28T21:08:18.000Z" itemprop="datePublished">2019-05-28</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/LeetCode/">LeetCode</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><p>给定一个二叉树和其中的一个结点，请找出中序遍历顺序的下一个结点并且返回。注意，树中的结点不仅包含左右子结点，同时包含指向父结点的指针。</p>
+<h4 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h4><p>这道题其实理解中序遍历的话就很简单，针对各种情况做不同的选择</p>
+<ul>
+<li>如果给定的点是根节点的话<ul>
+<li>判断根节点的右孩子是否存在，若存在则已有孩子为起点，查找最左节点</li>
+<li>如果右孩子不存在，则直接返回<code>null</code></li>
+</ul>
+</li>
+<li>如果给定的节点是父节点的左孩子<ul>
+<li>判断节点是否存在右孩子节点，如果存在，则返回右孩子</li>
+<li>如果不存在，则返回父节点</li>
+</ul>
+</li>
+<li>如果给定的节点是父节点的右孩子<ul>
+<li>节点的右孩子是否存在，如果存在直接返回右孩子</li>
+<li>如果右孩子不存在，判断是否是最右节点，是的话直接返回<code>null</code></li>
+<li>否则，返回父节点的父节点</li>
+</ul>
+</li>
+</ul>
+                                                        
+                                                            <a class="article-more-link" href="/2019/05/28/leetcode-25/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/28/leetcode-25/" data-id="ckagk2wm0007516l9p0wfrkw6" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
+          <article id="post-java-web-38" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/05/26/java-web-38/">Nacos-Server 集群之配置中心</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/05/26/java-web-38/" class="article-date">
+  <time datetime="2019-05-26T22:40:57.000Z" itemprop="datePublished">2019-05-26</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/nacos/">nacos</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="如何实现配置在集群间同步的？"><a href="#如何实现配置在集群间同步的？" class="headerlink" title="如何实现配置在集群间同步的？"></a>如何实现配置在集群间同步的？</h4><h5 id="前提步骤"><a href="#前提步骤" class="headerlink" title="前提步骤"></a>前提步骤</h5><ul>
+<li>部署<code>MySQL</code>，并执行<code>sql</code>脚本创建<code>nacos schema</code></li>
+<li>参照官网的<code>nacos</code>集群部署指南——<a href="https://nacos.io/zh-cn/docs/cluster-mode-quick-start.html" target="_blank" rel="noopener">nacos 集群部署指南</a></li>
+<li>启动<code>nacos</code>集群</li>
+</ul>
+<h5 id="开始设置"><a href="#开始设置" class="headerlink" title="开始设置"></a>开始设置</h5><ul>
+<li>在集群中任意登陆一台<code>nacos server</code>节点，然后创建配置</li>
+<li>再次登陆其余节点，会发现配置信息已经同步到其余的节点中了</li>
+</ul>
+<h5 id="配置信息如何在集群间同步？"><a href="#配置信息如何在集群间同步？" class="headerlink" title="配置信息如何在集群间同步？"></a>配置信息如何在集群间同步？</h5>
+                                                        
+                                                            <a class="article-more-link" href="/2019/05/26/java-web-38/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/26/java-web-38/" data-id="ckagk2wk9003q16l99sobfm28" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nacos/">nacos</a></li></ul>
+
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
+          <article id="post-java-web-37" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/05/23/java-web-37/">Nacos是如何实现TCP端口测探方式检测实例是否存活</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/05/23/java-web-37/" class="article-date">
+  <time datetime="2019-05-23T21:24:19.000Z" itemprop="datePublished">2019-05-23</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/nacos/">nacos</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="如何发起健康检查"><a href="#如何发起健康检查" class="headerlink" title="如何发起健康检查"></a>如何发起健康检查</h4><p>在注册实例时，会需要带上集群信息；而集群信息在<code>nacos-server</code>端，会有相应的额外信息增加以及额外的初始化动作。其中，健康检查的设定操作如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Cluster</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (inited) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    checkTask = <span class="keyword">new</span> HealthCheckTask(<span class="keyword">this</span>);</span><br><span class="line">    HealthCheckReactor.scheduleCheck(checkTask);</span><br><span class="line">    inited = <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// HealthCheckTask</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">HealthCheckTask</span><span class="params">(Cluster cluster)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.cluster = cluster;</span><br><span class="line">    distroMapper = SpringContext.getAppContext().getBean(DistroMapper.class);</span><br><span class="line">    switchDomain = SpringContext.getAppContext().getBean(SwitchDomain.class);</span><br><span class="line">    healthCheckProcessor = SpringContext.getAppContext().getBean(HealthCheckProcessorDelegate.class);</span><br><span class="line">    initCheckRT();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2019/05/23/java-web-37/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/23/java-web-37/" data-id="ckagk2wk6003l16l92l6elkyo" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nacos/">nacos</a></li></ul>
+
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
+    </article>
+    
+  
+    
+      <nav class="page-nav">
+        <a class="extend prev" rel="prev" href="/page/2/">Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/4/">Next</a>
+      </nav>
+    
+  </section>
+</div>
+
+  <footer class="footer">
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-bar-chart"></i> <span id="busuanzi_value_site_pv"></span></li>
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+</ul>
+    </div>
+    <ul class="list-inline">
+      <li>&copy; 2020 春少 Blog</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
+
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="春少 Blog"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/gallery">Gallery</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
+</div>
+    </li>
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+</aside>
+<script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/ocean.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
+</html>

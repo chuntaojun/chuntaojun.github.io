@@ -1,237 +1,80 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 3.7.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"www.liaochuntao.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
-  </script>
-
-  <meta name="description" content="如何实现配置在集群间同步的？前提步骤 部署MySQL，并执行sql脚本创建nacos schema 参照官网的nacos集群部署指南——nacos 集群部署指南 启动nacos集群  开始设置 在集群中任意登陆一台nacos server节点，然后创建配置 再次登陆其余节点，会发现配置信息已经同步到其余的节点中了  配置信息如何在集群间同步？其实，这个配置信息同步是很简单的——直接从MySQL中读">
-<meta name="keywords" content="nacos">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Nacos-Server 集群之配置中心">
-<meta property="og:url" content="https://www.liaochuntao.cn/2019/05/26/java-web-38/index.html">
-<meta property="og:site_name" content="春少 Blog">
-<meta property="og:description" content="如何实现配置在集群间同步的？前提步骤 部署MySQL，并执行sql脚本创建nacos schema 参照官网的nacos集群部署指南——nacos 集群部署指南 启动nacos集群  开始设置 在集群中任意登陆一台nacos server节点，然后创建配置 再次登陆其余节点，会发现配置信息已经同步到其余的节点中了  配置信息如何在集群间同步？其实，这个配置信息同步是很简单的——直接从MySQL中读">
-<meta property="og:locale" content="default">
-<meta property="og:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-38-1.png">
-<meta property="og:updated_time" content="2019-06-19T02:02:56.000Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Nacos-Server 集群之配置中心">
-<meta name="twitter:description" content="如何实现配置在集群间同步的？前提步骤 部署MySQL，并执行sql脚本创建nacos schema 参照官网的nacos集群部署指南——nacos 集群部署指南 启动nacos集群  开始设置 在集群中任意登陆一台nacos server节点，然后创建配置 再次登陆其余节点，会发现配置信息已经同步到其余的节点中了  配置信息如何在集群间同步？其实，这个配置信息同步是很简单的——直接从MySQL中读">
-<meta name="twitter:image" content="http://120.24.90.180:8080/blog/image/java_web/java-web-38-1.png">
-
-<link rel="canonical" href="https://www.liaochuntao.cn/2019/05/26/java-web-38/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'default'
-  };
-</script>
-
-  <title>Nacos-Server 集群之配置中心 | 春少 Blog</title>
+  <meta charset="utf-8">
   
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+  
+  
+    <meta name="description" content="励志成为一位大佬">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    Nacos-Server 集群之配置中心 |
+    
+    春少 Blog</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-java-web-38" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">春少 Blog</h1>
-      <span class="logo-line-after"><i></i></span>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
-    </div>
-  </div>
-</div>
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h1 class="article-title" itemprop="name">
+      Nacos-Server 集群之配置中心
+    </h1>
+  
+  
 
 
 
 
-<nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
-
-  </li>
-        <li class="menu-item menu-item-schedule">
-
-    <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>Schedule</a>
-
-  </li>
-        <li class="menu-item menu-item-sitemap">
-
-    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
-
-  </li>
-  </ul>
-</nav>
-
-
-
-
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
+            </header>
             
 
-    
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/05/26/java-web-38/">
+                
+                    <div class="article-meta">
+                        <a href="/2019/05/26/java-web-38/" class="article-date">
+  <time datetime="2019-05-26T22:40:57.000Z" itemprop="datePublished">2019-05-26</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/nacos/">nacos</a>
+  </div>
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
+                    </div>
+                    
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Nacos-Server 集群之配置中心
-        </h1>
+                        
+                            
+    <div class="tocbot"></div>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2019-05-26 22:40:57" itemprop="dateCreated datePublished" datetime="2019-05-26T22:40:57+08:00">2019-05-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-06-19 10:02:56" itemprop="dateModified" datetime="2019-06-19T10:02:56+08:00">2019-06-19</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/nacos/" itemprop="url" rel="index"><span itemprop="name">nacos</span></a>
-                </span>
-            </span>
 
-          
 
-        </div>
-      </header>
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                
 
-      
-        <h4 id="如何实现配置在集群间同步的？"><a href="#如何实现配置在集群间同步的？" class="headerlink" title="如何实现配置在集群间同步的？"></a>如何实现配置在集群间同步的？</h4><h5 id="前提步骤"><a href="#前提步骤" class="headerlink" title="前提步骤"></a>前提步骤</h5><ul>
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                                    <h4 id="如何实现配置在集群间同步的？"><a href="#如何实现配置在集群间同步的？" class="headerlink" title="如何实现配置在集群间同步的？"></a>如何实现配置在集群间同步的？</h4><h5 id="前提步骤"><a href="#前提步骤" class="headerlink" title="前提步骤"></a>前提步骤</h5><ul>
 <li>部署<code>MySQL</code>，并执行<code>sql</code>脚本创建<code>nacos schema</code></li>
 <li>参照官网的<code>nacos</code>集群部署指南——<a href="https://nacos.io/zh-cn/docs/cluster-mode-quick-start.html" target="_blank" rel="noopener">nacos 集群部署指南</a></li>
 <li>启动<code>nacos</code>集群</li>
@@ -240,7 +83,8 @@
 <li>在集群中任意登陆一台<code>nacos server</code>节点，然后创建配置</li>
 <li>再次登陆其余节点，会发现配置信息已经同步到其余的节点中了</li>
 </ul>
-<h5 id="配置信息如何在集群间同步？"><a href="#配置信息如何在集群间同步？" class="headerlink" title="配置信息如何在集群间同步？"></a>配置信息如何在集群间同步？</h5><p>其实，这个配置信息同步是很简单的——直接从<code>MySQL</code>中读取就好了，在集群模式下，<code>nacos-server</code>需要使用数据库进行存储<code>config</code>配置信息，然后其他<code>nacos-server config</code>节点直接从数据库中读取即可</p>
+<h5 id="配置信息如何在集群间同步？"><a href="#配置信息如何在集群间同步？" class="headerlink" title="配置信息如何在集群间同步？"></a>配置信息如何在集群间同步？</h5><a id="more"></a>
+<p>其实，这个配置信息同步是很简单的——直接从<code>MySQL</code>中读取就好了，在集群模式下，<code>nacos-server</code>需要使用数据库进行存储<code>config</code>配置信息，然后其他<code>nacos-server config</code>节点直接从数据库中读取即可</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 此处为 nacos-server-config拉取所有配置信息列表</span></span><br><span class="line"><span class="comment"> * 查询配置信息，返回JSON格式。</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(params = <span class="string">"search=accurate"</span>, method = RequestMethod.GET)</span><br><span class="line"><span class="meta">@ResponseBody</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Page&lt;ConfigInfo&gt; <span class="title">searchConfig</span><span class="params">(HttpServletRequest request,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         HttpServletResponse response,</span></span></span><br><span class="line"><span class="function"><span class="params">                                         @RequestParam(<span class="string">"dataId"</span>)</span> String dataId,</span></span><br><span class="line"><span class="function">                                         @<span class="title">RequestParam</span><span class="params">(<span class="string">"group"</span>)</span> String group,</span></span><br><span class="line"><span class="function">                                         @<span class="title">RequestParam</span><span class="params">(value = <span class="string">"appName"</span>, required = <span class="keyword">false</span>)</span> String appName,</span></span><br><span class="line"><span class="function">                                         @<span class="title">RequestParam</span><span class="params">(value = <span class="string">"tenant"</span>, required = <span class="keyword">false</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                                             defaultValue = StringUtils.EMPTY)</span> String tenant,</span></span><br><span class="line"><span class="function">                                         @<span class="title">RequestParam</span><span class="params">(value = <span class="string">"config_tags"</span>, required = <span class="keyword">false</span>)</span> String configTags,</span></span><br><span class="line"><span class="function">                                         @<span class="title">RequestParam</span><span class="params">(<span class="string">"pageNo"</span>)</span> <span class="keyword">int</span> pageNo,</span></span><br><span class="line"><span class="function">                                         @<span class="title">RequestParam</span><span class="params">(<span class="string">"pageSize"</span>)</span> <span class="keyword">int</span> pageSize) </span>&#123;</span><br><span class="line">    Map&lt;String, Object&gt; configAdvanceInfo = <span class="keyword">new</span> HashMap&lt;String, Object&gt;(<span class="number">100</span>);</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isNotBlank(appName)) &#123;</span><br><span class="line">        configAdvanceInfo.put(<span class="string">"appName"</span>, appName);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isNotBlank(configTags)) &#123;</span><br><span class="line">        configAdvanceInfo.put(<span class="string">"config_tags"</span>, configTags);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> persistService.findConfigInfo4Page(pageNo, pageSize, dataId, group, tenant,</span><br><span class="line">                configAdvanceInfo);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        String errorMsg = <span class="string">"serialize page error, dataId="</span> + dataId + <span class="string">", group="</span> + group;</span><br><span class="line">        log.error(errorMsg, e);</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(errorMsg, e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4 id="CommunicationController的作用"><a href="#CommunicationController的作用" class="headerlink" title="CommunicationController的作用"></a><code>CommunicationController</code>的作用</h4><p>既然部署了<code>nacos-server config</code>集群，那么<code>nacos-client</code>连接的时候，基本上都是写上<code>nacos-server cluster</code>集群下所有节点的<code>IP</code>地址信息，那么这里就会有一个问题了，假设现在有三台<code>nacos-server-config</code>，分别为<code>nacos-A/nacos-B/nacos-C</code>，同时有一个<code>nacos-client</code>，它连接到了<code>nacos-A</code>，但是运维的同学，却在<code>nacos-B</code>进行了配置发布，那么<code>nacos-client</code>要怎么才能获取到最新的配置信息，换句话说，<code>nacos-A</code>要怎么才能知道配置已经更新了？这个时候<code>CommunicationController</code>的作用就体现出来了</p>
 <p><code>CommunicationController</code>是用于其他节点通知的控制器，是被动接受配置更新通知的。那么，这个通知是怎么发出的呢？这个时候回到<code>ConfigController.publishConfig</code></p>
@@ -272,199 +116,153 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ConfigServletInner.doGetConfig</span></span><br><span class="line"></span><br><span class="line">md5 = cacheItem.getMd5();</span><br><span class="line">lastModified = cacheItem.getLastModifiedTs();</span><br><span class="line"><span class="keyword">if</span> (STANDALONE_MODE &amp;&amp; !PropertyUtil.isStandaloneUseMysql()) &#123;</span><br><span class="line">	configInfoBase = persistService.findConfigInfo(dataId, group, tenant);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	file = DiskUtil.targetFile(dataId, group, tenant);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>之所以采用这个操作，而不是直接读<code>MySQL</code>，是为了降低<code>MySQL</code>的数据读取压力，因为在集群模式下，虽然推荐<code>MySQL</code>采用高可用的部署，但是由于配置信息如果在发布时，可能导致大量的查询语句落在<code>MySQL</code>上，因此采用本地文件缓存的形式，以降低<code>MySQL</code>的数据读取压力</p>
 
+                                                                        
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/26/java-web-38/" data-id="ckagk2wk9003q16l99sobfm28" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nacos/">nacos</a></li></ul>
+
+                                    </footer>
+
     </div>
 
     
-    
-    
-
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/nacos/" rel="tag"># nacos</a>
-          </div>
-
         
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2019/05/23/java-web-37/" rel="prev" title="Nacos是如何实现TCP端口测探方式检测实例是否存活">
-      <i class="fa fa-chevron-left"></i> Nacos是如何实现TCP端口测探方式检测实例是否存活
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2019/05/28/leetcode-25/" rel="next" title="牛客网——剑指offer之二叉树的下一个结点">
-      牛客网——剑指offer之二叉树的下一个结点 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
+  <nav class="article-nav">
     
-  </article>
-  
-  
-  
-
-
-
-          </div>
+      <a href="/2019/05/28/leetcode-25/" class="article-nav-link">
+        <strong class="article-nav-caption">Newer</strong>
+        <div class="article-nav-title">
           
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
+            牛客网——剑指offer之二叉树的下一个结点
+          
         </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#如何实现配置在集群间同步的？"><span class="nav-number">1.</span> <span class="nav-text">如何实现配置在集群间同步的？</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#前提步骤"><span class="nav-number">1.1.</span> <span class="nav-text">前提步骤</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#开始设置"><span class="nav-number">1.2.</span> <span class="nav-text">开始设置</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#配置信息如何在集群间同步？"><span class="nav-number">1.3.</span> <span class="nav-text">配置信息如何在集群间同步？</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CommunicationController的作用"><span class="nav-number">2.</span> <span class="nav-text">CommunicationController的作用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#其他节点接收此更新事件的后续操作"><span class="nav-number">2.1.</span> <span class="nav-text">其他节点接收此更新事件的后续操作</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码流程图"><span class="nav-number">3.</span> <span class="nav-text">代码流程图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DumpService为什么要dump出文件"><span class="nav-number">4.</span> <span class="nav-text">DumpService为什么要dump出文件</span></a></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">liaochuntao</p>
-  <div class="site-description" itemprop="description">励志成为一位大佬</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">118</span>
-          <span class="site-state-item-name">posts</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">10</span>
-        <span class="site-state-item-name">categories</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">21</span>
-        <span class="site-state-item-name">tags</span>
-      </div>
+      </a>
+    
+    
+      <a href="/2019/05/23/java-web-37/" class="article-nav-link">
+        <strong class="article-nav-caption">Older</strong>
+        <div class="article-nav-title">Nacos是如何实现TCP端口测探方式检测实例是否存活</div>
+      </a>
+    
   </nav>
-</div>
-  <div class="links-of-author motion-element">
-      <span class="links-of-author-item">
-        <a href="https://github.com/chuntaojun" title="GitHub → https://github.com/chuntaojun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-      <span class="links-of-author-item">
-        <a href="mailto:lessspring@outlook.com" title="E-Mail → mailto:lessspring@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
-      </span>
-  </div>
 
 
+            
 
-      </div>
+                
+                    
+                        
+                            
 
+</article>
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+    <li><i class="fe fe-bookmark"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul>
     </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
+    <ul class="list-inline">
+      <li>&copy; 2020 春少 Blog</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
 
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-        
-
-<div class="copyright">
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+<nav class="navbar">
   
-  &copy; 
-  <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="春少 Blog"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/gallery">Gallery</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
-  </div>
+    </li>
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+</aside>
+<script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
 
-        
-
-
-
-
-
-
-
-
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
 
 
 
+  <script src="/js/tocbot.min.js"></script>
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
 
 
-
-
-
-
-
-
-
-
-
-
-  
-
-  
+<script src="/js/ocean.js"></script>
 
 <script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
 </html>

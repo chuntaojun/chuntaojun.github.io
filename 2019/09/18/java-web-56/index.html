@@ -1,234 +1,81 @@
 <!DOCTYPE html>
-<html lang="">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 3.7.1">
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
-
-<script id="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"www.liaochuntao.cn","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
-  </script>
-
-  <meta name="description" content="JRaft 启动流程12345678public synchronized Node start(final boolean startRpcServer) &amp;#123;  ...  //Adds RPC server to Server.  NodeManager.getInstance().addAddress(this.serverId.getEndpoint());  // 工厂方法，创建">
-<meta property="og:type" content="article">
-<meta property="og:title" content="JRaft 选主流程浅析">
-<meta property="og:url" content="https://www.liaochuntao.cn/2019/09/18/java-web-56/index.html">
-<meta property="og:site_name" content="春少 Blog">
-<meta property="og:description" content="JRaft 启动流程12345678public synchronized Node start(final boolean startRpcServer) &amp;#123;  ...  //Adds RPC server to Server.  NodeManager.getInstance().addAddress(this.serverId.getEndpoint());  // 工厂方法，创建">
-<meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-09-23T06:29:56.000Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="JRaft 选主流程浅析">
-<meta name="twitter:description" content="JRaft 启动流程12345678public synchronized Node start(final boolean startRpcServer) &amp;#123;  ...  //Adds RPC server to Server.  NodeManager.getInstance().addAddress(this.serverId.getEndpoint());  // 工厂方法，创建">
-
-<link rel="canonical" href="https://www.liaochuntao.cn/2019/09/18/java-web-56/">
-
-
-<script id="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'default'
-  };
-</script>
-
-  <title>JRaft 选主流程浅析 | 春少 Blog</title>
+  <meta charset="utf-8">
   
-
-
-
-
-
-
-  <noscript>
-  <style>
-  .use-motion .brand,
-  .use-motion .menu-item,
-  .sidebar-inner,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
-  </style>
-</noscript>
-
+  
+  
+    <meta name="description" content="励志成为一位大佬">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>
+    JRaft 选主流程浅析 |
+    
+    春少 Blog</title>
+  
+    <link rel="shortcut icon" href="/favicon.ico">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+    <link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+  
+  <script src="/js/pace.min.js"></script>
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+<body>
+<main class="content">
+  <section class="outer">
+  <article id="post-java-web-56" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="Toggle navigation bar">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
-      <h1 class="site-title">春少 Blog</h1>
-      <span class="logo-line-after"><i></i></span>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
-    </div>
-  </div>
-</div>
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h1 class="article-title" itemprop="name">
+      JRaft 选主流程浅析
+    </h1>
+  
+  
 
 
 
 
-<nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
-
-  </li>
-        <li class="menu-item menu-item-schedule">
-
-    <a href="/schedule/" rel="section"><i class="fa fa-calendar fa-fw"></i>Schedule</a>
-
-  </li>
-        <li class="menu-item menu-item-sitemap">
-
-    <a href="/sitemap.xml" rel="section"><i class="fa fa-sitemap fa-fw"></i>Sitemap</a>
-
-  </li>
-  </ul>
-</nav>
-
-
-
-
-</div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
+            </header>
             
 
-    
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="default">
-    <link itemprop="mainEntityOfPage" href="https://www.liaochuntao.cn/2019/09/18/java-web-56/">
+                
+                    <div class="article-meta">
+                        <a href="/2019/09/18/java-web-56/" class="article-date">
+  <time datetime="2019-09-18T10:00:59.000Z" itemprop="datePublished">2019-09-18</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/JRaft/">JRaft</a>
+  </div>
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="liaochuntao">
-      <meta itemprop="description" content="励志成为一位大佬">
-    </span>
+                    </div>
+                    
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="春少 Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          JRaft 选主流程浅析
-        </h1>
+                        
+                            
+    <div class="tocbot"></div>
 
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2019-09-18 10:00:59" itemprop="dateCreated datePublished" datetime="2019-09-18T10:00:59+08:00">2019-09-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2019-09-23 14:29:56" itemprop="dateModified" datetime="2019-09-23T14:29:56+08:00">2019-09-23</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">In</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JRaft/" itemprop="url" rel="index"><span itemprop="name">JRaft</span></a>
-                </span>
-            </span>
 
-          
 
-        </div>
-      </header>
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+                                
 
-      
-        <h4 id="JRaft-启动流程"><a href="#JRaft-启动流程" class="headerlink" title="JRaft 启动流程"></a>JRaft 启动流程</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> Node <span class="title">start</span><span class="params">(<span class="keyword">final</span> <span class="keyword">boolean</span> startRpcServer)</span> </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">//Adds RPC server to Server.</span></span><br><span class="line">  NodeManager.getInstance().addAddress(<span class="keyword">this</span>.serverId.getEndpoint());</span><br><span class="line">  <span class="comment">// 工厂方法，创建并初始化一个 Raft Node 节点，会初始化一些Raft协议中的一些配置以及相应的触发器</span></span><br><span class="line">  <span class="keyword">this</span>.node = RaftServiceFactory.createAndInitRaftNode(<span class="keyword">this</span>.groupId, <span class="keyword">this</span>.serverId, <span class="keyword">this</span>.nodeOptions);</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                                    <h4 id="JRaft-启动流程"><a href="#JRaft-启动流程" class="headerlink" title="JRaft 启动流程"></a>JRaft 启动流程</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> Node <span class="title">start</span><span class="params">(<span class="keyword">final</span> <span class="keyword">boolean</span> startRpcServer)</span> </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">//Adds RPC server to Server.</span></span><br><span class="line">  NodeManager.getInstance().addAddress(<span class="keyword">this</span>.serverId.getEndpoint());</span><br><span class="line">  <span class="comment">// 工厂方法，创建并初始化一个 Raft Node 节点，会初始化一些Raft协议中的一些配置以及相应的触发器</span></span><br><span class="line">  <span class="keyword">this</span>.node = RaftServiceFactory.createAndInitRaftNode(<span class="keyword">this</span>.groupId, <span class="keyword">this</span>.serverId, <span class="keyword">this</span>.nodeOptions);</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<a id="more"></a>
 <p>现在看下这个<code>RaftServiceFactory.createAndInitRaftNode</code>做了什么</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">init</span><span class="params">(<span class="keyword">final</span> NodeOptions opts)</span> </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">// 构建时间触发器，</span></span><br><span class="line">  <span class="comment">// 这里构建了一个选主投票的时间触发器，当节点启动时直接触发，等待一段时间，如果还没有选举出Leader</span></span><br><span class="line">  <span class="comment">// 自己就会因为选举超时的原因，自己提升自己的节点角色，开启自选举以及发起Leader选举</span></span><br><span class="line">  <span class="keyword">this</span>.voteTimer = <span class="keyword">new</span> RepeatedTimer(<span class="string">"JRaft-VoteTimer"</span>, <span class="keyword">this</span>.options.getElectionTimeoutMs()) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onTrigger</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="comment">// 当超时后，触发投票动作</span></span><br><span class="line">      handleVoteTimeout();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">adjustTimeout</span><span class="params">(<span class="keyword">final</span> <span class="keyword">int</span> timeoutMs)</span> </span>&#123;</span><br><span class="line">      <span class="comment">// 随机时间调整，具体参考Raft论文中的细则</span></span><br><span class="line">      <span class="keyword">return</span> randomTimeout(timeoutMs);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">  <span class="comment">// 构建了一个选主的时间触发器，当Leader的租约到期没有继续续约时，会触发这个Timer</span></span><br><span class="line">  <span class="keyword">this</span>.electionTimer = <span class="keyword">new</span> RepeatedTimer(<span class="string">"JRaft-ElectionTimer"</span>, <span class="keyword">this</span>.options.getElectionTimeoutMs()) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onTrigger</span><span class="params">()</span> </span>&#123;</span><br><span class="line">      <span class="comment">// 当超时后，触发选举动作</span></span><br><span class="line">      handleElectionTimeout();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">adjustTimeout</span><span class="params">(<span class="keyword">final</span> <span class="keyword">int</span> timeoutMs)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> randomTimeout(timeoutMs);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h4 id="voteTimer"><a href="#voteTimer" class="headerlink" title="voteTimer"></a>voteTimer</h4><h5 id="handleVoteTimeout"><a href="#handleVoteTimeout" class="headerlink" title="handleVoteTimeout"></a>handleVoteTimeout</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handleVoteTimeout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.writeLock.lock();</span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">this</span>.state == State.STATE_CANDIDATE) &#123;</span><br><span class="line">    LOG.debug(<span class="string">"Node &#123;&#125; term &#123;&#125; retry elect."</span>, getNodeId(), <span class="keyword">this</span>.currTerm);</span><br><span class="line">    <span class="comment">// 自我选举</span></span><br><span class="line">    electSelf();</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.writeLock.unlock();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">electSelf</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">long</span> oldTerm;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    LOG.info(<span class="string">"Node &#123;&#125; start vote and grant vote self, term=&#123;&#125;."</span>, getNodeId(), <span class="keyword">this</span>.currTerm);</span><br><span class="line">    <span class="comment">// 如果当前的配置元数据中布包好自己的ip信息，结束本次自我选举操作</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.conf.contains(<span class="keyword">this</span>.serverId)) &#123;</span><br><span class="line">      LOG.warn(<span class="string">"Node &#123;&#125; can't do electSelf as it is not in &#123;&#125;."</span>, getNodeId(), <span class="keyword">this</span>.conf);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 判断当前节点的状态是否是Follower状态，如果是，接收electionTimer</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.state == State.STATE_FOLLOWER) &#123;</span><br><span class="line">      LOG.debug(<span class="string">"Node &#123;&#125; stop election timer, term=&#123;&#125;."</span>, getNodeId(), <span class="keyword">this</span>.currTerm);</span><br><span class="line">      <span class="keyword">this</span>.electionTimer.stop();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 重置Leader Ip信息，置为 0.0.0.0（即任何一ip都可能为Ledaer节点）</span></span><br><span class="line">    resetLeaderId(PeerId.emptyPeer(), <span class="keyword">new</span> Status(RaftError.ERAFTTIMEDOUT, <span class="string">"A follower's leader_id is reset to NULL as it begins to request_vote."</span>));</span><br><span class="line">    <span class="comment">// 设置当前节点状态为 candidate</span></span><br><span class="line">    <span class="keyword">this</span>.state = State.STATE_CANDIDATE;</span><br><span class="line">    <span class="comment">// 任期自增</span></span><br><span class="line">    <span class="keyword">this</span>.currTerm++;</span><br><span class="line">    <span class="comment">// 自我投票</span></span><br><span class="line">    <span class="keyword">this</span>.votedId = <span class="keyword">this</span>.serverId.copy();</span><br><span class="line">    LOG.debug(<span class="string">"Node &#123;&#125; start vote timer, term=&#123;&#125; ."</span>, getNodeId(), <span class="keyword">this</span>.currTerm);</span><br><span class="line">    <span class="comment">// 投票器开启</span></span><br><span class="line">    <span class="keyword">this</span>.voteTimer.start();</span><br><span class="line">    <span class="comment">// 投票上下文开启并初始化</span></span><br><span class="line">    <span class="keyword">this</span>.voteCtx.init(<span class="keyword">this</span>.conf.getConf(), <span class="keyword">this</span>.conf.isStable() ? <span class="keyword">null</span> : <span class="keyword">this</span>.conf.getOldConf());</span><br><span class="line">    <span class="comment">// 记录旧的 Term 信息</span></span><br><span class="line">    oldTerm = <span class="keyword">this</span>.currTerm;</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.writeLock.unlock();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 获取当前最新的日志索引信息</span></span><br><span class="line">  <span class="keyword">final</span> LogId lastLogId = <span class="keyword">this</span>.logManager.getLastLogId(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">this</span>.writeLock.lock();</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// vote need defense ABA after unlock&amp;writeLock</span></span><br><span class="line">    <span class="keyword">if</span> (oldTerm != <span class="keyword">this</span>.currTerm) &#123;</span><br><span class="line">      LOG.warn(<span class="string">"Node &#123;&#125; raise term &#123;&#125; when getLastLogId."</span>, getNodeId(), <span class="keyword">this</span>.currTerm);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 遍历所以的 Raft Node 节点，进行发起 Rpc 请求</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">final</span> PeerId peer : <span class="keyword">this</span>.conf.listPeers()) &#123;</span><br><span class="line">      <span class="keyword">if</span> (peer.equals(<span class="keyword">this</span>.serverId)) &#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 连接远端节点</span></span><br><span class="line">      <span class="keyword">if</span> (!<span class="keyword">this</span>.rpcService.connect(peer.getEndpoint())) &#123;</span><br><span class="line">        LOG.warn(<span class="string">"Node &#123;&#125; channel init failed, address=&#123;&#125;."</span>, getNodeId(), peer.getEndpoint());</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 创建一个 RequestVote 的 RPC 请求</span></span><br><span class="line">      <span class="keyword">final</span> OnRequestVoteRpcDone done = <span class="keyword">new</span> OnRequestVoteRpcDone(peer, <span class="keyword">this</span>.currTerm, <span class="keyword">this</span>);</span><br><span class="line">      done.request = RequestVoteRequest.newBuilder() <span class="comment">//</span></span><br><span class="line">                    .setPreVote(<span class="keyword">false</span>) <span class="comment">// It's not a pre-vote request.</span></span><br><span class="line">                    .setGroupId(<span class="keyword">this</span>.groupId) <span class="comment">//</span></span><br><span class="line">                    .setServerId(<span class="keyword">this</span>.serverId.toString()) <span class="comment">//</span></span><br><span class="line">                    .setPeerId(peer.toString()) <span class="comment">//</span></span><br><span class="line">                    .setTerm(<span class="keyword">this</span>.currTerm) <span class="comment">//</span></span><br><span class="line">                    .setLastLogIndex(lastLogId.getIndex()) <span class="comment">//</span></span><br><span class="line">                    .setLastLogTerm(lastLogId.getTerm()) <span class="comment">//</span></span><br><span class="line">                    .build();</span><br><span class="line">      <span class="comment">// 发起 rpc 请求</span></span><br><span class="line">      <span class="keyword">this</span>.rpcService.requestVote(peer.getEndpoint(), done.request, done);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 元数据存储，记录当前任期以及自己的投票结果</span></span><br><span class="line">    <span class="keyword">this</span>.metaStorage.setTermAndVotedFor(<span class="keyword">this</span>.currTerm, <span class="keyword">this</span>.serverId);</span><br><span class="line">    <span class="comment">// 这里是进行投票结果判断</span></span><br><span class="line">    <span class="keyword">this</span>.voteCtx.grant(<span class="keyword">this</span>.serverId);</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.voteCtx.isGranted()) &#123;</span><br><span class="line">      <span class="comment">// 成为 Leader 节点</span></span><br><span class="line">      becomeLeader();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.writeLock.unlock();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 处理 Request Vote 投票请求响应的处理</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">handleRequestVoteResponse</span><span class="params">(<span class="keyword">final</span> PeerId peerId, <span class="keyword">final</span> <span class="keyword">long</span> term, <span class="keyword">final</span> RequestVoteResponse response)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.writeLock.lock();</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 判断当前节点状态，还有为 candidate状态的节点可以处理，否则直接跳过</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.state != State.STATE_CANDIDATE) &#123;</span><br><span class="line">      LOG.warn(<span class="string">"Node &#123;&#125; received invalid RequestVoteResponse from &#123;&#125;, state not in STATE_CANDIDATE but &#123;&#125;."</span>, getNodeId(), peerId, <span class="keyword">this</span>.state);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// check stale term</span></span><br><span class="line">    <span class="comment">// 判断任期是否与当前任期相同</span></span><br><span class="line">    <span class="keyword">if</span> (term != <span class="keyword">this</span>.currTerm) &#123;</span><br><span class="line">      LOG.warn(<span class="string">"Node &#123;&#125; received stale RequestVoteResponse from &#123;&#125;, term=&#123;&#125;, currTerm=&#123;&#125;."</span>, getNodeId(), peerId, term, <span class="keyword">this</span>.currTerm);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// check response term</span></span><br><span class="line">    <span class="comment">// 如果其他节点所处的任期大于自己的任期，则自己调整自己的状态</span></span><br><span class="line">    <span class="keyword">if</span> (response.getTerm() &gt; <span class="keyword">this</span>.currTerm) &#123;</span><br><span class="line">      LOG.warn(<span class="string">"Node &#123;&#125; received invalid RequestVoteResponse from &#123;&#125;, term=&#123;&#125;, expect=&#123;&#125;."</span>, getNodeId(), peerId, response.getTerm(), <span class="keyword">this</span>.currTerm);</span><br><span class="line">      stepDown(response.getTerm(), <span class="keyword">false</span>, <span class="keyword">new</span> Status(RaftError.EHIGHERTERMRESPONSE, <span class="string">"Raft node receives higher term request_vote_response."</span>));</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// check granted quorum?</span></span><br><span class="line">    <span class="comment">// 检查响应是否认可本次发起的选举，认可，投票箱中加一个票数，同时计算此时的投票结果，是否达到了过半的要求</span></span><br><span class="line">    <span class="keyword">if</span> (response.getGranted()) &#123;</span><br><span class="line">      <span class="keyword">this</span>.voteCtx.grant(peerId);</span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.voteCtx.isGranted()) &#123;</span><br><span class="line">        becomeLeader();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.writeLock.unlock();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">becomeLeader</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  Requires.requireTrue(<span class="keyword">this</span>.state == State.STATE_CANDIDATE, <span class="string">"Illegal state: "</span> + <span class="keyword">this</span>.state);</span><br><span class="line">  LOG.info(<span class="string">"Node &#123;&#125; become leader of group, term=&#123;&#125;, conf=&#123;&#125;, oldConf=&#123;&#125;."</span>, getNodeId(), <span class="keyword">this</span>.currTerm, <span class="keyword">this</span>.conf.getConf(), <span class="keyword">this</span>.conf.getOldConf());</span><br><span class="line">  <span class="comment">// cancel candidate vote timer</span></span><br><span class="line">  <span class="comment">// 停止投票计时器</span></span><br><span class="line">  stopVoteTimer();</span><br><span class="line">  <span class="comment">// 更新自己的节点状态信息</span></span><br><span class="line">  <span class="keyword">this</span>.state = State.STATE_LEADER;</span><br><span class="line">  <span class="comment">// 拷贝自己的地址信息</span></span><br><span class="line">  <span class="keyword">this</span>.leaderId = <span class="keyword">this</span>.serverId.copy();</span><br><span class="line">  <span class="comment">// 重置复制组的任期信息</span></span><br><span class="line">  <span class="keyword">this</span>.replicatorGroup.resetTerm(<span class="keyword">this</span>.currTerm);</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">final</span> PeerId peer : <span class="keyword">this</span>.conf.listPeers()) &#123;</span><br><span class="line">    <span class="keyword">if</span> (peer.equals(<span class="keyword">this</span>.serverId)) &#123;</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    LOG.debug(<span class="string">"Node &#123;&#125; add replicator, term=&#123;&#125;, peer=&#123;&#125;."</span>, getNodeId(), <span class="keyword">this</span>.currTerm, peer);</span><br><span class="line">    <span class="comment">// 重新添加 follower</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.replicatorGroup.addReplicator(peer)) &#123;</span><br><span class="line">      LOG.error(<span class="string">"Fail to add replicator, peer=&#123;&#125;."</span>, peer);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// init commit manager</span></span><br><span class="line">  <span class="keyword">this</span>.ballotBox.resetPendingIndex(<span class="keyword">this</span>.logManager.getLastLogIndex() + <span class="number">1</span>);</span><br><span class="line">  <span class="comment">// Register _conf_ctx to reject configuration changing before the first log</span></span><br><span class="line">  <span class="comment">// is committed.</span></span><br><span class="line">  <span class="keyword">if</span> (<span class="keyword">this</span>.confCtx.isBusy()) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 刷新当前元数据信息</span></span><br><span class="line">  <span class="keyword">this</span>.confCtx.flush(<span class="keyword">this</span>.conf.getConf(), <span class="keyword">this</span>.conf.getOldConf());</span><br><span class="line">  <span class="keyword">this</span>.stepDownTimer.start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -237,196 +84,151 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compareTo</span><span class="params">(<span class="keyword">final</span> LogId o)</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 优先比较term，如果term相等，在比较日志索引的新旧关系</span></span><br><span class="line">  <span class="keyword">final</span> <span class="keyword">int</span> c = Long.compare(getTerm(), o.getTerm());</span><br><span class="line">  <span class="keyword">if</span> (c == <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> Long.compare(getIndex(), o.getIndex());</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> c;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>如果<em>request</em>中携带的<em>term</em>大于节点自身所处的<em>term</em>，则直接同意<em>request</em>，如果<em>term</em>相同，则需要比较<em>request</em>携带的<em>LogId Index</em>信息与节点自身当前的<em>LogId Index</em>最新信息比较</p>
 <h4 id="electionTimer"><a href="#electionTimer" class="headerlink" title="electionTimer"></a>electionTimer</h4><h5 id="handleElectionTimeout"><a href="#handleElectionTimeout" class="headerlink" title="handleElectionTimeout"></a>handleElectionTimeout</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handleElectionTimeout</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">boolean</span> doUnlock = <span class="keyword">true</span>;</span><br><span class="line">  <span class="keyword">this</span>.writeLock.lock();</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// 如果当前节点的状态非 Follower，直接结束本次触发任务</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.state != State.STATE_FOLLOWER) &#123;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 判断当前的 Leader 的租约是否有效</span></span><br><span class="line">    <span class="keyword">if</span> (isCurrentLeaderValid()) &#123;</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果租约过期，重新设置 Leader 信息</span></span><br><span class="line">    resetLeaderId(PeerId.emptyPeer(), <span class="keyword">new</span> Status(RaftError.ERAFTTIMEDOUT, <span class="string">"Lost connection from leader %s."</span>, <span class="keyword">this</span>.leaderId));</span><br><span class="line">    doUnlock = <span class="keyword">false</span>;</span><br><span class="line">    <span class="comment">// 开启预投票机制（为了避免 term 因为某些情况迅速提升）</span></span><br><span class="line">    preVote();</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (doUnlock) &#123;</span><br><span class="line">      <span class="keyword">this</span>.writeLock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">preVote</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">long</span> oldTerm;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    LOG.info(<span class="string">"Node &#123;&#125; term &#123;&#125; start preVote."</span>, getNodeId(), <span class="keyword">this</span>.currTerm);</span><br><span class="line">    <span class="comment">// 判断当前的快照执行器是否正在执行快照安装操作</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.snapshotExecutor != <span class="keyword">null</span> &amp;&amp; <span class="keyword">this</span>.snapshotExecutor.isInstallingSnapshot()) &#123;</span><br><span class="line">      LOG.warn(<span class="string">"Node &#123;&#125; term &#123;&#125; doesn't do preVote when installing snapshot as the configuration may be out of date."</span>, getNodeId());</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>.conf.contains(<span class="keyword">this</span>.serverId)) &#123;</span><br><span class="line">      LOG.warn(<span class="string">"Node &#123;&#125; can't do preVote as it is not in conf &lt;&#123;&#125;&gt;."</span>, getNodeId(), <span class="keyword">this</span>.conf);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    oldTerm = <span class="keyword">this</span>.currTerm;</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.writeLock.unlock();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> LogId lastLogId = <span class="keyword">this</span>.logManager.getLastLogId(<span class="keyword">true</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">boolean</span> doUnlock = <span class="keyword">true</span>;</span><br><span class="line">  <span class="keyword">this</span>.writeLock.lock();</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// pre_vote need defense ABA after unlock&amp;writeLock</span></span><br><span class="line">    <span class="keyword">if</span> (oldTerm != <span class="keyword">this</span>.currTerm) &#123;</span><br><span class="line">      LOG.warn(<span class="string">"Node &#123;&#125; raise term &#123;&#125; when get lastLogId."</span>, getNodeId(), <span class="keyword">this</span>.currTerm);</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 预投票箱初始化</span></span><br><span class="line">    <span class="keyword">this</span>.prevVoteCtx.init(<span class="keyword">this</span>.conf.getConf(), <span class="keyword">this</span>.conf.isStable() ? <span class="keyword">null</span> : <span class="keyword">this</span>.conf.getOldConf());</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">final</span> PeerId peer : <span class="keyword">this</span>.conf.listPeers()) &#123;</span><br><span class="line">      <span class="keyword">if</span> (peer.equals(<span class="keyword">this</span>.serverId)) &#123;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">if</span> (!<span class="keyword">this</span>.rpcService.connect(peer.getEndpoint())) &#123;</span><br><span class="line">        LOG.warn(<span class="string">"Node &#123;&#125; channel init failed, address=&#123;&#125;."</span>, getNodeId(), peer.getEndpoint());</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="comment">// 发起预投票请求</span></span><br><span class="line">      <span class="keyword">final</span> OnPreVoteRpcDone done = <span class="keyword">new</span> OnPreVoteRpcDone(peer, <span class="keyword">this</span>.currTerm);</span><br><span class="line">      done.request = RequestVoteRequest.newBuilder() <span class="comment">//</span></span><br><span class="line">          .setPreVote(<span class="keyword">true</span>) <span class="comment">// it's a pre-vote request.</span></span><br><span class="line">          .setGroupId(<span class="keyword">this</span>.groupId) <span class="comment">//</span></span><br><span class="line">          .setServerId(<span class="keyword">this</span>.serverId.toString()) <span class="comment">//</span></span><br><span class="line">          .setPeerId(peer.toString()) <span class="comment">//</span></span><br><span class="line">          <span class="comment">// 很重要的一点，preVote 之所以能够避免 term 在某些极端情况下快速上升，就是在这里做了优化</span></span><br><span class="line">          .setTerm(<span class="keyword">this</span>.currTerm + <span class="number">1</span>) <span class="comment">// next term</span></span><br><span class="line">          .setLastLogIndex(lastLogId.getIndex()) <span class="comment">//</span></span><br><span class="line">          .setLastLogTerm(lastLogId.getTerm()) <span class="comment">//</span></span><br><span class="line">          .build();</span><br><span class="line">      <span class="keyword">this</span>.rpcService.preVote(peer.getEndpoint(), done.request, done);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 同刚刚的自选举一样的意思</span></span><br><span class="line">    <span class="comment">// 如果发现自己的预投票确认箱得到半数同意，则开启自投票选举</span></span><br><span class="line">    <span class="keyword">this</span>.prevVoteCtx.grant(<span class="keyword">this</span>.serverId);</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.prevVoteCtx.isGranted()) &#123;</span><br><span class="line">      doUnlock = <span class="keyword">false</span>;</span><br><span class="line">      electSelf();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (doUnlock) &#123;</span><br><span class="line">      <span class="keyword">this</span>.writeLock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+                                                                        
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/09/18/java-web-56/" data-id="ckagk2wl0005516l9kka8l5x9" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
     </div>
 
     
-    
-    
-
-      <footer class="post-footer">
-
         
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2019/09/16/java-web-55/" rel="prev" title="Nacos一致性协议实现之`Distro`协议浅析">
-      <i class="fa fa-chevron-left"></i> Nacos一致性协议实现之`Distro`协议浅析
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/02/11/java-web-58/" rel="next" title="memberlist 的 gossip 实现">
-      memberlist 的 gossip 实现 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
+  <nav class="article-nav">
     
-  </article>
-  
-  
-  
-
-
-
-          </div>
+      <a href="/2020/02/11/java-web-58/" class="article-nav-link">
+        <strong class="article-nav-caption">Newer</strong>
+        <div class="article-nav-title">
           
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
+            memberlist 的 gossip 实现
+          
         </div>
-          
-  
-  <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
-  </div>
-
-  <aside class="sidebar">
-    <div class="sidebar-inner">
-
-      <ul class="sidebar-nav motion-element">
-        <li class="sidebar-nav-toc">
-          Table of Contents
-        </li>
-        <li class="sidebar-nav-overview">
-          Overview
-        </li>
-      </ul>
-
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#JRaft-启动流程"><span class="nav-number">1.</span> <span class="nav-text">JRaft 启动流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#voteTimer"><span class="nav-number">2.</span> <span class="nav-text">voteTimer</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#handleVoteTimeout"><span class="nav-number">2.1.</span> <span class="nav-text">handleVoteTimeout</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#其他节点如何处理Request-Vote请求"><span class="nav-number">2.2.</span> <span class="nav-text">其他节点如何处理Request Vote请求</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#electionTimer"><span class="nav-number">3.</span> <span class="nav-text">electionTimer</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#handleElectionTimeout"><span class="nav-number">3.1.</span> <span class="nav-text">handleElectionTimeout</span></a></li></ol></li></ol></div>
-      </div>
-      <!--/noindex-->
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-  <p class="site-author-name" itemprop="name">liaochuntao</p>
-  <div class="site-description" itemprop="description">励志成为一位大佬</div>
-</div>
-<div class="site-state-wrap motion-element">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">118</span>
-          <span class="site-state-item-name">posts</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">10</span>
-        <span class="site-state-item-name">categories</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">21</span>
-        <span class="site-state-item-name">tags</span>
-      </div>
+      </a>
+    
+    
+      <a href="/2019/09/16/java-web-55/" class="article-nav-link">
+        <strong class="article-nav-caption">Older</strong>
+        <div class="article-nav-title">Nacos一致性协议实现之`Distro`协议浅析</div>
+      </a>
+    
   </nav>
-</div>
-  <div class="links-of-author motion-element">
-      <span class="links-of-author-item">
-        <a href="https://github.com/chuntaojun" title="GitHub → https://github.com/chuntaojun" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-      <span class="links-of-author-item">
-        <a href="mailto:lessspring@outlook.com" title="E-Mail → mailto:lessspring@outlook.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
-      </span>
-  </div>
 
 
+            
 
-      </div>
+                
+                    
+                        
+                            
 
+</article>
+</section>
+  <footer class="footer">
+  <div class="outer">
+    <div class="float-right">
+      <ul class="list-inline">
+  
+    <li><i class="fe fe-smile-alt"></i> <span id="busuanzi_value_site_uv"></span></li>
+  
+    <li><i class="fe fe-bookmark"></i> <span id="busuanzi_value_page_pv"></span></li>
+  
+</ul>
     </div>
-  </aside>
-  <div id="sidebar-dimmer"></div>
+    <ul class="list-inline">
+      <li>&copy; 2020 春少 Blog</li>
+      <li>Powered by <a href="http://hexo.io/" target="_blank">Hexo</a></li>
+      <li>Theme  <a href="https://github.com/zhwangart/hexo-theme-ocean">Ocean</a></li>
+    </ul>
+  </div>
+</footer>
 
-
-      </div>
-    </main>
-
-    <footer class="footer">
-      <div class="footer-inner">
-        
-
-        
-
-<div class="copyright">
+</main>
+<aside class="sidebar">
+  <button class="navbar-toggle"></button>
+<nav class="navbar">
   
-  &copy; 
-  <span itemprop="copyrightYear">2020</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">liaochuntao</span>
+    <div class="logo">
+      <a href="/"><img src="/images/hexo.svg" alt="春少 Blog"></a>
+    </div>
+  
+  <ul class="nav nav-main">
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/">Home</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/archives">Archives</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/gallery">Gallery</a>
+      </li>
+    
+      <li class="nav-item">
+        <a class="nav-item-link" href="/about">About</a>
+      </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link nav-item-search" title="Search">
+        <i class="fe fe-search"></i>
+        Search
+      </a>
+    </li>
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      <div class="totop" id="totop">
+  <i class="fe fe-rocket"></i>
 </div>
-  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
-  </div>
+    </li>
+    <li class="nav-item">
+      
+        <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+          <i class="fe fe-feed"></i>
+        </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+</aside>
+<script src="/js/jquery-2.0.3.min.js"></script>
+<script src="/js/jquery.justifiedGallery.min.js"></script>
+<script src="/js/lazyload.min.js"></script>
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
 
-        
-
-
-
-
-
-
-
-
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
-<script src="/js/schemes/muse.js"></script>
-<script src="/js/next-boot.js"></script>
-
-
-
-  
+  <script src="/fancybox/jquery.fancybox.min.js"></script>
 
 
 
+  <script src="/js/tocbot.min.js"></script>
+  <script>
+    // Tocbot_v4.7.0  http://tscanlin.github.io/tocbot/
+    tocbot.init({
+      tocSelector: '.tocbot',
+      contentSelector: '.article-entry',
+      headingSelector: 'h1, h2, h3, h4, h5, h6',
+      hasInnerContainers: true,
+      scrollSmooth: true,
+      positionFixedSelector: '.tocbot',
+      positionFixedClass: 'is-position-fixed',
+      fixedSidebarOffset: 'auto',
+    });
+  </script>
 
 
-
-
-
-
-
-
-
-
-
-
-  
-
-  
+<script src="/js/ocean.js"></script>
 
 <script src="/live2dw/lib/L2Dwidget.min.js?0c58a1486de42ac6cc1c59c7d98ae887"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/hijiki.model.json"},"display":{"superSample":2,"width":150,"height":300,"position":"left","hOffset":0,"vOffset":-50},"mobile":{"show":true,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"tagMode":false});</script></body>
 </html>

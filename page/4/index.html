@@ -58,6 +58,73 @@
       <h1 class="page-type-title"></h1>
       
         
+          <article id="post-java-web-37" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/05/23/java-web-37/">Nacos是如何实现TCP端口测探方式检测实例是否存活</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/05/23/java-web-37/" class="article-date">
+  <time datetime="2019-05-23T21:24:19.000Z" itemprop="datePublished">2019-05-23</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/nacos/">nacos</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="如何发起健康检查"><a href="#如何发起健康检查" class="headerlink" title="如何发起健康检查"></a>如何发起健康检查</h4><p>在注册实例时，会需要带上集群信息；而集群信息在<code>nacos-server</code>端，会有相应的额外信息增加以及额外的初始化动作。其中，健康检查的设定操作如下</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Cluster</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (inited) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    checkTask = <span class="keyword">new</span> HealthCheckTask(<span class="keyword">this</span>);</span><br><span class="line">    HealthCheckReactor.scheduleCheck(checkTask);</span><br><span class="line">    inited = <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// HealthCheckTask</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">HealthCheckTask</span><span class="params">(Cluster cluster)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.cluster = cluster;</span><br><span class="line">    distroMapper = SpringContext.getAppContext().getBean(DistroMapper.class);</span><br><span class="line">    switchDomain = SpringContext.getAppContext().getBean(SwitchDomain.class);</span><br><span class="line">    healthCheckProcessor = SpringContext.getAppContext().getBean(HealthCheckProcessorDelegate.class);</span><br><span class="line">    initCheckRT();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2019/05/23/java-web-37/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/23/java-web-37/" data-id="ckaibdlz0003i16mrje92ezzh" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nacos/">nacos</a></li></ul>
+
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
           <article id="post-leetcode-24" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
     <div class="article-inner">
@@ -112,7 +179,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/21/leetcode-24/" data-id="ckagk2wly007316l9ggm1jez7" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/21/leetcode-24/" data-id="ckaibdm0y007316mr8m1ftzqh" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -178,7 +245,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/17/java-web-36/" data-id="ckagk2wk4003i16l9xz65ht39" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/17/java-web-36/" data-id="ckaibdlyw003a16mrkw5prisv" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -246,7 +313,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/10/java-web-35/" data-id="ckagk2wk2003d16l9k0f2vwlw" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/10/java-web-35/" data-id="ckaibdlyv003816mr9zi83yie" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -315,7 +382,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/09/java-web-32/" data-id="ckagk2wnl009516l97dc82o17" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/09/java-web-32/" data-id="ckaibdm25008d16mrpcffeodq" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -384,7 +451,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/09/java-web-34/" data-id="ckagk2wk1003b16l996942fxv" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/09/java-web-34/" data-id="ckaibdlyz003f16mryyehf011" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -452,7 +519,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/06/leetcode-23/" data-id="ckagk2wlx007116l9sh9itapx" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/06/leetcode-23/" data-id="ckaibdm0x007116mricbw4f4r" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -517,7 +584,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/06/java-web-33/" data-id="ckagk2wnl009616l9lvgbmr2m" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/06/java-web-33/" data-id="ckaibdm2q009916mry2p5lum7" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -582,7 +649,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/04/29/java-web-31/" data-id="ckagk2wjz003716l9mcdllaqa" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/04/29/java-web-31/" data-id="ckaibdlyn003116mrcc2extrg" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -693,81 +760,7 @@
                                                                         
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/04/28/java-web-30/" data-id="ckagk2wjy003416l9kz7uzhws" class="article-share-link">
-                                            Share
-                                        </a>
-                                        
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nacos/">nacos</a></li></ul>
-
-                                    </footer>
-
-    </div>
-
-    
-
-                
-
-</article>
-        
-          <article id="post-java-web-29" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
-
-    <div class="article-inner">
-        
-            <header class="article-header">
-                
-  
-    <h2 itemprop="name">
-      <a class="article-title" href="/2019/04/25/java-web-29/">简单分析Nacos是如何进行服务发现以及服务注册的</a>
-    </h2>
-  
-  
-
-
-
-
-            </header>
-            
-
-                
-                    <div class="article-meta">
-                        <a href="/2019/04/25/java-web-29/" class="article-date">
-  <time datetime="2019-04-25T20:19:28.000Z" itemprop="datePublished">2019-04-25</time>
-</a>
-                            
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/nacos/">nacos</a>
-  </div>
-
-                    </div>
-                    
-
-                        
-
-                                    <div class="article-entry" itemprop="articleBody">
-                                        
-
-
-                                            
-
-                                                
-                                                    <h4 id="什么是Nacos"><a href="#什么是Nacos" class="headerlink" title="什么是Nacos"></a>什么是Nacos</h4><p><strong><em>官方定义</em></strong></p>
-<blockquote>
-<p>an easy-to-use dynamic service discovery, configuration and service management platform for building cloud native applications</p>
-</blockquote>
-<p><strong><em>官网</em></strong></p>
-<blockquote>
-<p><a href="https://nacos.io/en-us/" target="_blank" rel="noopener">https://nacos.io/en-us/</a></p>
-</blockquote>
-<p><strong><em>几个重要概念</em></strong></p>
-                                                        
-                                                            <a class="article-more-link" href="/2019/04/25/java-web-29/">
-                                                                Read More...
-                                                            </a>
-                                                            
-                                                                
-                                    </div>
-                                    <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/04/25/java-web-29/" data-id="ckagk2wjx003116l91hklnidv" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/04/28/java-web-30/" data-id="ckaibdlyo003416mrgpf8j8u9" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -788,7 +781,7 @@
   
     
       <nav class="page-nav">
-        <a class="extend prev" rel="prev" href="/page/3/">Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/5/">Next</a>
+        <a class="extend prev" rel="prev" href="/page/3/">Prev</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><span class="space">&hellip;</span><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/5/">Next</a>
       </nav>
     
   </section>

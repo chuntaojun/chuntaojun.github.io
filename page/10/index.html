@@ -58,6 +58,76 @@
       <h1 class="page-type-title"></h1>
       
         
+          <article id="post-machine-learning-3" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/02/01/machine-learning-3/">机器学习之朴素贝叶斯</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2018/02/01/machine-learning-3/" class="article-date">
+  <time datetime="2018-02-01T16:50:13.000Z" itemprop="datePublished">2018-02-01</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/机器学习/">机器学习</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <p>分类算法有前面说的knn和决策树，这两个算法中，决策树是knn的优化版，因为knn算法虽然是实现分类的万金油算法，但是它的计算量太庞大；而决策树又不容易分类成功，泛化能力弱以及容易过拟合。因此，今天学习了利用概率来实现分类的入门算法——朴素贝叶斯。</p>
+<p>朴素贝叶斯最重要的就是条件概率，那么什么是条件概率？</p>
+<blockquote>
+<p>条件概率</p>
+</blockquote>
+<p>p(A|B) = p(A &amp; B) / p(B)，意思是指在B条件下发生A事件的概率；举一个例子，假设有十个小球：四个白的，六个黑的。如果都放到一个黑箱子中，取到白球的概率是2/5，取到黑球的概率是3/5；如果现在有两个箱子A.B，A箱子中有五个球：三个白球两个黑球；B箱子中有五个球：一个白球四个黑球；那么，我取到B箱子中黑球的概率是多少？这就是一个典型的条件概率事件。我们可以这样算：用B箱子中的黑球个数除以总的球数得到pa，然后在用B箱子中的总球数除以总球数得到pb，然后只需要用pa/pb就可以得出最后我们要求的概率</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pa = <span class="number">1</span> / <span class="number">10</span>; pb = <span class="number">5</span> / <span class="number">10</span>; p(黑球|B箱子) = pa / pb = <span class="number">1</span> / <span class="number">5</span>;</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2018/02/01/machine-learning-3/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/02/01/machine-learning-3/" data-id="ckaibdm28008i16mrc2rp4r2o" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
           <article id="post-leetcode-3" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
     <div class="article-inner">
@@ -112,7 +182,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/01/31/leetcode-3/" data-id="ckagk2wm8007f16l96ovjbnos" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/01/31/leetcode-3/" data-id="ckaibdm17007f16mrcfu9n870" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -183,7 +253,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/01/30/machine-learning-2/" data-id="ckagk2wmo008916l983pk5ttj" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/01/30/machine-learning-2/" data-id="ckaibdm27008f16mrshwj56xr" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -257,7 +327,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/01/29/machine-learning-1/" data-id="ckagk2wmn008716l9yxfd4ask" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/01/29/machine-learning-1/" data-id="ckaibdm24008c16mrjdsvlg8o" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -328,7 +398,7 @@ return [0, 1].
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/01/23/leetcode_2/" data-id="ckagk2wmh007w16l9fgii5t8g" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/01/23/leetcode_2/" data-id="ckaibdm1x008216mrpnne1fcd" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -392,7 +462,7 @@ return [0, 1].
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/01/20/data_struct_16/" data-id="ckagk2wie000g16l91salxokc" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/01/20/data_struct_16/" data-id="ckaibdlx6000d16mr1lt7cdwk" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -456,7 +526,7 @@ return [0, 1].
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/01/18/java_web_2/" data-id="ckagk2wlc005r16l939iak5qj" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/01/18/java_web_2/" data-id="ckaibdm09005q16mrgkihl8qg" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -524,7 +594,7 @@ return [0, 1].
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/01/09/java_web_6/" data-id="ckagk2wlg006016l9igxc2n1a" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/01/09/java_web_6/" data-id="ckaibdm0c005w16mrs8mp2390" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -596,7 +666,7 @@ return [0, 1].
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2017/12/31/deep_learning_2/" data-id="ckagk2wix001f16l91fegqc1t" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2017/12/31/deep_learning_2/" data-id="ckaibdlxv001i16mrxrb6mupq" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -668,78 +738,11 @@ return [0, 1].
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2017/12/27/deep_learning_1/" data-id="ckagk2wiv001d16l9sov0y0k8" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2017/12/27/deep_learning_1/" data-id="ckaibdlxr001a16mrgyuljela" class="article-share-link">
                                             Share
                                         </a>
                                         
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/图像识别/">图像识别</a></li></ul>
-
-                                    </footer>
-
-    </div>
-
-    
-
-                
-
-</article>
-        
-          <article id="post-data_struct_15" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
-
-    <div class="article-inner">
-        
-            <header class="article-header">
-                
-  
-    <h2 itemprop="name">
-      <a class="article-title" href="/2017/12/27/data_struct_15/">排序算法三之快速排序</a>
-    </h2>
-  
-  
-
-
-
-
-            </header>
-            
-
-                
-                    <div class="article-meta">
-                        <a href="/2017/12/27/data_struct_15/" class="article-date">
-  <time datetime="2017-12-27T01:07:14.000Z" itemprop="datePublished">2017-12-27</time>
-</a>
-                            
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/数据结构/">数据结构</a>
-  </div>
-
-                    </div>
-                    
-
-                        
-
-                                    <div class="article-entry" itemprop="articleBody">
-                                        
-
-
-                                            
-
-                                                
-                                                    <p>今天，我们要讲最后一个排序内容——快速排序，快速排序目前是用的最多的排序方法，在<a href="https://www.liaochuntao.cn/2017/12/16/data_struct_12/">排序算法一</a></p>
-<p>中我们有一张图，上面记录了快速排序的时间复杂度为O（NlogN），并且快速排序和归并排序一样是一种分治的递归算法。</p>
-                                                        
-                                                            <a class="article-more-link" href="/2017/12/27/data_struct_15/">
-                                                                Read More...
-                                                            </a>
-                                                            
-                                                                
-                                    </div>
-                                    <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2017/12/27/data_struct_15/" data-id="ckagk2wic000d16l9z3i2g2zt" class="article-share-link">
-                                            Share
-                                        </a>
-                                        
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/排序/">排序</a></li></ul>
 
                                     </footer>
 
@@ -756,7 +759,7 @@ return [0, 1].
   
     
       <nav class="page-nav">
-        <a class="extend prev" rel="prev" href="/page/9/">Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><a class="page-number" href="/page/12/">12</a><a class="extend next" rel="next" href="/page/11/">Next</a>
+        <a class="extend prev" rel="prev" href="/page/9/">Prev</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/8/">8</a><a class="page-number" href="/page/9/">9</a><span class="page-number current">10</span><a class="page-number" href="/page/11/">11</a><a class="page-number" href="/page/12/">12</a><a class="page-number" href="/page/13/">13</a><a class="extend next" rel="next" href="/page/11/">Next</a>
       </nav>
     
   </section>

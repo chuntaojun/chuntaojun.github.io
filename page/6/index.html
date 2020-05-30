@@ -58,6 +58,78 @@
       <h1 class="page-type-title"></h1>
       
         
+          <article id="post-java-web-24" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/02/27/java-web-24/">简易实现文件分块上传功能——后端代码的实现</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/02/27/java-web-24/" class="article-date">
+  <time datetime="2019-02-27T15:17:24.000Z" itemprop="datePublished">2019-02-27</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="原理解析"><a href="#原理解析" class="headerlink" title="原理解析"></a>原理解析</h4><p>面对大文件上传时，如果文件过大，不仅上传耗时长，并且后端的I/O线程将处于长时间的写文件状态，不仅拖累后端的运行，而且对于前端用户的体验也不好，如果中途失败的话，文件上传失败，不仅白白浪费时间，后端也白白浪费了线程的工作效率</p>
+<p>这个时候，就可以考虑前后端合作实现文件的分块上传，前端实现文件的切割服务，后端根据文件块进行文件块的存储、最终文件块的merge成为最终的上传文件</p>
+<p>其实原理很简单，前端将文件分块，同时对文件的内容进行MD5处理生成一个签名，在发送文件块的时候，附带几个信息</p>
+<ul>
+<li>当前文件块的chunkId</li>
+<li>总文件chunk数目</li>
+<li>原文件名</li>
+<li>文件MD5签名</li>
+</ul>
+                                                        
+                                                            <a class="article-more-link" href="/2019/02/27/java-web-24/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/02/27/java-web-24/" data-id="ckatrlg22002i16miquzy0ca2" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
           <article id="post-java-web-23" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
     <div class="article-inner">
@@ -112,7 +184,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/02/25/java-web-23/" data-id="ckatreo30002k1dpa6diwgu46" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/02/25/java-web-23/" data-id="ckatrlg21002g16miau1hq235" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -181,7 +253,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/02/21/java-web-22/" data-id="ckatreo2z002h1dpavjifcgsi" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/02/21/java-web-22/" data-id="ckatrlg20002d16miko2ksosj" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -247,7 +319,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/02/18/leetcode-18/" data-id="ckatreo5c006n1dpap9omi4i3" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/02/18/leetcode-18/" data-id="ckatrlg4a006s16mismkgu6zf" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -311,7 +383,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/02/17/leetcode-17/" data-id="ckatreo5a006l1dpa33gi2o63" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/02/17/leetcode-17/" data-id="ckatrlg48006q16miztp2958o" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -375,7 +447,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/02/16/leetcode-16/" data-id="ckatreo58006i1dpauqo78fod" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/02/16/leetcode-16/" data-id="ckatrlg47006n16mi6jbeo3st" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -446,7 +518,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/02/15/java-web-21/" data-id="ckatreo2x002f1dpatxjb32e1" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/02/15/java-web-21/" data-id="ckatrlg1y002b16misd3qj0oa" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -510,7 +582,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/02/15/leetcode-15/" data-id="ckatreo57006g1dpar2fcb7et" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/02/15/leetcode-15/" data-id="ckatrlg45006k16miypjidsvk" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -574,7 +646,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/01/06/leetcode-14/" data-id="ckatreo55006d1dpavssybube" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/01/06/leetcode-14/" data-id="ckatrlg44006g16mi36l2khgc" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -638,71 +710,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/12/30/leetcode-13/" data-id="ckatreo54006a1dpawycihh4j" class="article-share-link">
-                                            Share
-                                        </a>
-                                        
-                                    </footer>
-
-    </div>
-
-    
-
-                
-
-</article>
-        
-          <article id="post-leetcode-12" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
-
-    <div class="article-inner">
-        
-            <header class="article-header">
-                
-  
-    <h2 itemprop="name">
-      <a class="article-title" href="/2018/12/29/leetcode-12/">leeetcode回顾——Merge k Sorted Lists</a>
-    </h2>
-  
-  
-
-
-
-
-            </header>
-            
-
-                
-                    <div class="article-meta">
-                        <a href="/2018/12/29/leetcode-12/" class="article-date">
-  <time datetime="2018-12-29T12:47:03.000Z" itemprop="datePublished">2018-12-29</time>
-</a>
-                            
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/LeetCode/">LeetCode</a>
-  </div>
-
-                    </div>
-                    
-
-                        
-
-                                    <div class="article-entry" itemprop="articleBody">
-                                        
-
-
-                                            
-
-                                                
-                                                    <h4 id="题目"><a href="#题目" class="headerlink" title="题目"></a>题目</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">合并 k 个排序链表，返回合并后的排序链表。请分析和描述算法的复杂度。</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line"></span><br><span class="line">输入:</span><br><span class="line">[</span><br><span class="line">  1-&gt;4-&gt;5,</span><br><span class="line">  1-&gt;3-&gt;4,</span><br><span class="line">  2-&gt;6</span><br><span class="line">]</span><br><span class="line">输出: 1-&gt;1-&gt;2-&gt;3-&gt;4-&gt;4-&gt;5-&gt;6</span><br></pre></td></tr></table></figure>
-                                                        
-                                                            <a class="article-more-link" href="/2018/12/29/leetcode-12/">
-                                                                Read More...
-                                                            </a>
-                                                            
-                                                                
-                                    </div>
-                                    <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/12/29/leetcode-12/" data-id="ckatreo5300671dpasiegclta" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/12/30/leetcode-13/" data-id="ckatrlg43006d16mit0ms3vwe" class="article-share-link">
                                             Share
                                         </a>
                                         

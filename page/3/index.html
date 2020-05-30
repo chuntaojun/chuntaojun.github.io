@@ -58,6 +58,74 @@
       <h1 class="page-type-title"></h1>
       
         
+          <article id="post-java-web-46" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/06/21/java-web-46/">Netty是如何解决Java epoll中的BUG的</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/06/21/java-web-46/" class="article-date">
+  <time datetime="2019-06-21T08:32:45.000Z" itemprop="datePublished">2019-06-21</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="问题的由来"><a href="#问题的由来" class="headerlink" title="问题的由来"></a>问题的由来</h4><p>在Java原生使用<code>NIO(epoll)</code>中，会存在一个著名的<code>bug</code>——<code>epoll</code>空轮训导致CPU出现100%的情况出现</p>
+<h4 id="Netty是如何解决这个问题的"><a href="#Netty是如何解决这个问题的" class="headerlink" title="Netty是如何解决这个问题的"></a>Netty是如何解决这个问题的</h4><p>这里需要深入跟踪一下<code>NioEventLoop</code>类的实现</p>
+<h5 id="静态代码块"><a href="#静态代码块" class="headerlink" title="静态代码块"></a>静态代码块</h5>
+                                                        
+                                                            <a class="article-more-link" href="/2019/06/21/java-web-46/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/06/21/java-web-46/" data-id="ckatrlg32004816mi294bamhn" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/netty/">netty</a></li></ul>
+
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
           <article id="post-java-web-45" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
     <div class="article-inner">
@@ -109,7 +177,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/06/11/java-web-45/" data-id="ckatreo4100491dpao8q51fu1" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/06/11/java-web-45/" data-id="ckatrlg31004516mim17guf87" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -175,7 +243,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/06/09/java-web-43/" data-id="ckatreo3y00431dpaoxchtcl6" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/06/09/java-web-43/" data-id="ckatrlg2y003z16mi6ejkmgb7" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -242,7 +310,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/06/09/java-web-44/" data-id="ckatreo4000461dpa4ghvr14j" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/06/09/java-web-44/" data-id="ckatrlg2z004216miruu9mws5" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -311,7 +379,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/06/03/java-web-42/" data-id="ckatreo3v003x1dpabvp3rda4" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/06/03/java-web-42/" data-id="ckatrlg2v003t16mii9q4bwoq" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -379,7 +447,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/06/01/java-web-41/" data-id="ckatreo3x00401dpa383sfu92" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/06/01/java-web-41/" data-id="ckatrlg2w003w16mibszwxe98" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -456,7 +524,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/30/java-web-40/" data-id="ckatreo3s003r1dpa3caaqqoe" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/30/java-web-40/" data-id="ckatrlg2t003q16miolyd47jt" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -521,7 +589,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/30/leetcode-26/" data-id="ckatreo5o00731dpaq15vnavi" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/30/leetcode-26/" data-id="ckatrlg4l007816mi0kfovr1g" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -587,7 +655,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/29/java-web-39/" data-id="ckatreo3t003u1dpakzdktg3u" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/29/java-web-39/" data-id="ckatrlg2p003i16mi89ht289j" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -672,85 +740,10 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/28/leetcode-25/" data-id="ckatreo5n00711dpaeyjlhdiy" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/28/leetcode-25/" data-id="ckatrlg4j007616miil4vgsif" class="article-share-link">
                                             Share
                                         </a>
                                         
-                                    </footer>
-
-    </div>
-
-    
-
-                
-
-</article>
-        
-          <article id="post-java-web-38" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
-
-    <div class="article-inner">
-        
-            <header class="article-header">
-                
-  
-    <h2 itemprop="name">
-      <a class="article-title" href="/2019/05/26/java-web-38/">Nacos-Server 集群之配置中心</a>
-    </h2>
-  
-  
-
-
-
-
-            </header>
-            
-
-                
-                    <div class="article-meta">
-                        <a href="/2019/05/26/java-web-38/" class="article-date">
-  <time datetime="2019-05-26T22:40:57.000Z" itemprop="datePublished">2019-05-26</time>
-</a>
-                            
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/nacos/">nacos</a>
-  </div>
-
-                    </div>
-                    
-
-                        
-
-                                    <div class="article-entry" itemprop="articleBody">
-                                        
-
-
-                                            
-
-                                                
-                                                    <h4 id="如何实现配置在集群间同步的？"><a href="#如何实现配置在集群间同步的？" class="headerlink" title="如何实现配置在集群间同步的？"></a>如何实现配置在集群间同步的？</h4><h5 id="前提步骤"><a href="#前提步骤" class="headerlink" title="前提步骤"></a>前提步骤</h5><ul>
-<li>部署<code>MySQL</code>，并执行<code>sql</code>脚本创建<code>nacos schema</code></li>
-<li>参照官网的<code>nacos</code>集群部署指南——<a href="https://nacos.io/zh-cn/docs/cluster-mode-quick-start.html" target="_blank" rel="noopener">nacos 集群部署指南</a></li>
-<li>启动<code>nacos</code>集群</li>
-</ul>
-<h5 id="开始设置"><a href="#开始设置" class="headerlink" title="开始设置"></a>开始设置</h5><ul>
-<li>在集群中任意登陆一台<code>nacos server</code>节点，然后创建配置</li>
-<li>再次登陆其余节点，会发现配置信息已经同步到其余的节点中了</li>
-</ul>
-<h5 id="配置信息如何在集群间同步？"><a href="#配置信息如何在集群间同步？" class="headerlink" title="配置信息如何在集群间同步？"></a>配置信息如何在集群间同步？</h5>
-                                                        
-                                                            <a class="article-more-link" href="/2019/05/26/java-web-38/">
-                                                                Read More...
-                                                            </a>
-                                                            
-                                                                
-                                    </div>
-                                    <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/26/java-web-38/" data-id="ckatreo3p003m1dpatycs04oj" class="article-share-link">
-                                            Share
-                                        </a>
-                                        
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nacos/">nacos</a></li></ul>
-
                                     </footer>
 
     </div>

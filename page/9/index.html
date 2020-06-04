@@ -58,6 +58,75 @@
       <h1 class="page-type-title"></h1>
       
         
+          <article id="post-java-web-8" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/05/04/java-web-8/">SpringBoot集成SpringSecurity Oauth2</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2018/05/04/java-web-8/" class="article-date">
+  <time datetime="2018-05-04T14:25:24.000Z" itemprop="datePublished">2018-05-04</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <blockquote>
+<p>前期准备</p>
+</blockquote>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">buildscript</span> &#123;</span><br><span class="line">    ext &#123;</span><br><span class="line">        springBootVersion = <span class="string">'1.5.13.BUILD-SNAPSHOT'</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">repositories</span> &#123;</span><br><span class="line">        mavenCentral()</span><br><span class="line">        maven &#123; url <span class="string">"https://repo.spring.io/snapshot"</span> &#125;</span><br><span class="line">        maven &#123; url <span class="string">"https://repo.spring.io/milestone"</span> &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">dependencies</span> &#123;</span><br><span class="line">        <span class="keyword">classpath</span>(<span class="string">"org.springframework.boot:spring-boot-gradle-plugin:$&#123;springBootVersion&#125;"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">apply plugin: <span class="string">'java'</span></span><br><span class="line">apply plugin: <span class="string">'eclipse'</span></span><br><span class="line">apply plugin: <span class="string">'org.springframework.boot'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">group</span> = <span class="string">'com.example'</span></span><br><span class="line">version = <span class="string">'0.0.1-SNAPSHOT'</span></span><br><span class="line"><span class="keyword">sourceCompatibility</span> = <span class="number">1.8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">repositories</span> &#123;</span><br><span class="line">    mavenCentral()</span><br><span class="line">    maven &#123; url <span class="string">"https://repo.spring.io/snapshot"</span> &#125;</span><br><span class="line">    maven &#123; url <span class="string">"https://repo.spring.io/milestone"</span> &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">dependencies</span> &#123;</span><br><span class="line">    <span class="keyword">compile</span>(<span class="string">'org.springframework.boot:spring-boot-starter-data-redis'</span>)</span><br><span class="line">    <span class="keyword">compile</span>(<span class="string">'org.springframework.boot:spring-boot-starter-security'</span>)</span><br><span class="line">    <span class="keyword">compile</span>(<span class="string">'org.springframework.boot:spring-boot-starter-web'</span>)</span><br><span class="line">    <span class="keyword">compile</span>(<span class="string">'org.mybatis.spring.boot:mybatis-spring-boot-starter:1.3.2'</span>)</span><br><span class="line">    <span class="keyword">compile</span>(<span class="string">'org.springframework.security.oauth:spring-security-oauth2'</span>)</span><br><span class="line">    <span class="keyword">runtime</span>(<span class="string">'mysql:mysql-connector-java'</span>)</span><br><span class="line">    compileOnly(<span class="string">'org.projectlombok:lombok'</span>)</span><br><span class="line">    testCompile(<span class="string">'org.springframework.boot:spring-boot-starter-test'</span>)</span><br><span class="line">    testCompile(<span class="string">'org.springframework.restdocs:spring-restdocs-mockmvc'</span>)</span><br><span class="line">    testCompile(<span class="string">'org.springframework.security:spring-security-test'</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2018/05/04/java-web-8/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/05/04/java-web-8/" data-id="ckb0yq1c5005l16rlxl3sma30" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring/">Spring</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SpringSecurity-Oauth/">SpringSecurity Oauth</a></li></ul>
+
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
           <article id="post-deep-learning-6" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
     <div class="article-inner">
@@ -113,7 +182,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/04/13/deep-learning-6/" data-id="ckatrou0k001816rszm4yhf9i" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/04/13/deep-learning-6/" data-id="ckb0yq19b001716rla1cr75x5" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -177,7 +246,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/04/07/deep-learning-4/" data-id="ckatrou0j001516rsb6e1mipk" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/04/07/deep-learning-4/" data-id="ckb0yq19a001416rlw0s7r71i" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -247,7 +316,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/04/07/machine-learning-7/" data-id="ckatrou4m008x16rsg19g8i0l" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/04/07/machine-learning-7/" data-id="ckb0yq1eh008y16rlgysjpwvj" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -311,7 +380,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/04/01/java-web-7/" data-id="ckatrou2o005h16rshdr2c6xf" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/04/01/java-web-7/" data-id="ckb0yq1c2005e16rlgdxygcsm" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -382,7 +451,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/03/31/linux-4/" data-id="ckatrou3v008316rskc0e3mux" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/03/31/linux-4/" data-id="ckb0yq1e3008c16rldd0wo7rj" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -450,7 +519,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/03/29/leetcode-4/" data-id="ckatrou3l007j16rs91b63n43" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/03/29/leetcode-4/" data-id="ckb0yq1d9007l16rl929edxg3" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -519,7 +588,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/03/15/linux-3/" data-id="ckatrou3u008016rsb8z1yf81" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/03/15/linux-3/" data-id="ckb0yq1e2008a16rl06wgy65q" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -586,7 +655,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/02/26/machine-learning-6/" data-id="ckatrou4k008w16rsqvcz3bl3" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/02/26/machine-learning-6/" data-id="ckb0yq1eg008w16rlkw7eysel" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -655,78 +724,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/02/16/machine-learning-5/" data-id="ckatrou4j008u16rstbdkmryw" class="article-share-link">
-                                            Share
-                                        </a>
-                                        
-                                    </footer>
-
-    </div>
-
-    
-
-                
-
-</article>
-        
-          <article id="post-deep-learning-3" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
-
-    <div class="article-inner">
-        
-            <header class="article-header">
-                
-  
-    <h2 itemprop="name">
-      <a class="article-title" href="/2018/02/09/deep-learning-3/">记一次竞赛题目有感——根据姓名预测男女性别</a>
-    </h2>
-  
-  
-
-
-
-
-            </header>
-            
-
-                
-                    <div class="article-meta">
-                        <a href="/2018/02/09/deep-learning-3/" class="article-date">
-  <time datetime="2018-02-09T16:29:14.000Z" itemprop="datePublished">2018-02-09</time>
-</a>
-                            
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/深度学习/">深度学习</a>
-  </div>
-
-                    </div>
-                    
-
-                        
-
-                                    <div class="article-entry" itemprop="articleBody">
-                                        
-
-
-                                            
-
-                                                
-                                                    <blockquote>
-<p>比赛连接 sofasofa.io</p>
-</blockquote>
-<p><a href="http://sofasofa.io/competition.php?id=3" target="_blank" rel="noopener">根据姓名预测男女性别</a></p>
-<p>今天尝试着做了一道机器学习题——根据姓名预测男女性别。这道题目其实算法就是二分类的题目，这类算法很多，比如knn近邻算法，决策树，svm向量机等等；传统的机器学习算法可以达到百分之七十到百分之八十五之间，我想能不能用深度学习来做一下看看能达到多高的accuracy率。</p>
-<blockquote>
-<p>我们每天会接触不同的人，有热情的面孔，也有冰冷的名片。作为一个说着中国话的中国人，我们有着常年累月的积累和对文字的理解，通过名字判断（猜测）性别，并非难事。可是，对于一个冰冷的机器，它能够根据名字判断性别吗？这个练习赛就是根据中文名字（姓已经省略），判断性别 </p>
-</blockquote>
-                                                        
-                                                            <a class="article-more-link" href="/2018/02/09/deep-learning-3/">
-                                                                Read More...
-                                                            </a>
-                                                            
-                                                                
-                                    </div>
-                                    <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/02/09/deep-learning-3/" data-id="ckatrou0i001316rshp50p8h4" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/02/16/machine-learning-5/" data-id="ckb0yq1ee008t16rl1owwgg8w" class="article-share-link">
                                             Share
                                         </a>
                                         

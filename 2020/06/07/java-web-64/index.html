@@ -76,6 +76,7 @@
                                                 
                                                                     <h3 id="DNS协议"><a href="#DNS协议" class="headerlink" title="DNS协议"></a>DNS协议</h3><p><code>DNS</code>协议其本身就是一个天然的分布式服务发现中心，通过域名映射IP，用户只需要记住域名即可访问对应的服务。</p>
 <p>纵观<code>Nacos</code>、<code>Eureka</code>、<code>Etcd</code>以及<code>Zookeeper</code>，这些充当服务发现中心的组件，其都需要一个<code>Client-SDK</code>为上层应用提供根据服务名查找到一个机器IP的能力，而这就带来了一个问题，应用必须要集成这一些组件的客户端SDK，一旦组件的SDK出现问题需要升级时，就需要推动应用方的升级，这是不想见到的。而DNS协议，天然跨语言，因此<code>Consul</code>或者<code>Kubernetes</code>都选择使用<code>DNS</code>协议作为服务发现，直接解决了跨语言的问题。</p>
+<a id="more"></a>
 <h3 id="Nacos的DNS"><a href="#Nacos的DNS" class="headerlink" title="Nacos的DNS"></a>Nacos的DNS</h3><blockquote>
 <p>官网介绍</p>
 </blockquote>
@@ -101,7 +102,7 @@
                                                                         
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2020/06/07/java-web-64/" data-id="ckbai2qec005o16olqoyp6lje" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2020/06/07/java-web-64/" data-id="ckbaiggv3005k16qywe7ovr0b" class="article-share-link">
                                             Share
                                         </a>
                                         

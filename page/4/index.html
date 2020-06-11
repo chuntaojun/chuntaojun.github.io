@@ -58,6 +58,74 @@
       <h1 class="page-type-title"></h1>
       
         
+          <article id="post-java-web-39" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2019/05/29/java-web-39/">记一次Nacos的issue问题解决之并发导致的NPE异常</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2019/05/29/java-web-39/" class="article-date">
+  <time datetime="2019-05-29T17:54:13.000Z" itemprop="datePublished">2019-05-29</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="ISSUE"><a href="#ISSUE" class="headerlink" title="ISSUE"></a>ISSUE</h4><p><a href="https://github.com/nacos-group/nacos-spring-boot-project/issues/21" target="_blank" rel="noopener">Spring boot 应用启动被终止 #21</a></p>
+<h4 id="错误分析"><a href="#错误分析" class="headerlink" title="错误分析"></a>错误分析</h4><p><code>DeferredApplicationEventPublisher</code>的继承关系</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationEvent;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationEventPublisher;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ApplicationListener;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.ConfigurableApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.event.ContextRefreshedEvent;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DeferredApplicationEventPublisher</span> <span class="keyword">implements</span> <span class="title">ApplicationEventPublisher</span>, <span class="title">ApplicationListener</span>&lt;<span class="title">ContextRefreshedEvent</span>&gt; </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+                                                        
+                                                            <a class="article-more-link" href="/2019/05/29/java-web-39/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/29/java-web-39/" data-id="ckbai2qd5003n16olgbag3f33" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nacos/">nacos</a></li></ul>
+
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
           <article id="post-leetcode-25" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
     <div class="article-inner">
@@ -127,7 +195,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/28/leetcode-25/" data-id="ckb1j91ef007a16quh6hs9q9q" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/28/leetcode-25/" data-id="ckbai2qfd007h16olwjkex1k4" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -200,7 +268,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/26/java-web-38/" data-id="ckb1j91cc003m16qut3mhbr1v" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/26/java-web-38/" data-id="ckbai2qd2003i16oll90f9nxo" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -267,7 +335,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/23/java-web-37/" data-id="ckb1j91c6003f16qug9ryj3r6" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/23/java-web-37/" data-id="ckbai2qd0003f16olftmfw7u4" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -337,7 +405,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/21/leetcode-24/" data-id="ckb1j91ee007816quwv5gxxp6" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/21/leetcode-24/" data-id="ckbai2qfc007f16olojyejzv2" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -403,7 +471,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/17/java-web-36/" data-id="ckb1j91c3003a16quce2j25gi" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/17/java-web-36/" data-id="ckbai2qcx003a16olwkgn1u6p" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -471,7 +539,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/10/java-web-35/" data-id="ckb1j91c0003416qufolysuzd" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/10/java-web-35/" data-id="ckbai2qcw003816olfqq3vsjh" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -540,7 +608,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/09/java-web-32/" data-id="ckb1j91gh009h16qu31mlho0i" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/09/java-web-32/" data-id="ckbai2qha009k16olp0hsgrkd" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -609,7 +677,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/09/java-web-34/" data-id="ckb1j91gd009g16qunckouw7y" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/09/java-web-34/" data-id="ckbai2qhb009l16olj7hb6qcd" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -677,72 +745,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/06/leetcode-23/" data-id="ckb1j91ea007416qujdz4hex5" class="article-share-link">
-                                            Share
-                                        </a>
-                                        
-                                    </footer>
-
-    </div>
-
-    
-
-                
-
-</article>
-        
-          <article id="post-java-web-33" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
-
-    <div class="article-inner">
-        
-            <header class="article-header">
-                
-  
-    <h2 itemprop="name">
-      <a class="article-title" href="/2019/05/06/java-web-33/">从浏览器请求到WebApplication响应“hello world”的过程是什么</a>
-    </h2>
-  
-  
-
-
-
-
-            </header>
-            
-
-                
-                    <div class="article-meta">
-                        <a href="/2019/05/06/java-web-33/" class="article-date">
-  <time datetime="2019-05-06T11:08:18.000Z" itemprop="datePublished">2019-05-06</time>
-</a>
-                            
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java-web/">java-web</a>
-  </div>
-
-                    </div>
-                    
-
-                        
-
-                                    <div class="article-entry" itemprop="articleBody">
-                                        
-
-
-                                            
-
-                                                
-                                                    <h4 id="前话"><a href="#前话" class="headerlink" title="前话"></a>前话</h4><p>在编写<code>SpringBoot Web</code>程序完后，运行这个<code>web</code>程序，然后用<code>http</code>请求工具发送请求，然后程序对应的请求处理器就会执行相应的操作；那么，这个<code>http</code>请求是如何被<code>web</code>程序所接受的，又是如何路由到我们对应的<code>http handler</code>上的？</p>
-<h4 id="Web容器"><a href="#Web容器" class="headerlink" title="Web容器"></a>Web容器</h4><p>在使用<code>SpringBoot</code>有一大好处——再也不用外部的<code>web</code>容器了，它自身整合了目前流行的几大<code>web</code>容器，当然你也可以实现自己的<code>web</code>容器</p>
-                                                        
-                                                            <a class="article-more-link" href="/2019/05/06/java-web-33/">
-                                                                Read More...
-                                                            </a>
-                                                            
-                                                                
-                                    </div>
-                                    <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2019/05/06/java-web-33/" data-id="ckb1j91fg008616quf3lfnjpw" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2019/05/06/leetcode-23/" data-id="ckbai2qf9007b16ol3q2ii8td" class="article-share-link">
                                             Share
                                         </a>
                                         

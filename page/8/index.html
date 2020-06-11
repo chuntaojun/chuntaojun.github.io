@@ -58,6 +58,71 @@
       <h1 class="page-type-title"></h1>
       
         
+          <article id="post-java-web-19" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
+
+    <div class="article-inner">
+        
+            <header class="article-header">
+                
+  
+    <h2 itemprop="name">
+      <a class="article-title" href="/2018/11/29/java-web-19/">利用AOP编程实现springboot多数据源的切换</a>
+    </h2>
+  
+  
+
+
+
+
+            </header>
+            
+
+                
+                    <div class="article-meta">
+                        <a href="/2018/11/29/java-web-19/" class="article-date">
+  <time datetime="2018-11-29T15:14:39.000Z" itemprop="datePublished">2018-11-29</time>
+</a>
+                            
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/java-web/">java-web</a>
+  </div>
+
+                    </div>
+                    
+
+                        
+
+                                    <div class="article-entry" itemprop="articleBody">
+                                        
+
+
+                                            
+
+                                                
+                                                    <h4 id="为什么需要多数据源切换"><a href="#为什么需要多数据源切换" class="headerlink" title="为什么需要多数据源切换"></a>为什么需要多数据源切换</h4><p>在正式的、较大的项目中，很少会只有一个数据库的，至少都会有一个主数据库和一个从数据库，从数据库作为数据备份以及数据读取，而主库作为数据写入；因此就产生了一个问题——如何在项目中做到数据源的切换，如何根据操作进行数据库主从的切换。</p>
+<h4 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h4><p>在利用springboot集成mybatis的时候，mybatis的sessionFactory由springboot进行创建，而sessionFactory由依赖于数据库连接，因此，首先就是需要解决数据源的问题，这里，利用springboot的注入功能，去注入三个DataSource的bean——<code>masterDataSource</code>、<code>slaveDataSource</code>以及<code>dynamicDataSource</code>，而<code>dynamicDataSource</code>这个我们需要加上<code>@Primary</code>注解，表明这个是优先注入的DataSource对象</p>
+                                                        
+                                                            <a class="article-more-link" href="/2018/11/29/java-web-19/">
+                                                                Read More...
+                                                            </a>
+                                                            
+                                                                
+                                    </div>
+                                    <footer class="article-footer">
+                                        <a data-url="https://www.liaochuntao.cn/2018/11/29/java-web-19/" data-id="ckbai2qc1002116ol247uyd8f" class="article-share-link">
+                                            Share
+                                        </a>
+                                        
+                                    </footer>
+
+    </div>
+
+    
+
+                
+
+</article>
+        
           <article id="post-java-web-17" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
 
     <div class="article-inner">
@@ -109,7 +174,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/11/19/java-web-17/" data-id="ckb1j91b6002016quk0fitjlg" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/11/19/java-web-17/" data-id="ckbai2qc3002516olf5d7wt9y" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -176,7 +241,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/11/06/java-web-16/" data-id="ckb1j91b2001u16qujfdb2wkl" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/11/06/java-web-16/" data-id="ckbai2qc0001z16olu694rxjm" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -231,7 +296,7 @@
                                                                         
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/10/13/home/" data-id="ckb1j91aq001c16qutau3vszk" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/10/13/home/" data-id="ckbai2qbn001c16olii5uoo9w" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -297,7 +362,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/10/13/java-web-14/" data-id="ckb1j91b1001s16qu2yvg4pwl" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/10/13/java-web-14/" data-id="ckbai2qby001v16olqmm5gbp3" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -363,7 +428,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/09/16/java-web-13/" data-id="ckb1j91az001p16quk761mxri" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/09/16/java-web-13/" data-id="ckbai2qbv001p16olbtym2ti6" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -432,7 +497,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/09/12/leetcode-5/" data-id="ckb1j91eq007q16quz1m24xwt" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/09/12/leetcode-5/" data-id="ckbai2qfn007v16olugrszcsf" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -496,7 +561,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/09/09/java-web-12/" data-id="ckb1j91ax001l16quhz1t44gj" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/09/09/java-web-12/" data-id="ckbai2qbw001s16ole9flc23l" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -564,7 +629,7 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/09/08/java-web-9/" data-id="ckb1j91dj005n16quu2z50rkh" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/09/08/java-web-9/" data-id="ckbai2qef005u16olrrk6wma1" class="article-share-link">
                                             Share
                                         </a>
                                         
@@ -634,77 +699,11 @@
                                                                 
                                     </div>
                                     <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/06/15/java-web-11/" data-id="ckb1j91av001i16qu9wav6y9l" class="article-share-link">
+                                        <a data-url="https://www.liaochuntao.cn/2018/06/15/java-web-11/" data-id="ckbai2qbt001l16olmw6qw8t9" class="article-share-link">
                                             Share
                                         </a>
                                         
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/spring/">spring</a></li></ul>
-
-                                    </footer>
-
-    </div>
-
-    
-
-                
-
-</article>
-        
-          <article id="post-java-web-10" class="article article-type-post" itemscope itemprop="blogPost" data-scroll-reveal>
-
-    <div class="article-inner">
-        
-            <header class="article-header">
-                
-  
-    <h2 itemprop="name">
-      <a class="article-title" href="/2018/05/26/java-web-10/">solr快速搭建</a>
-    </h2>
-  
-  
-
-
-
-
-            </header>
-            
-
-                
-                    <div class="article-meta">
-                        <a href="/2018/05/26/java-web-10/" class="article-date">
-  <time datetime="2018-05-26T17:30:02.000Z" itemprop="datePublished">2018-05-26</time>
-</a>
-                            
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/java-web/">java-web</a>
-  </div>
-
-                    </div>
-                    
-
-                        
-
-                                    <div class="article-entry" itemprop="articleBody">
-                                        
-
-
-                                            
-
-                                                
-                                                    <h4 id="什么是solr"><a href="#什么是solr" class="headerlink" title="什么是solr"></a>什么是solr</h4><h3 id="引用于维基百科"><a href="#引用于维基百科" class="headerlink" title="引用于维基百科"></a>引用于维基百科</h3><p>开发者    Apache软件基金会<br>稳定版本<br>6.6.0 （2017年6月6日，​11个月前 ）<br>开发状态    活跃<br>编程语言    Java<br>操作系统    跨平台<br>类型    企业搜索服务器软件<br>许可协议    Apache许可证 2.0<br>网站    lucene.apache.org/solr/<br>源代码库    git.apache.org/lucene-solr.git<br>Solr（读作“solar”）是Apache Lucene项目的开源企业搜索平台。其主要功能包括全文检索、命中标示[1]、分面搜索、动态聚类、数据库集成，以及富文本（如Word、PDF）的处理。Solr是高度可扩展的，并提供了分布式搜索和索引复制。Solr是最流行的企业级搜索引擎，[2]Solr 4还增加了NoSQL支持。[3]<br>Solr是用Java编写、运行在Servlet容器（如Apache Tomcat或Jetty）的一个独立的全文搜索服务器。 Solr采用了Lucene Java搜索库为核心的全文索引和搜索，并具有类似REST的HTTP/XML和JSON的API。 Solr强大的外部配置功能使得无需进行Java编码，便可对其进行调整以适应多种类型的应用程序。Solr有一个插件架构，以支持更多的高级定制。<br>因为2010年Apache Lucene和Apache Solr项目合并，两个项目是由同一个Apache软件基金会开发团队制作实现的。提到技术或产品时，Lucene/Solr或Solr/Lucene是一样的。</p>
-                                                        
-                                                            <a class="article-more-link" href="/2018/05/26/java-web-10/">
-                                                                Read More...
-                                                            </a>
-                                                            
-                                                                
-                                    </div>
-                                    <footer class="article-footer">
-                                        <a data-url="https://www.liaochuntao.cn/2018/05/26/java-web-10/" data-id="ckb1j91at001g16quefpkz2i4" class="article-share-link">
-                                            Share
-                                        </a>
-                                        
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/solr/">solr</a></li></ul>
 
                                     </footer>
 
